@@ -1,0 +1,354 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>課程分類系統</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Banner 樣式 */
+        .banner {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 10px 10px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .banner h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .banner p {
+            font-size: 1.5rem;
+            opacity: 0.9;
+        }
+        
+        /* 標籤分類樣式 */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 2px;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background-color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
+            white-space: nowrap;
+ font-size: 1.5em;
+
+        }
+        
+        .tab:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .tab.active {
+            background-color: #4a6cf7;
+            color: white;
+            border-color: #3b5be3;
+        }
+        
+        /* 內容單元樣式 */
+        .units {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+        
+        .unit {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 15px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 140px;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .unit:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .unit-icon {
+            font-size: 2.4rem;
+            margin-bottom: 12px;
+            color: #F0F;
+        }
+        
+        .unit h3 {
+           
+            font-size: 1.5em;
+            color: #00F;
+            line-height: 1.3;
+        }
+        
+        /* 回應式設計 */
+        @media (max-width: 1200px) {
+            .units {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .units {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .banner h1 {
+                font-size: 2rem;
+            }
+            
+            .banner p {
+                font-size: 1rem;
+            }
+            
+            .tabs {
+                flex-direction: row;
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding-bottom: 10px;
+                margin-bottom: 20px;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+            
+            .tabs::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .tab {
+                flex: 0 0 auto;
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .units {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+            }
+            
+            .unit {
+                padding: 15px 10px;
+                min-height: 120px;
+            }
+            
+            .unit-icon {
+                font-size: 1.8rem;
+                margin-bottom: 8px;
+            }
+            
+            .unit h3 {
+                font-size: 1.2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .banner {
+                padding: 20px 15px;
+            }
+            
+            .units {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2px;
+            }
+            
+            .unit {
+                min-height: 110px;
+                padding: 2px 2px;
+            }
+            
+            .unit-icon {
+                font-size: 2.6rem;
+            }
+            
+            .unit h3 {
+                font-size: 1.2rem;
+            }
+        }
+        
+        /* 頁腳樣式 */
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* 動畫效果 */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Banner -->
+        <div class="banner">
+            <h1>國文閱讀課程平臺</h1>
+        </div>
+        
+        <!-- 工作表標籤分類 -->
+        <div class="tabs">
+            <div class="tab active" data-category="work">第１冊</div>
+            <div class="tab" data-category="design">第２冊</div>
+            <div class="tab" data-category="data">第３冊</div>
+            <div class="tab" data-category="doc">第４冊</div>
+            <div class="tab" data-category="project">第５冊</div>
+        </div>
+        
+        <!-- 內容單元 -->
+        <div class="units" id="course-container">
+            <!-- 課程內容由JavaScript動態生成 -->
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2023 課程平臺 - 所有權利保留</p>
+    </footer>
+
+    <script>
+        // 課程數據
+        const courses = {
+            work: [
+{icon: 'fas fa-chart-bar', title: '1.晏子春秋．諫上', url: 'chi-001.htm'},
+{icon: 'fas fa-database', title: '2.外儲說右下', url: 'chi-002.htm'},
+{icon: 'fas fa-signal', title: '3.夢渓筆談', url: 'chi-003.htm'},
+{icon: 'fas fa-calculator', title: '4.左傳．隱公六年', url: 'chi-004.htm'},
+{icon: 'fas fa-brain', title: '5.莊子.秋水', url: 'chi-005.htm'},
+{icon: 'fas fa-project-diagram', title: '6.古今譚慨', url: 'chi-006.htm'},
+{icon: 'fas fa-chart-bar', title: '7.哀江頭', url: 'chi-007.htm'},
+{icon: 'fas fa-database', title: '8.豔歌行', url: 'chi-008.htm'},
+{icon: 'fas fa-signal', title: '9.史記、項羽本紀贊', url: 'chi-009.htm'},
+],
+            design: [
+                { icon: 'fas fa-paint-brush', title: 'UI設計入門', url: '5.htm' },
+                { icon: 'fas fa-palette', title: '色彩理論應用', url: '6.htm' },
+                { icon: 'fas fa-vector-square', title: '向量圖形設計', url: '7.htm' }
+            ],
+            data: [
+                { icon: 'fas fa-chart-bar', title: 'Excel高級分析', url: '8.htm' },
+                { icon: 'fas fa-database', title: 'SQL資料庫管理', url: '9.htm' },
+                { icon: 'fas fa-signal', title: '數據視覺化', url: '10.htm' },
+                { icon: 'fas fa-calculator', title: '統計分析方法', url: '11.htm' },
+                { icon: 'fas fa-brain', title: '機器學習基礎', url: '12.htm' },
+                { icon: 'fas fa-project-diagram', title: '資料採擷技術', url: '13.htm' }
+            ],
+            doc: [
+                { icon: 'fas fa-file-word', title: '專業文檔編寫', url: '14.htm' },
+                { icon: 'fas fa-share-alt', title: '即時協作技巧', url: '15.htm' },
+                { icon: 'fas fa-cloud', title: '雲文檔管理', url: '16.htm' }
+            ],
+            project: [
+                { icon: 'fas fa-tasks', title: '敏捷開發方法', url: '17.htm' },
+                { icon: 'fas fa-calendar', title: '專案排期規劃', url: '18.htm' },
+                { icon: 'fas fa-money-bill-wave', title: '專案預算管理', url: '19.htm' },
+                { icon: 'fas fa-user-friends', title: '團隊資源配置', url: '20.htm' },
+                { icon: 'fas fa-chart-pie', title: '專案進度跟蹤', url: '21.htm' },
+                { icon: 'fas fa-flag-checkered', title: '專案風險管理', url: '22.htm' }
+            ]
+        };
+
+        // 獲取DOM元素
+        const tabs = document.querySelectorAll('.tab');
+        const courseContainer = document.getElementById('course-container');
+        
+        // 初始載入工作區課程
+        renderCourses('work');
+        
+        // 標籤切換功能
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有active類
+                tabs.forEach(t => t.classList.remove('active'));
+                // 為當前點擊的標籤添加active類
+                tab.classList.add('active');
+                
+                // 獲取分類並渲染課程
+                const category = tab.getAttribute('data-category');
+                renderCourses(category);
+            });
+        });
+        
+        // 渲染課程函數
+        function renderCourses(category) {
+            // 清空容器
+            courseContainer.innerHTML = '';
+            
+            // 獲取當前分類的課程
+            const categoryCourses = courses[category];
+            
+            // 創建課程元素
+            categoryCourses.forEach(course => {
+                const unitLink = document.createElement('a');
+                unitLink.className = 'unit fade-in';
+                unitLink.href = course.url;
+                unitLink.target = "_self"; // 在新標籤頁打開
+                
+                unitLink.innerHTML = `
+                    <div class="unit-icon">
+                        <i class="${course.icon}"></i>
+                    </div>
+                    <h3>${course.title}</h3>
+                `;
+                
+                courseContainer.appendChild(unitLink);
+            });
+        }
+    </script>
+</body>
+</html>
