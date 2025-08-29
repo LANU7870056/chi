@@ -131,68 +131,67 @@
         }
 
         function showWrongAnswers() {
-            wrongAnswersList.innerHTML = '';
-            let wrongCount = 0;
-            
-            selectedQuestions.forEach(question => {
-                if (question.userAnswer !== question.ans) {
-                    wrongCount++;
-                    const formattedText = formatQuestionText(question.item);
-                    const wrongAnswerItem = document.createElement('div');
-                    wrongAnswerItem.className = 'wrong-answer-item';
-                    wrongAnswerItem.innerHTML = `
-                        <div class="wrong-answer-title">第${question.questionNumber}題</div>
-                        <p>${formattedText}</p>
-                        <p>您的答案: <span class="incorrect">${question.userAnswer || '未作答'}</span></p>
-                        <p>正確答案: <span class="correct">${question.ans}</span></p>
-                        ${question.tea ? `<p class="explanation">解析: ${question.tea}</p>` : ''}
-                    `;
-                    wrongAnswersList.appendChild(wrongAnswerItem);
-                }
-            });
-            
-            if (wrongCount === 0) {
-                wrongAnswersList.innerHTML = '<p>恭喜您！沒有答錯的題目。</p>';
-            }
-            
-            wrongAnswersModal.style.display = 'block';
+    wrongAnswersList.innerHTML = '';
+    let wrongCount = 0;
+    
+    selectedQuestions.forEach(question => {
+        if (question.userAnswer !== question.ans) {
+            wrongCount++;
+            const formattedText = formatQuestionText(question.item);
+            const wrongAnswerItem = document.createElement('div');
+            wrongAnswerItem.className = 'wrong-answer-item';
+            wrongAnswerItem.innerHTML = `
+                <div class="wrong-answer-title">第${question.questionNumber}題</div>
+                <p>${formattedText}</p>
+                <p>您的答案: <span class="incorrect">${question.userAnswer || '未作答'}</span></p>
+                <p>正確答案: <span class="correct">${question.ans}</span></p>
+                ${question.tea ? `<p class="explanation">解析: ${question.tea}</p>` : ''}
+            `;
+            wrongAnswersList.appendChild(wrongAnswerItem);
         }
+    });
+    
+    if (wrongCount === 0) {
+        wrongAnswersList.innerHTML = '<p>恭喜您！沒有答錯的題目。</p>';
+    }
+    
+    wrongAnswersModal.style.display = 'block';
+}
 
         // 新增下载功能函数
         function downloadWrongAnswers() {
-            let content = "答錯題目複習\n\n";
-            let wrongCount = 0;
-            
-            selectedQuestions.forEach(question => {
-                if (question.userAnswer !== question.ans) {
-                    wrongCount++;
-                    content += `第${question.questionNumber}題\n`;
-                    content += `題目: ${question.item.replace(/<br>/g, '\n')}\n`;
-                    content += `您的答案: ${question.userAnswer || '未作答'}\n`;
-                    content += `正確答案: ${question.ans}\n`;
-                    if (question.tea) {
-                        content += `解析: ${question.tea.replace(/<br>/g, '\n')}\n`;
-                    }
-                    content += "\n" + "=".repeat(50) + "\n\n";
-                }
-            });
-            
-            if (wrongCount === 0) {
-                content = "恭喜您！沒有答錯的題目。";
+    let content = "答錯題目複習\n\n";
+    let wrongCount = 0;
+    
+    selectedQuestions.forEach(question => {
+        if (question.userAnswer !== question.ans) {
+            wrongCount++;
+            content += `第${question.questionNumber}題\n`;
+            content += `題目: ${question.item.replace(/<br>/g, '\n')}\n`;
+            content += `您的答案: ${question.userAnswer || '未作答'}\n`;
+            content += `正確答案: ${question.ans}\n`;
+            if (question.tea) {
+                content += `解析: ${question.tea}\n`;
             }
-            
-            // 创建下载链接
-            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = '答錯題目複習.txt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            content += "\n" + "=".repeat(50) + "\n\n";
         }
-
+    });
+    
+    if (wrongCount === 0) {
+        content = "恭喜您！沒有答錯的題目。";
+    }
+    
+    // 创建下载链接
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '答錯題目複習.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
         // 初始化
         document.addEventListener('DOMContentLoaded', () => {
             renderQuestionNav();

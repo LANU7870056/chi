@@ -85,3 +85,25 @@
                 });
             });
         });
+
+
+    function showModal() {
+      
+      const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+      document.getElementById("videoFrame").src = embedUrl;
+      document.getElementById("overlay").style.display = "flex";
+    }
+
+    function hideModal() {
+      document.getElementById("videoFrame").src = ""; // 停止播放
+      document.getElementById("overlay").style.display = "none";
+    }
+
+
+window.onload = function() {
+        const imgElement = document.getElementById("videoIcon");
+        if (videoId === "") {
+            imgElement.style.display = "none";
+        }
+    };
+
