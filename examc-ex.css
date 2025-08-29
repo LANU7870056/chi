@@ -301,3 +301,7 @@
     padding: 10px;
     border-bottom: 1px solid #ddd;
 }
+u1 {
+  color: blue;         /* 藍色字體 */
+  text-decoration: underline; /* 加底線 */
+}
