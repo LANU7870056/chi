@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>國文閱讀線上學習 - 經典文學課程</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="chi2.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Serif SC', 'SimSun', serif;
+        }
+        
+        body {
+            background: #f8f3e9 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill-opacity="0.05" fill="%237a1f1f" x="0" y="0" width="100" height="100"/></svg>');
+            color: #4a2b0f;
+            line-height: 1.6;
+            padding: 20px;
+            position: relative;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 10px;
+            background: linear-gradient(to right, #8d5b3f, #b17a4e);
+            border-radius: 10px;
+            color: #fff8e7;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            border-bottom: 5px solid #704214;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+            position: relative;
+        }
+        
+        .header-content {
+            flex: 1;
+        }
+        
+        h1 {
+            font-size: 2.0rem;
+            margin-bottom: 0px;
+            text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3);
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff8e7;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        
+        .main-content {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            position: relative;
+        }
+        
+        .left-panel {
+            flex: 2;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .right-panel {
+            flex: 1;
+            min-width: 300px;
+            background: #fff8e7;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #d9c7a8;
+            height: fit-content;
+            transition: all 0.3s ease;
+        }
+        
+        .welcome-section {
+            background: #fff8e7;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #d9c7a8;
+        }
+        
+        .content-display {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff8e7;
+            z-index: 1000;
+            padding: 0;
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+        }
+        
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 50px;
+            padding: 0 20px;
+            background: linear-gradient(to right, #8d5b3f, #b17a4e);
+            color: #fff8e7;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .content-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .content-body p {
+            margin-bottom: 20px;
+            text-indent: 2em;
+            text-align: justify;
+        }
+        
+        .close-content {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            font-size: 1rem;
+            color: #fff8e7;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s ease;
+            height: 36px;
+        }
+        
+        .close-content:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        #externalFrame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #f9f5ed;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #e9dcc9;
+            border-top: 6px solid #8d5b3f;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .feature-card {
+            background: linear-gradient(to bottom right, #f7f2e6, #e9dcc9);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #d9c7a8;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-card h3 {
+            color: #704214;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tree-menu {
+            list-style: none;
+        }
+        
+        .tree-item {
+            margin-bottom: 10px;
+            position: relative;
+        }
+        
+        .tree-category {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #704214;
+            padding: 12px 15px;
+            background: #e9dcc9;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            border-left: 5px solid #8d5b3f;
+        }
+        
+        .tree-category:hover {
+            background: #d9c7a8;
+        }
+        
+        .tree-category i {
+            transition: transform 0.3s ease;
+        }
+        
+        .tree-submenu {
+            list-style: none;
+            padding-left: 30px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .tree-submenu.active {
+            display: block;
+        }
+        
+        .tree-submenu li {
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            background: #f7f2e6;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            border-left: 3px solid #b17a4e;
+        }
+        
+        .tree-submenu li:hover {
+            background: #e9dcc9;
+            transform: translateX(5px);
+        }
+        
+        .tree-submenu a {
+            text-decoration: none;
+            color: #4a2b0f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        
+        .tree-submenu a:hover {
+            color: #8d5b3f;
+        }
+        
+        .intro {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px dashed #d9c7a8;
+        }
+        
+        .intro h2 {
+            color: #704214;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+        
+        .intro p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #8d5b3f;
+            color: #fff8e7;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .btn:hover {
+            background: #704214;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            color: #704214;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+        
+        .search-box {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 30px;
+            border: 1px solid #d9c7a8;
+            background: #f7f2e6;
+            font-size: 1rem;
+            padding-left: 45px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8d5b3f;
+        }
+        
+        .recent-activity {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px dashed #d9c7a8;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9dcc9;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: #e9dcc9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8d5b3f;
+        }
+        
+        /* 全屏模式下的樣式 */
+        body.fullscreen-mode {
+            overflow: hidden;
+            padding: 0;
+        }
+        
+        body.fullscreen-mode .container:not(.content-display) {
+            display: none;
+        }
+        
+        body.fullscreen-mode footer {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .right-panel {
+                position: fixed;
+                right: 20px;
+                top: 100px;
+                z-index: 1000;
+                width: calc(100% - 40px);
+                max-width: 350px;
+                transform: translateX(100%);
+                opacity: 0;
+                transition: all 0.3s ease;
+            }
+            
+            .right-panel.active {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            
+            .content-header {
+                padding: 0 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content" style="height:30px;">
+                <h1>國文閱讀線上學習</h1>
+            </div>
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </header>
+        
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="welcome-section" id="welcomeSection">
+                    <div class="intro">
+                        <h2>歡迎來到國文閱讀線上學習</h2>
+                        <p>中華文化源遠流長，古典文學作為其重要組成部分，承載著千年智慧與美學。本課程精選多部經典著作，帶您領略古人智慧，感受文字之美。</p>
+                        <p>通過右側的樹狀功能表，您可以方便地流覽和選擇感興趣的課程內容，每一部經典都配有詳細解讀和注釋，説明您深入理解文本內涵。</p>
+                    </div>
+                    
+                    <button class="btn" id="startLearning">開始學習之旅</button>
+                </div>
+                
+                <h2>功能特色</h2>
+                <div class="features">
+                    <div class="feature-card">
+                        <h3><i class="fas fa-book-open"></i> 全文檢索</h3>
+                        <p>強大的全文檢索功能，幫助您快速定位到感興趣的內容和章節。</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3><i class="fas fa-highlighter"></i> 筆記功能</h3>
+                        <p>閱讀時可添加個人筆記和注釋，支援匯出和分享功能。</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3><i class="fas fa-audio-description"></i> 語音朗讀</h3>
+                        <p>專業播音員錄製的高品質音訊，支援聽書功能。</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3><i class="fas fa-download"></i> 離線閱讀</h3>
+                        <p>支援下載課程內容，無需網路即可隨時閱讀學習。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-panel active" id="rightPanel">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="搜索課程內容..." id="searchInput">
+                </div>
+                
+                <h2>課程目錄</h2>
+                <ul class="tree-menu" id="courseMenu">
+                    <!-- 課程功能表將通過JavaScript動態生成 -->
+                </ul>
+                
+                <div class="recent-activity">
+                    <h3>最近學習</h3>
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div>
+                            <p>晏子春秋．諫上</p>
+                            <small>昨天閱讀</small>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div>
+                            <p>夢渓筆談</p>
+                            <small>3天前閱讀</small>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div>
+                            <p>外儲說右下</p>
+                            <small>1周前閱讀</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 國文閱讀線上學習 - 傳承千年智慧，弘揚中華文化</p>
+        </footer>
+    </div>
+    
+    <!-- 全屏內容顯示區域 -->
+    <div class="content-display" id="contentDisplay">
+        <div class="content-header">
+            <h2 id="contentTitle">英語詞彙學習</h2>
+            <button class="close-content" id="closeContent">
+                <i class="fas fa-times"></i> 關閉
+            </button>
+        </div>
+        <div class="content-body">
+            <div class="loading" id="loadingIndicator">
+                <div class="loading-spinner"></div>
+                <p>正在載入內容，請稍候...</p>
+            </div>
+            <iframe id="externalFrame"></iframe>
+        </div>
+    </div>
+
+    <script>
+
+
+        // 初始化頁面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 生成課程菜單
+            generateCourseMenu();
+            
+            // 預設展開第一個菜單
+            toggleMenu('work-menu');
+            
+            // 添加事件監聽器
+            document.getElementById('menuToggle').addEventListener('click', function() {
+                document.getElementById('rightPanel').classList.toggle('active');
+                updateMenuIcon();
+            });
+            
+            document.getElementById('closeContent').addEventListener('click', function() {
+                closeContent();
+            });
+            
+            document.getElementById('startLearning').addEventListener('click', function() {
+                // 預設載入第一個內容
+                loadExternalContent('https://lanu7870056.github.io/eng/word01.htm', '英語詞彙學習');
+            });
+            
+            // 添加ESC鍵關閉功能
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeContent();
+                }
+            });
+            
+            // 添加搜索功能
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                filterCourses(e.target.value);
+            });
+        });
+        
+        // 生成課程菜單
+        function generateCourseMenu() {
+            const menuContainer = document.getElementById('courseMenu');
+            menuContainer.innerHTML = '';
+            
+            for (const [category, items] of Object.entries(courses)) {
+                const categoryName = categoryNames[category] || category;
+                const categoryId = `${category}-menu`;
+                
+                const categoryItem = document.createElement('li');
+                categoryItem.className = 'tree-item';
+                categoryItem.innerHTML = `
+                    <div class="tree-category" onclick="toggleMenu('${categoryId}')">
+                        <span><i class="fas fa-book"></i> ${categoryName}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <ul id="${categoryId}" class="tree-submenu">
+                        ${items.map(item => `
+                            <li>
+                                <a onclick="loadExternalContent('${item.url}', '${item.title}')">
+                                    <i class="${item.icon}"></i> ${item.title}
+                                </a>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                
+                menuContainer.appendChild(categoryItem);
+            }
+        }
+        
+        // 搜索過濾課程
+        function filterCourses(searchText) {
+            const allMenuItems = document.querySelectorAll('.tree-submenu li');
+            
+            if (!searchText) {
+                // 顯示所有課程
+                allMenuItems.forEach(item => {
+                    item.style.display = 'block';
+                });
+                return;
+            }
+            
+            // 過濾課程
+            allMenuItems.forEach(item => {
+                const courseTitle = item.textContent.toLowerCase();
+                if (courseTitle.includes(searchText.toLowerCase())) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        
+        function toggleMenu(menuId) {
+            const menu = document.getElementById(menuId);
+            const icon = menu.previousElementSibling.querySelector('.fa-chevron-down');
+            
+            if (menu.classList.contains('active')) {
+                menu.classList.remove('active');
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                // 關閉所有其他菜單
+                document.querySelectorAll('.tree-submenu.active').forEach(item => {
+                    if (item.id !== menuId) {
+                        item.classList.remove('active');
+                        item.previousElementSibling.querySelector('.fa-chevron-down').style.transform = 'rotate(0deg)';
+                    }
+                });
+                
+                menu.classList.add('active');
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+        
+        function updateMenuIcon() {
+            const menuToggle = document.getElementById('menuToggle');
+            const rightPanel = document.getElementById('rightPanel');
+            
+            if (rightPanel.classList.contains('active')) {
+                menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            } else {
+                menuToggle.innerHTML = '<i class="fas fa-times"></i>';
+            }
+        }
+        
+        function loadExternalContent(url, title) {
+            // 進入全屏模式
+            document.body.classList.add('fullscreen-mode');
+            
+            // 顯示內容部分
+            document.getElementById('contentDisplay').style.display = 'flex';
+            
+            // 設置標題
+            document.getElementById('contentTitle').textContent = title;
+            
+            // 顯示載入指示器
+            document.getElementById('loadingIndicator').style.display = 'flex';
+            document.getElementById('externalFrame').style.display = 'none';
+            
+            // 設置iframe源
+            const frame = document.getElementById('externalFrame');
+            frame.src = url;
+            
+            // 隱藏右側菜單
+            document.getElementById('rightPanel').classList.remove('active');
+            updateMenuIcon();
+            
+            // 監聽iframe載入完成
+            frame.onload = function() {
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('externalFrame').style.display = 'block';
+            };
+        }
+        
+        function closeContent() {
+            // 退出全屏模式
+            document.body.classList.remove('fullscreen-mode');
+            
+            // 隱藏內容部分
+            document.getElementById('contentDisplay').style.display = 'none';
+            
+            // 重置iframe
+            const frame = document.getElementById('externalFrame');
+            frame.src = '';
+            
+            // 顯示右側功能表
+            document.getElementById('rightPanel').classList.add('active');
+            updateMenuIcon();
+        }
+    </script>
+</body>
+</html>
