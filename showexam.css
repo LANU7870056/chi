@@ -18,6 +18,16 @@
 padding: 10px;
         }
 
+.option-box {
+            display: inline-block;
+            padding: 2px 2px;
+            margin: 0 2px;
+            border: 1px solid #ccc;
+            background-color: #ffffcc;
+            border-radius: 3px;
+            border-radius: 50%; 
+            font-weight: bold;
+        }
 
 .logo {
   width: 220px; /* 或依圖片大小調整 */

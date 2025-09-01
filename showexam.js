@@ -1,6 +1,5 @@
         // 提取单元信息
         exam.forEach((q, index) => {
-//const match = q.item.match(/\[(\d+-\d+)\]/);
   const match = q.item.match(/\[([^\]]+)\]/);
  
             q.unit = match ? match[1] : '未知';
@@ -24,20 +23,26 @@
                 questionElement.className = 'question-card';
                 
                 // 提取题目内容（去掉最后的单元标记）
-                const questionText = question.item.replace(/\[(\d+-\d+)\]$/, '');
+               // const questionText2 = question.item.replace(/\[(\d+-\d+)\]$/, '');
+
+const questionText = question.item
+  .replace(/\[(\d+-\d+)\]$/, '')
+  .replace(/\(A\)/g, '<br><span class="option-box">(A)</span>')
+  .replace(/\(B\)/g, '<br><span class="option-box">(B)</span>')
+  .replace(/\(C\)/g, '<br><span class="option-box">(C)</span>')
+  .replace(/\(D\)/g, '<br><span class="option-box">(D)</span>');
+//alert(questionText3);
                 
-                questionElement.innerHTML = `
-                    <div class="question-header">
-                        <span class="question-number">第${question.id}题</span>
-                        <span class="question-tag">${question.unit}</span>
-                    </div>
-                    <div class="question-content">${questionText}</div>
-                    <div class="answer">
-                        <strong>正确答案: ${question.ans}</strong>
-                    </div>
-                `;
-                
-                questionList.appendChild(questionElement);
+questionElement.innerHTML = `
+ 
+  <div class="question-content">第${question.id}题：${questionText}</div>
+  <div class="answer">
+    <strong>正確答案: ${question.ans}</strong>
+  </div>
+`;
+
+questionList.appendChild(questionElement);
+
             }
             
             // 渲染分页
@@ -55,7 +60,7 @@
             // 添加上一页按钮
             if (currentPage > 1) {
                 const prevButton = document.createElement('button');
-                prevButton.textContent = '上一页';
+                prevButton.textContent = '上一頁';
                 prevButton.addEventListener('click', () => {
                     renderQuestions(currentPage - 1);
                 });
@@ -78,7 +83,7 @@
             // 添加下一页按钮
             if (currentPage < totalPages) {
                 const nextButton = document.createElement('button');
-                nextButton.textContent = '下一页';
+                nextButton.textContent = '下一頁';
                 nextButton.addEventListener('click', () => {
                     renderQuestions(currentPage + 1);
                 });
