@@ -185,7 +185,7 @@ font-weight: 900;
 }
 
 .banner-column2 {
-  flex: 0 0 300px; /* 固定寬度或你可以調整為 auto */
+  flex: 0 0 500px; /* 固定寬度或你可以調整為 auto */
   text-align: center;
 }
 
@@ -231,3 +231,4 @@ u1 {
       cursor: pointer;
       z-index: 10000;
     }
+
