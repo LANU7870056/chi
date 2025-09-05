@@ -9,45 +9,63 @@
         let currentPage = 1;
         const questionsPerPage = 10;
 
-        // 渲染题目列表
-        function renderQuestions(page = 1) {
-            const questionList = document.getElementById('question-list');
-            questionList.innerHTML = '';
+
+
+
+        // 渲染题目列表~~~~~~~~~~~~~~~~~~~~~~~~~~
+// 渲染题目列表
+function renderQuestions(page = 1) {
+    const questionList = document.getElementById('question-list');
+    questionList.innerHTML = '';
+    
+    const startIndex = (page - 1) * questionsPerPage;
+    const endIndex = Math.min(startIndex + questionsPerPage, exam.length);
+    
+    for (let i = startIndex; i < endIndex; i++) {
+        const question = exam[i];
+        const questionElement = document.createElement('div');
+        questionElement.className = 'question-card';
+        
+        const questionText = question.item
+            .replace(/\[(\d+-\d+)\]$/, '')
+            .replace(/\(A\)/g, '<br><span class="option-box">(A)</span>')
+            .replace(/\(B\)/g, '<br><span class="option-box">(B)</span>')
+            .replace(/\(C\)/g, '<br><span class="option-box">(C)</span>')
+            .replace(/\(D\)/g, '<br><span class="option-box">(D)</span>');
+        
+        questionElement.innerHTML = `
+            <div class="question-content">第${question.id}题：${questionText}</div>
+            <button class="show-answer-btn" data-id="${question.id}">顯示答案</button>
+            <div class="answer" id="answer-${question.id}" style="display: none;">
+                <strong>正確答案: ${question.ans}</strong>
+            </div>
+        `;
+        
+        questionList.appendChild(questionElement);
+    }
+    
+    // 添加按钮事件监听
+    document.querySelectorAll('.show-answer-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const questionId = this.getAttribute('data-id');
+            const answerElement = document.getElementById(`answer-${questionId}`);
             
-            const startIndex = (page - 1) * questionsPerPage;
-            const endIndex = Math.min(startIndex + questionsPerPage, exam.length);
-            
-            for (let i = startIndex; i < endIndex; i++) {
-                const question = exam[i];
-                const questionElement = document.createElement('div');
-                questionElement.className = 'question-card';
-                
-                // 提取题目内容（去掉最后的单元标记）
-               // const questionText2 = question.item.replace(/\[(\d+-\d+)\]$/, '');
-
-const questionText = question.item
-  .replace(/\[(\d+-\d+)\]$/, '')
-  .replace(/\(A\)/g, '<br><span class="option-box">(A)</span>')
-  .replace(/\(B\)/g, '<br><span class="option-box">(B)</span>')
-  .replace(/\(C\)/g, '<br><span class="option-box">(C)</span>')
-  .replace(/\(D\)/g, '<br><span class="option-box">(D)</span>');
-//alert(questionText3);
-                
-questionElement.innerHTML = `
- 
-  <div class="question-content">第${question.id}题：${questionText}</div>
-  <div class="answer">
-    <strong>正確答案: ${question.ans}</strong>
-  </div>
-`;
-
-questionList.appendChild(questionElement);
-
+            if (answerElement.style.display === 'none') {
+                answerElement.style.display = 'block';
+                this.textContent = '隱藏答案';
+            } else {
+                answerElement.style.display = 'none';
+                this.textContent = '顯示答案';
             }
-            
-            // 渲染分页
-            renderPagination(exam.length, page);
-        }
+        });
+    });
+    
+    // 渲染分页
+    renderPagination(exam.length, currentPage);
+}
+
+
+
 
         // 渲染分页控件
         function renderPagination(totalQuestions, currentPage) {
