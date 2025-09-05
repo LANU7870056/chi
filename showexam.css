@@ -150,12 +150,12 @@ color:#00F;
         }
         
         .answer {
-            padding: 12px;
+            padding: 5px;
             background: #d4edda;
             color: #155724;
-            border-radius: 6px;
-            margin-top: 10px;
-            border-left: 4px solid #28a745;
+            border-radius: 0px;
+            margin-top: 0px;
+            //border-left: 0px solid #28a745;
         }
         
         .pagination {

@@ -35,10 +35,16 @@ function renderQuestions(page = 1) {
         
         questionElement.innerHTML = `
             <div class="question-content">第${question.id}题：${questionText}</div>
-            <button class="show-answer-btn" data-id="${question.id}">顯示答案</button>
-            <div class="answer" id="answer-${question.id}" style="display: none;">
-                <strong>正確答案: ${question.ans}</strong>
-            </div>
+
+
+<div style="display: flex; align-items: center;">
+  <button class="show-answer-btn" data-id="${question.id}">顯示答案</button>
+  <div class="answer" id="answer-${question.id}" style="display: none; margin-left: 10px;">
+    <strong>正確答案: ${question.ans}</strong>
+  </div>
+</div>
+
+     
         `;
         
         questionList.appendChild(questionElement);
