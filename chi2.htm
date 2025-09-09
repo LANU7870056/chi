@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>國文閱讀線上學習 - 經典文學課程</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+
+#closeContent {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 10000; /* 高於 externalFrame */
+    border-radius: 5px;
+}
+
+#closeContent i {
+    margin-right: 5px;
+}
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Serif SC', 'SimSun', serif;
+        }
+        
+        body {
+            background: #f8f3e9 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill-opacity="0.05" fill="%237a1f1f" x="0" y="0" width="100" height="100"/></svg>');
+            color: #4a2b0f;
+            line-height: 1.6;
+            padding: 20px;
+            position: relative;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 10px;
+            background: linear-gradient(to right, #8d5b3f, #b17a4e);
+            border-radius: 0px;
+            color: #fff8e7;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            border-bottom: 5px solid #704214;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+            position: relative;
+        }
+        
+        .header-content {
+            flex: 1;
+        }
+        
+        h1 {
+            font-size: 2.0rem;
+            margin-bottom: 0px;
+            text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3);
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff8e7;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        
+        .main-content {
+            display: flex;
+            gap: 0px;
+            flex-wrap: wrap;
+            position: relative;
+        }
+        
+        .left-panel {
+            flex: 2;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .right-panel {
+            flex: 1;
+            min-width: 500px;
+            background: #fff8e7;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #d9c7a8;
+            transition: all 0.3s ease;
+            /* 移除固定高度，讓內容決定高度 */
+            height: auto;
+            /* 添加外部滾動 */
+            max-height: 380vh;
+            overflow-y: auto;
+        }
+        
+        /* 自定義滾動條樣式 */
+        .right-panel::-webkit-scrollbar {
+            width: 2px;
+        }
+        
+        .right-panel::-webkit-scrollbar-track {
+            background: #f1e9d9;
+            border-radius: 4px;
+        }
+        
+        .right-panel::-webkit-scrollbar-thumb {
+            background: #c4ab87;
+            border-radius: 4px;
+        }
+        
+        .right-panel::-webkit-scrollbar-thumb:hover {
+            background: #8d5b3f;
+        }
+        
+        .welcome-section {
+            background: #fff8e7;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #d9c7a8;
+        }
+        
+        .content-display {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff8e7;
+            z-index: 1000;
+            padding: 0;
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+        }
+        
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 50px;
+            padding: 0 20px;
+            background: linear-gradient(to right, #8d5b3f, #b17a4e);
+            color: #fff8e7;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .content-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .content-body p {
+            margin-bottom: 20px;
+            text-indent: 2em;
+            text-align: justify;
+        }
+        
+        .close-content {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            font-size: 1rem;
+            color: #fff8e7;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s ease;
+            height: 36px;
+        }
+        
+        .close-content:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        #externalFrame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #f9f5ed;
+
+ position: fixed;
+  top: 0;
+left: 0;
+    //width: 100vw;
+   // height: 100vh;
+    //border: none;
+   // background: #f9f5ed;
+   // z-index: 9999;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            flex-direction: column;
+            gap: 0px;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #e9dcc9;
+            border-top: 6px solid #8d5b3f;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .feature-card {
+            background: linear-gradient(to bottom right, #f7f2e6, #e9dcc9);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #d9c7a8;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-card h3 {
+            color: #704214;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tree-menu {
+            list-style: none;
+            /* 移除內部滾動條 */
+            overflow-y: visible;
+            max-height: none;
+        }
+        
+        .tree-item {
+            margin-bottom: 10px;
+            position: relative;
+        }
+        
+        .tree-category {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #704214;
+            padding: 12px 15px;
+            background: #e9dcc9;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            border-left: 5px solid #8d5b3f;
+        }
+        
+        .tree-category:hover {
+            background: #d9c7a8;
+        }
+        
+        .tree-category i {
+            transition: transform 0.3s ease;
+        }
+        
+        .tree-submenu {
+            list-style: none;
+            padding-left: 30px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .tree-submenu.active {
+            display: block;
+        }
+        
+        .tree-submenu li {
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            background: #f7f2e6;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            border-left: 3px solid #b17a4e;
+        }
+        
+        .tree-submenu li:hover {
+            background: #e9dcc9;
+            transform: translateX(5px);
+        }
+        
+        .tree-submenu a {
+            text-decoration: none;
+            color: #4a2b0f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        
+        .tree-submenu a:hover {
+            color: #8d5b3f;
+        }
+        
+        .intro {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px dashed #d9c7a8;
+        }
+        
+        .intro h2 {
+            color: #704214;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+        
+        .intro p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #8d5b3f;
+            color: #fff8e7;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .btn:hover {
+            background: #704214;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            color: #704214;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+        
+        .search-box {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 30px;
+            border: 1px solid #d9c7a8;
+            background: #f7f2e6;
+            font-size: 1rem;
+            padding-left: 45px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8d5b3f;
+        }
+        
+        .recent-activity {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px dashed #d9c7a8;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9dcc9;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: #e9dcc9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8d5b3f;
+        }
+        
+        /* 全屏模式下的樣式 */
+        body.fullscreen-mode {
+            overflow: hidden;
+            padding: 0;
+        }
+        
+        body.fullscreen-mode .container:not(.content-display) {
+            display: none;
+        }
+        
+        body.fullscreen-mode footer {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .right-panel {
+                position: fixed;
+                right:20px;
+                top: 100px;
+                z-index: 1000;
+                width: calc(100% - 40px);
+                max-width: 450px;
+                transform: translateX(100%);
+                opacity: 0;
+                transition: all 0.3s ease;
+                max-height: 70vh;
+            }
+            
+            .right-panel.active {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            
+            .content-header {
+                padding: 0 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content" style="height:50px;">
+                <h1>國文閱讀線上學習</h1>
+            </div>
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </header>
+        
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="welcome-section" id="welcomeSection">
+                    <div class="intro">
+                        <h2>歡迎來到國文閱讀線上學習</h2>
+                        <p>中華文化源遠流長，古典文學作為其重要組成部分，承載著千年智慧與美學。本課程精選多部經典著作，帶您領略古人智慧，感受文字之美。</p>
+                        <p>通過右側的樹狀功能表，您可以方便地流覽和選擇感興趣的課程內容，每一部經典都配有詳細解讀和注釋，説明您深入理解文本內涵。</p>
+                    </div>
+                    
+                    <button class="btn" id="startLearning">開始學習之旅</button>
+                </div>
+                
+              
+            
+            </div>
+            
+            <div class="right-panel active" id="rightPanel">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="搜索課程內容..." id="searchInput">
+                </div>
+                
+                <h2>課程目錄</h2>
+                <ul class="tree-menu" id="courseMenu">
+                    <!-- 課程功能表將通過JavaScript動態生成 -->
+                </ul>
+                
+         
+                    
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 國文閱讀線上學習 - 傳承千年智慧，弘揚中華文化</p>
+        </footer>
+    </div>
+    
+    <!-- 全屏內容顯示區域 -->
+    <div class="content-display" id="contentDisplay">
+        <div class="content-header">
+            <h2 id="contentTitle">英語詞彙學習</h2>
+            <button class="close-content" id="closeContent">
+                <i class="fas fa-times"></i>回選單
+            </button>
+        </div>
+        <div class="content-body">
+            <div class="loading" id="loadingIndicator">
+                <div class="loading-spinner"></div>
+                <p>正在載入內容，請稍候...</p>
+            </div>
+            <iframe id="externalFrame"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // 課程數據
+        const courses = {
+            work: [
+                {icon: 'fas fa-chart-bar', title: '1.晏子春秋．諫上', url: 'chi-001.htm'},
+                {icon: 'fas fa-database', title: '2.外儲說右下', url: 'chi-002.htm'},
+                {icon: 'fas fa-signal', title: '3.夢渓筆談', url: 'chi-003.htm'},
+                {icon: 'fas fa-calculator', title: '4.左傳．隱公六年', url: 'chi-004.htm'},
+                {icon: 'fas fa-brain', title: '5.莊子.秋水', url: 'chi-005.htm'},
+                {icon: 'fas fa-project-diagram', title: '6.古今譚慨', url: 'chi-006.htm'},
+                {icon: 'fas fa-music', title: '7.哀江頭', url: 'chi-007.htm'},
+                {icon: 'fas fa-film', title: '8.豔歌行', url: 'chi-008.htm'},
+                {icon: 'fas fa-theater-masks', title: '9.史記、項羽本紀贊', url: 'chi-009.htm'},
+                {icon: 'fas fa-gamepad', title: '10.世說新語．品藻第九', url: 'chi-010.htm'},
+                {icon: 'fas fa-dice', title: '11.列子．說符', url: 'chi-011.htm'},
+                {icon: 'fas fa-dice-d20', title: '12.史記．貨殖列傳', url: 'chi-012.htm'},
+                {icon: 'fas fa-guitar', title: '13.王安石-辨私', url: 'chi-013.htm'},
+                {icon: 'fas fa-drum', title: '15.莊子．至樂', url: 'chi-015.htm'},
+                {icon: 'fas fa-drum-steelpan', title: '16.世說新語．言語', url: 'chi-016.htm'},
+                {icon: 'fas fa-headphones', title: '17.論語．陽貨', url: 'chi-017.htm'},
+                {icon: 'fas fa-microphone', title: '18.辨姦論', url: 'chi-018.htm'},
+                {icon: 'fas fa-microphone-alt', title: '19.歸去來辭', url: 'chi-019.htm'},
+                {icon: 'fas fa-star-of-david', title: '20.讀孟嘗君傳', url: 'chi-020.htm'},
+                {icon: 'fas fa-cross', title: '21.世說新語．規箴篇', url: 'chi-021.htm'},
+                {icon: 'fas fa-om', title: '22.聊齋志異．蒲松齡', url: 'chi-022.htm'},
+                {icon: 'fas fa-kaaba', title: '23.過香積寺', url: 'chi-023.htm'},
+                {icon: 'fas fa-hanukiah', title: '24.說苑．正諫', url: 'chi-024.htm'},
+                {icon: 'fas fa-church', title: '25.孟子．萬章', url: 'chi-025.htm'},
+            ],
+            work2: [
+                {icon: 'fas fa-mosque', title: '34.聊齋誌異', url: 'chi-034.htm'},
+                {icon: 'fas fa-synagogue', title: '35.論語．泰伯', url: 'chi-035.htm'},
+                {icon: 'fas fa-campground', title: '37.資治通鑑-唐紀31', url: 'chi-037.htm'},
+                {icon: 'fas fa-fire', title: '38.資稟與修養[節錄]', url: 'chi-038.htm'},
+                {icon: 'fas fa-hat-wizard', title: '41.孔子使子路問津', url: 'chi-041.htm'},
+                {icon: 'fas fa-mask', title: '42.論語．微子', url: 'chi-042.htm'},
+                {icon: 'fas fa-candy-cane', title: '43.微子第十八', url: 'chi-043.htm'},
+                {icon: 'fas fa-gift', title: '44.論學', url: 'chi-044.htm'},
+                {icon: 'fas fa-holly-berry', title: '45.勸學', url: 'chi-045.htm'},
+                {icon: 'fas fa-snowman', title: '47.說苑．反質', url: 'chi-047.htm'},
+                {icon: 'fas fa-tree', title: '49.五柳先生傳－陶淵明', url: 'chi-049.htm'},
+                {icon: 'fas fa-file', title: '50.愛蓮說－周敦頤', url: 'chi-050.htm'},
+                {icon: 'fas fa-file-code', title: '51.柳宗元<蝜蝂傳>', url: 'chi-051.htm'},
+                {icon: 'fas fa-folder', title: '52.瀧岡阡表-歐陽脩', url: 'chi-052.htm'},
+                {icon: 'fas fa-folder-open', title: '53.禦暴說-陳黯', url: 'chi-053.htm'},
+                {icon: 'fas fa-save', title: '54.短歌行-曹操', url: 'chi-054.htm'},
+                {icon: 'fas fa-upload', title: '55.義田記-錢公輔', url: 'chi-055.htm'},
+                {icon: 'fas fa-download', title: '56.哀溺文-柳宗元', url: 'chi-056.htm'},
+                {icon: 'fas fa-wifi', title: '58.楚辭‧漁父', url: 'chi-058.htm'},
+                {icon: 'fas fa-signal', title: '59.師說', url: 'chi-059.htm'},
+            ],
+            design: [
+                {icon: 'fas fa-satellite-dish', title: '60.赤壁之戰-司馬光', url: 'chi-060.htm'},
+                {icon: 'fas fa-broadcast-tower', title: '61.柳河東', url: 'chi-061.htm'},
+                {icon: 'fas fa-chart-line', title: '62.哀江頭－杜甫', url: 'chi-062.htm'},
+                {icon: 'fas fa-chart-pie', title: '63.說林篇－韓非子', url: 'chi-063.htm'},
+                {icon: 'fas fa-table', title: '65.說符－列子', url: 'chi-065.htm'},
+                {icon: 'fas fa-server', title: '67.新語．辨惑－陸賈', url: 'chi-067.htm'},
+                {icon: 'fas fa-network-wired', title: '69.外儲說左上－韓非子', url: 'chi-069.htm'},
+                {icon: 'fas fa-project-diagram', title: '70.諫太宗十思疏－魏徵', url: 'chi-070.htm'},
+                {icon: 'fas fa-chart-bar', title: '72.梁惠王下－孟子', url: 'chi-072.htm'},
+                {icon: 'fas fa-database', title: '73.史記．孔子世家', url: 'chi-073.htm'},
+                {icon: 'fas fa-signal', title: '74.戰國策－楚策.', url: 'chi-074.htm'},
+                {icon: 'fas fa-calculator', title: '76.古詩十九首之八', url: 'chi-076.htm'},
+                {icon: 'fas fa-brain', title: '77.詩經．邶風．凱風', url: 'chi-077.htm'},
+                {icon: 'fas fa-project-diagram', title: '78.漢書．霍光傳－班固', url: 'chi-078.htm'},
+                {icon: 'fas fa-music', title: '81.東山談苑·宋人軼事彙編', url: 'chi-081.htm'},
+                {icon: 'fas fa-film', title: '82.故人之為心', url: 'chi-082.htm'},
+                {icon: 'fas fa-theater-masks', title: '84.陳情表－李密', url: 'chi-084.htm'},
+                {icon: 'fas fa-gamepad', title: '86.三國志·諸葛亮傳－陳壽', url: 'chi-086.htm'},
+                {icon: 'fas fa-dice', title: '87.許由疑盜－韓非子', url: 'chi-087.htm'},
+                {icon: 'fas fa-dice-d20', title: '88.說難－韓非子', url: 'chi-088.htm'},
+                {icon: 'fas fa-guitar', title: '89.搜神記 韓憑夫妻', url: 'chi-089.htm'},
+                {icon: 'fas fa-drum', title: '90.世說新語·雅量', url: 'chi-090.htm'},
+                {icon: 'fas fa-drum-steelpan', title: '91.孟子見梁惠王', url: 'chi-091.htm'},
+                {icon: 'fas fa-headphones', title: '92.逍遙遊－莊子', url: 'chi-092.htm'},
+                {icon: 'fas fa-microphone', title: '93.知北遊－莊子', url: 'chi-093.htm'},
+                {icon: 'fas fa-microphone-alt', title: '94.莊周貸粟', url: 'chi-094.htm'},
+                {icon: 'fas fa-star-of-david', title: '95.世說新語．言語篇[詠絮之才]', url: 'chi-095.htm'},
+                {icon: 'fas fa-cross', title: '96.呂氏春秋·士容', url: 'chi-096.htm'},
+                {icon: 'fas fa-om', title: '98.鹽鐵論', url: 'chi-098.htm'},
+            ],
+            doc: [
+                {icon: 'fas fa-kaaba', title: '101.世說新語．陶侃搬磚', url: 'chi-101.htm'},
+                {icon: 'fas fa-hanukiah', title: '102.內儲說上－韓非子', url: 'chi-102.htm'},
+                {icon: 'fas fa-church', title: '103.養梟－劉基', url: 'chi-103.htm'},
+                {icon: 'fas fa-mosque', title: '105.賣炭翁－白居易', url: 'chi-105.htm'},
+                {icon: 'fas fa-synagogue', title: '106.晉書．列傳第36－陶侃', url: 'chi-106.htm'},
+                {icon: 'fas fa-campground', title: '109.左傳·鄭伯克段于鄢', url: 'chi-109.htm'},
+                {icon: 'fas fa-fire', title: '110.顏氏家訓．慕賢', url: 'chi-110.htm'},
+                {icon: 'fas fa-hat-wizard', title: '111.晉平公問於師曠', url: 'chi-111.htm'},
+                {icon: 'fas fa-mask', title: '112.漢．樂府詩', url: 'chi-112.htm'},
+                {icon: 'fas fa-candy-cane', title: '113.將進酒－李白', url: 'chi-113.htm'},
+                {icon: 'fas fa-gift', title: '114.贈衛人處士－杜甫', url: 'chi-114.htm'},
+                {icon: 'fas fa-holly-berry', title: '115.清平樂－李煜', url: 'chi-115.htm'},
+                {icon: 'fas fa-snowman', title: '117.念奴嬌－蘇軾', url: 'chi-117.htm'},
+                {icon: 'fas fa-tree', title: '119.水調歌頭－蘇軾', url: 'chi-119.htm'},
+            ],
+            project: [
+                { icon: 'fas fa-tasks', title: '敏捷開發方法', url: '17.htm' },              
+            ]
+        };
+
+        // 分類名稱映射
+        const categoryNames = {
+            work: '第1冊',
+            work2: '第2冊',
+            design: '第3冊',
+            doc: '第4冊',
+            project: '第5冊'
+        };
+
+         // 初始化頁面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 生成課程菜單
+            generateCourseMenu();
+            
+            // 預設展開第一個菜單
+            toggleMenu('work-menu');
+            
+            // 添加事件監聽器
+            document.getElementById('menuToggle').addEventListener('click', function() {
+                document.getElementById('rightPanel').classList.toggle('active');
+                updateMenuIcon();
+            });
+            
+            document.getElementById('closeContent').addEventListener('click', function() {
+                closeContent();
+            });
+            
+            document.getElementById('startLearning').addEventListener('click', function() {
+                // 預設載入第一個內容
+                loadExternalContent('chi.htm', '英語詞彙學習');
+            });
+            
+            // 添加ESC鍵關閉功能
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeContent();
+                }
+            });
+            
+            // 添加搜索功能
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                filterCourses(e.target.value);
+            });
+        });
+        
+        // 生成課程菜單
+        function generateCourseMenu() {
+            const menuContainer = document.getElementById('courseMenu');
+            menuContainer.innerHTML = '';
+            
+            for (const [category, items] of Object.entries(courses)) {
+                const categoryName = categoryNames[category] || category;
+                const categoryId = `${category}-menu`;
+                
+                const categoryItem = document.createElement('li');
+                categoryItem.className = 'tree-item';
+                categoryItem.innerHTML = `
+                    <div class="tree-category" onclick="toggleMenu('${categoryId}')">
+                        <span><i class="fas fa-book"></i> ${categoryName}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <ul id="${categoryId}" class="tree-submenu">
+                        ${items.map(item => `
+                            <li>
+                                <a onclick="loadExternalContent('${item.url}', '${item.title}')">
+                                    <i class="${item.icon}"></i> ${item.title}
+                                </a>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                
+                menuContainer.appendChild(categoryItem);
+            }
+        }
+        
+        // 搜索過濾課程
+        function filterCourses(searchText) {
+            const allMenuItems = document.querySelectorAll('.tree-submenu li');
+            
+            if (!searchText) {
+                // 顯示所有課程
+                allMenuItems.forEach(item => {
+                    item.style.display = 'block';
+                });
+                return;
+            }
+            
+            // 過濾課程
+            allMenuItems.forEach(item => {
+                const courseTitle = item.textContent.toLowerCase();
+                if (courseTitle.includes(searchText.toLowerCase())) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        
+        function toggleMenu(menuId) {
+            const menu = document.getElementById(menuId);
+            const icon = menu.previousElementSibling.querySelector('.fa-chevron-down');
+            
+            if (menu.classList.contains('active')) {
+                menu.classList.remove('active');
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                // 關閉所有其他菜單
+                document.querySelectorAll('.tree-submenu.active').forEach(item => {
+                    if (item.id !== menuId) {
+                        item.classList.remove('active');
+                        item.previousElementSibling.querySelector('.fa-chevron-down').style.transform = 'rotate(0deg)';
+                    }
+                });
+                
+                menu.classList.add('active');
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+        
+        function updateMenuIcon() {
+            const menuToggle = document.getElementById('menuToggle');
+            const rightPanel = document.getElementById('rightPanel');
+            
+            if (rightPanel.classList.contains('active')) {
+                menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            } else {
+                menuToggle.innerHTML = '<i class="fas fa-times"></i>';
+            }
+        }
+        
+        function loadExternalContent(url, title) {
+            // 進入全屏模式
+
+            document.body.classList.add('fullscreen-mode');
+            
+            // 顯示內容部分
+            document.getElementById('contentDisplay').style.display = 'flex';
+            
+            // 設置標題
+            document.getElementById('contentTitle').textContent = title;
+            
+            // 顯示載入指示器
+            document.getElementById('loadingIndicator').style.display = 'flex';
+            document.getElementById('externalFrame').style.display = 'none';
+            
+            // 設置iframe來源
+            const frame = document.getElementById('externalFrame');
+            frame.onload = function() {
+                // 隱藏載入指示器
+                document.getElementById('loadingIndicator').style.display = 'none';
+                frame.style.display = 'block';
+            };
+            
+            frame.src = url;
+        }
+        
+        function closeContent() {
+            // 退出全屏模式
+            document.body.classList.remove('fullscreen-mode');
+            
+            // 隱藏內容部分
+            document.getElementById('contentDisplay').style.display = 'none';
+            
+            // 重置iframe
+            document.getElementById('externalFrame').src = '';
+        }
+    </script>
+</body>
+</html>

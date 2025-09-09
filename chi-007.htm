@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文學閱讀輔助</title>
+<script src="chi-007.js"></script>
+ <link rel="stylesheet" href="chi.css">
+  
+</head>
+<body>
+  <div id="overlay">
+    <button id="closeBtn" onclick="hideModal()">✖</button>
+    <div id="modal">
+      <iframe id="videoFrame" width="100%" height="100%" frameborder="0"
+        allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+  </div>
+
+    <div class="container">
+        <div class="banner">
+            <div class="banner-column1">
+                <a href="chi.htm#q"><img src="home.png" style="height:50px;width:50px;" ></a>
+	<a href="chi-007ex.htm"><img src="sexam.png" style="height:50px;width:50px;" ></a>
+<a href='chi-004-db.htm'><img src='sexam2.png' style='height:50px;width:50px;'></a>
+<img id="videoIcon"  src="mp4.png"  onclick="showModal()" style="height:50px;width:50px;" >
+            </div>
+            <div class="banner-column2">
+                <h2>國文閱讀  哀江頭</h2>
+            </div>
+             <div class="banner-column3">
+                <h2></h2>
+            </div>
+        </div>
+        
+        <div class="display-area">
+            <div class="display-content" id="displayContent">
+                點擊文中標有底線的詞語查看解釋
+            </div>
+        </div>
+        
+        <div class="content" id="content">
+            <!-- 內容將由JavaScript生成 -->
+        </div>
+        
+        <div class="footer">
+            <p>古典文學閱讀輔助系統 &copy; 2023</p>
+        </div>
+    </div>
+
+  <script src="chi.js"></script>
+</body>
+</html>
