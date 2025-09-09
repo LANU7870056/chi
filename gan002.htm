@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隨機測驗</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft JhengHei', '微軟正黑體', sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eaeaea;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+        .question-container {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 8px;
+            background: #FFF;   //
+            border-left: 4px solid #3498db;
+        }
+        .question-number {   /*第X題*/
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .question-text {
+            font-size: 18px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+background-color: #FFFF00;
+font-size: 22px;
+            gap: 12px;
+        }
+        @media (max-width: 600px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+        .option {
+            padding: 12px 15px;
+            background: white;
+            border: 2px solid #00F;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .option:hover {
+            background: #f1f8ff;
+            border-color: #3498db;
+        }
+        .option.selected {
+            background: #d6eaf8;
+            border-color: #3498db;
+        }
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: none;
+        }
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        .score-container {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        .score-text {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .score-value {
+            font-size: 48px;
+            color: #3498db;
+            font-weight: bold;
+        }
+        .restart-btn {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        .restart-btn:hover {
+            background: #2980b9;
+        }
+        .progress {
+            text-align: right;
+            margin-bottom: 15px;
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>課堂隨機測驗</h1>
+        </header>
+        
+        <div class="progress">第 <span id="current">1</span> / 5 題</div>
+        
+        <div id="quiz-container"></div>
+        
+        <div id="score-container" class="score-container">
+            <div class="score-text">測驗完成！您的得分是：</div>
+            <div class="score-value" id="score">0</div>
+            <button class="restart-btn" onclick="restartQuiz()">重新開始</button>
+        </div>
+    </div>
+
+    <script>
+        const exam = [
+            {item:"微軟在辦公室軟體Excel是那一個單字的縮寫(A)excellent優秀的　(B)excellency優點　(C)excel at擅長　(D)excess超越", tea:"", ans:"A"},
+            {item:"Excel使用加總，要按那一個按鈕：(A)AI加總　(B)自動加總　(C)自動計算　(D)電腦神算。", tea:"", ans:"B"},
+            {item:"計算名次，要使用那一個函數？(A)rank(B)sum(C)average(D)max", tea:"", ans:"A"},
+            {item:"將分數不及格，要標示紅色，是使用什麼功能？(A)格式化表格　(B)資料清除(C)格式化條件　(D)格式化儲存格", tea:"", ans:"C"},
+            {item:"<img src='ex01.jpg'>黃色的儲存格，名稱為？(A)A1　(B)B1(C)B3　(D)B2", tea:"", ans:"C"},
+        ];
+
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answered = false;
+
+        // 隨機選擇5道題目
+        function selectRandomQuestions() {
+            const shuffled = [...exam].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, 5);
+        }
+
+        // 顯示當前題目
+        function displayQuestion() {
+            if (currentQuestionIndex >= currentQuestions.length) {
+                showScore();
+                return;
+            }
+
+            document.getElementById('current').textContent = currentQuestionIndex + 1;
+            
+            const question = currentQuestions[currentQuestionIndex];
+            const questionElement = document.createElement('div');
+            questionElement.className = 'question-container';
+            
+            // 提取題目文本和選項
+            const questionText = question.item.split('(')[0];
+            const options = question.item.match(/\([A-D]\)[^\(]+/g);
+            
+            questionElement.innerHTML = `
+
+                <div class="question-text">第 ${currentQuestionIndex + 1} 題-${questionText}</div>
+                <div class="options">
+                    ${options.map(opt => `
+                        <div class="option" style="background-color: #FFFF00;" data-value="${opt[1]}">${opt}</div>
+                    `).join('')}
+                </div>
+                <div class="feedback" id="feedback"></div>
+            `;
+            
+            document.getElementById('quiz-container').innerHTML = '';
+            document.getElementById('quiz-container').appendChild(questionElement);
+            
+            // 添加選項點擊事件
+            const optionElements = document.querySelectorAll('.option');
+            optionElements.forEach(option => {
+                option.addEventListener('click', () => {
+                    if (answered) return;
+                    
+                    answered = true;
+                    const selectedValue = option.getAttribute('data-value');
+                    const correctValue = question.ans;
+                    
+                    optionElements.forEach(opt => {
+                        if (opt.getAttribute('data-value') === correctValue) {
+                            opt.classList.add('correct');
+                        }
+                        if (opt === option) {
+                            opt.classList.add('selected');
+                        }
+                    });
+                    
+                    const feedback = document.getElementById('feedback');
+                    if (selectedValue === correctValue) {
+                        feedback.textContent = '✓ 回答正確！';
+                        feedback.classList.add('correct');
+                        score++;
+                    } else {
+                        feedback.textContent = '✗ 回答錯誤！正確答案是：(' + correctValue + ')';
+                        feedback.classList.add('incorrect');
+                        option.classList.add('incorrect');
+                    }
+                    
+                    // 2秒後自動下一題
+                    setTimeout(nextQuestion, 2000);
+                });
+            });
+        }
+
+        // 下一題
+        function nextQuestion() {
+            currentQuestionIndex++;
+            answered = false;
+            displayQuestion();
+        }
+
+        // 顯示分數
+        function showScore() {
+            document.getElementById('quiz-container').innerHTML = '';
+            document.getElementById('score-container').style.display = 'block';
+            document.getElementById('score').textContent = `${score} / ${currentQuestions.length}`;
+        }
+
+        // 重新開始測驗
+        function restartQuiz() {
+            currentQuestions = selectRandomQuestions();
+            currentQuestionIndex = 0;
+            score = 0;
+            answered = false;
+            document.getElementById('score-container').style.display = 'none';
+            displayQuestion();
+        }
+
+        // 初始化測驗
+        window.onload = function() {
+            currentQuestions = selectRandomQuestions();
+            displayQuestion();
+        };
+    </script>
+</body>
+</html>
