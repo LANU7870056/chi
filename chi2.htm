@@ -109,8 +109,8 @@
         }
         
         .right-panel {
-            flex: 1;
-            min-width: 500px;
+            flex: 0;
+            min-width: 400px;
             background: #fff8e7;
             border-radius: 10px;
             padding: 20px;
@@ -126,7 +126,7 @@
         
         /* 自定義滾動條樣式 */
         .right-panel::-webkit-scrollbar {
-            width: 2px;
+            width: 12px;
         }
         
         .right-panel::-webkit-scrollbar-track {
@@ -189,16 +189,18 @@
         }
         
         .close-content {
+ margin-top: 50px;
             background: rgba(255, 255, 255, 0.2);
             border: none;
             font-size: 1rem;
             color: #fff8e7;
             cursor: pointer;
-            padding: 8px 16px;
+            padding:18px 16px;
             border-radius: 5px;
             display: flex;
             align-items: center;
             gap: 8px;
+
             transition: background 0.3s ease;
             height: 36px;
         }
@@ -664,9 +666,7 @@ left: 0;
                 {icon: 'fas fa-snowman', title: '117.念奴嬌－蘇軾', url: 'chi-117.htm'},
                 {icon: 'fas fa-tree', title: '119.水調歌頭－蘇軾', url: 'chi-119.htm'},
             ],
-            project: [
-                { icon: 'fas fa-tasks', title: '敏捷開發方法', url: '17.htm' },              
-            ]
+         
         };
 
         // 分類名稱映射
@@ -674,8 +674,7 @@ left: 0;
             work: '第1冊',
             work2: '第2冊',
             design: '第3冊',
-            doc: '第4冊',
-            project: '第5冊'
+            doc: '第4冊',         
         };
 
          // 初始化頁面
