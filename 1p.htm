@@ -19,12 +19,20 @@
   <span></span>
   <span></span>
 </div><BR><BR><BR><BR><BR><BR>
+<a href="index.htm" class="home-link" title="返回首頁">
+    <img src="home.png" alt="首頁" class="home-icon w-[20px] h-[20px] object-contain">
+</a>
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      background-color: #f4f6f9;
+            background-color: #5a0000; /* 深紅背景 */
     }
+.home-icon {
+    width: 50px;
+    height: 50px;
+    object-fit: contain; /* 確保圖片不變形 */
+}
     .card {
       background: white;
       padding: 20px;
@@ -100,8 +108,8 @@
   <script>
 // 1. 設定查詢字串
 
-const s = "0050,2330,2002,2317,2354,2610,00403A,00406A,4906,0052,6182,6770,6781,00896,00919,00929,00939,00961,00982A,00988A,00992A";
-
+var s="2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A";
+var s2="中鋼,鴻海,台積電,鴻準,華航,正文,合晶,力積電,AES-KY,統一台股50,主動中信台灣,元大台灣50,富邦台灣科技,中信綠能,群益台灣高息,復華台灣科技,統一台灣高息動能,臺灣永續高息,凱基台灣50,群益,主動統一全球,群益台灣科技";
 
     // 2. 宣告存放結果的變數 pr1
     let pr1 = "";
@@ -128,6 +136,7 @@ const s = "0050,2330,2002,2317,2354,2610,00403A,00406A,4906,0052,6182,6770,6781,
           console.log("查詢成功，變數 pr1 =", pr1);
       // 2. 寫入 Cookie
       document.cookie = `s=${encodeURIComponent(s)}; path=/; max-age=86400`;
+      document.cookie = `s2=${encodeURIComponent(s2)}; path=/; max-age=86400`;
       document.cookie = `pr2=${encodeURIComponent(pr1)}; path=/; max-age=86400`;
 
 
@@ -160,7 +169,7 @@ const s = "0050,2330,2002,2317,2354,2610,00403A,00406A,4906,0052,6182,6770,6781,
             return "";
         }
         const pr1 = decodeURIComponent(getCookie("pr2"));
-alert(pr1);
+
 
     const arrayS = s.split(',');
     const arrayPr1 = pr1.split(',');

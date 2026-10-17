@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>類型總金額與股票明細統計表</title>
+    <style>
+        body {
+            background-color: #5a0000; /* 深紅背景 */
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2px 2px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* 左上角回首頁圖示樣式 (PC 預設 40px) */
+        .home-icon {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1000;
+        }
+
+        .home-icon img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            transition: transform 0.2s;
+        }
+
+        .home-icon img:hover {
+            transform: scale(1.1);
+        }
+
+        /* 讓表格容器支援手機橫向滑動，避免螢幕太小破版 */
+        .table-container {
+            width: 100%;
+            max-width: 800px;
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 98%;
+            border-collapse: collapse;
+            text-align: center;
+            font-size: 18px;
+            border: 2px solid #000;
+            background-color: #fff;
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 10px 16px;
+            white-space: nowrap;
+        }
+
+        /* 表頭樣式 */
+        thead th {
+            background-color: #2b7cd3;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* 各類型列的背景顏色對應 */
+        .row-市值ETF { background-color: #ffeb3b; }
+        .row-高息 { background-color: #ffe0b2; }
+        .row-主動息 { background-color: #e1bee7; }
+        .row-其它 { background-color: #bbdefb; }
+        
+        /* 總計列樣式 */
+        tfoot tr {
+            background-color: #6d1a1a;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* 表格2專屬：咖啡色與加粗字體 */
+        .table-dark-text {
+            color: #4a2e1b;
+            font-weight: bold;
+        }
+
+        /* 損益顏色樣式 */
+        .profit-pos {
+            color: #0000ff !important;
+            font-weight: bold;
+        }
+        .profit-neg {
+            color: #ff0000 !important;
+            font-weight: bold;
+        }
+
+        /* === 針對手機版 (螢幕寬度小於 600px 時) 的優化 === */
+        @media screen and (max-width: 600px) {
+            table {
+                font-size: 14px;
+            }
+            th, td {
+                padding: 2px 2px;
+            }
+            /* 將手機版 Home 圖示放大至 120px，並加上 !important 確保強制生效 */
+            .home-icon img {
+                width: 50px !important;
+                height: 50px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 左上角回首頁圖示 -->
+    <a href="index.htm" class="home-icon" title="回首頁">
+        <img src="home.png" alt="Home">
+    </a>
+
+    <!-- 表格 1：類型總金額統計表 -->
+    <div class="table-container">
+        <h2 style="color: #fff; text-align: center; font-size: 20px;">類型總金額統計</h2>
+        <table id="stoTable">
+            <thead>
+                <tr>
+                    <th>類型</th>
+                    <th>總金額</th>
+                    <th>總金額2</th>
+                    <th>比例</th>
+                    <th>備註</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- JavaScript 動態填入資料 -->
+            </tbody>
+            <tfoot id="tableFoot">
+                <!-- JavaScript 動態填入總計 -->
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- 表格 2：股票明細與損益統計表 -->
+    <div class="table-container">
+        <h2 style="color: #fff; text-align: center; font-size: 20px;">股票明細損益統計 (表格2)</h2>
+        <table id="stoTable2">
+            <thead>
+                <tr>
+                    <th>股票SID</th>
+                    <th>名稱</th>
+                    <th>股數</th>
+                    <th>買價</th>
+                    <th>市價</th>
+                    <th>損益</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody2">
+                <!-- JavaScript 動態填入資料 -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 載入外部資料 -->
+    <script src="mysto.js"></script>
+    <script>
+        if (typeof mysto !== 'undefined') {
+
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return "";
+            }
+
+            const sCookie = decodeURIComponent(getCookie("s"));
+            const pr2Cookie = decodeURIComponent(getCookie("pr2"));
+
+            const sList = sCookie ? sCookie.split(',') : [];
+            const pr2List = pr2Cookie ? pr2Cookie.split(',') : [];
+
+            const priceMap = {};
+            sList.forEach((sid, index) => {
+                if (sid) {
+                    const cleanSid = String(sid).trim();
+                    const parsedPrice = parseFloat(pr2List[index]);
+                    if (!isNaN(parsedPrice)) {
+                        priceMap[cleanSid] = parsedPrice;
+                    }
+                }
+            });
+
+            mysto.forEach(item => {
+                if (item.sid) {
+                    const cleanSid = String(item.sid).trim();
+                    if (priceMap.hasOwnProperty(cleanSid)) {
+                        item.price = priceMap[cleanSid];
+                    }
+                }
+            });
+
+            const groupData = {};
+            const groupData2 = {};
+
+            mysto.forEach(item => {
+                const gro = item.gro || "其它";
+                const cost = parseFloat(item.cost) || 0;
+                
+                const price = parseFloat(item.price) || 0;
+                const no = parseFloat(item.no) || 0;
+                const cost2 = price * no;
+
+                if (!groupData[gro]) {
+                    groupData[gro] = 0;
+                    groupData2[gro] = 0;
+                }
+                groupData[gro] += cost;
+                groupData2[gro] += cost2;
+            });
+
+            const predefinedGroups = [
+                { name: "市值ETF", remark: "0052,9816" },
+                { name: "高息", remark: "高股息" },
+                { name: "主動息", remark: "代表為A" },
+                { name: "其它", remark: "" }
+            ];
+
+            const tbody = document.getElementById('tableBody');
+            let totalSum = 0;
+            let totalSum2 = 0;
+            predefinedGroups.forEach(group => {
+                totalSum += groupData[group.name] || 0;
+                totalSum2 += groupData2[group.name] || 0;
+            });
+
+            predefinedGroups.forEach(group => {
+                const cost = groupData[group.name] || 0;
+                const cost2 = groupData2[group.name] || 0;
+                const ratio = totalSum > 0 ? ((cost / totalSum) * 100).toFixed(1) + '%' : '0.0%';
+                
+                const tr = document.createElement('tr');
+                tr.className = `row-${group.name}`;
+                tr.innerHTML = `
+                    <td>${group.name}</td>
+                    <td style="text-align: right;">${Math.round(cost).toLocaleString()}</td>
+                    <td style="text-align: right;">${Math.round(cost2).toLocaleString()}</td>
+                    <td>${ratio}</td>
+                    <td style="text-align: left;">${group.remark}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const tfoot = document.getElementById('tableFoot');
+            const footTr = document.createElement('tr');
+            footTr.innerHTML = `
+                <td>總計</td>
+                <td style="text-align: right;">${Math.round(totalSum).toLocaleString()}</td>
+                <td style="text-align: right;">${Math.round(totalSum2).toLocaleString()}</td>
+                <td>損益</td>
+                <td style="text-align: right;">431,518</td>
+            `;
+            tfoot.appendChild(footTr);
+
+            const stockMap = {};
+
+            mysto.forEach(item => {
+                const sid = item.sid ? String(item.sid).trim() : "未知";
+                const name = item.na || item.name || item.sname || item.stockName || "";
+                const no = parseFloat(item.no) || 0;
+                const buy = parseFloat(item.buy) || 0;
+                const price = parseFloat(item.price) || 0;
+
+                if (!stockMap[sid]) {
+                    stockMap[sid] = {
+                        sid: sid,
+                        name: name,
+                        totalNo: 0,
+                        totalBuyWeight: 0,
+                        price: price
+                    };
+                } else {
+                    if (!stockMap[sid].name && name) stockMap[sid].name = name;
+                    stockMap[sid].price = price;
+                }
+
+                stockMap[sid].totalNo += no;
+                stockMap[sid].totalBuyWeight += (buy * no);
+            });
+
+            const sortedStocks = Object.values(stockMap).sort((a, b) => {
+                const numA = parseFloat(a.sid) || 0;
+                const numB = parseFloat(b.sid) || 0;
+                return numA - numB;
+            });
+
+            const tbody2 = document.getElementById('tableBody2');
+
+            sortedStocks.forEach(stock => {
+                const avgBuy = stock.totalNo > 0 ? (stock.totalBuyWeight / stock.totalNo) : 0;
+                const totalMarketValue = stock.totalNo * stock.price;
+                const totalCostValue = stock.totalBuyWeight;
+                const profit = totalMarketValue - totalCostValue;
+
+                let profitClass = 'table-dark-text';
+                if (profit > 0) {
+                    profitClass = 'profit-pos';
+                } else if (profit < 0) {
+                    profitClass = 'profit-neg';
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="table-dark-text">${stock.sid}</td>
+                    <td class="table-dark-text" style="text-align: left;">${stock.name}</td>
+                    <td class="table-dark-text" style="text-align: right;">${stock.totalNo.toLocaleString()}</td>
+                    <td class="table-dark-text" style="text-align: right;">${avgBuy.toFixed(2)}</td>
+                    <td class="table-dark-text" style="text-align: right;">${stock.price.toFixed(2)}</td>
+                    <td class="text-align: right; ${profitClass}">${Math.round(profit).toLocaleString()}</td>
+                `;
+                tbody2.appendChild(tr);
+            });
+        }
+    </script>
+ <iframe id="myIframe" src="1p.htm" width="400" height="80" scrolling="no" style="display: block; margin: 0 auto; border: none; overflow: hidden;"></iframe>
+
+    <script>
+        function scheduleReload() {
+            var now = new Date();
+            var totalMinutes = now.getHours() * 60 + now.getMinutes();
+
+            // 09:00 (540 分鐘) ~ 13:30 (810 分鐘)
+            var isPeakTime = totalMinutes >= 540 && totalMinutes <= 810;
+            var delay = isPeakTime ? 5000 : 20000; 
+
+            setTimeout(function() {
+                var iframe = document.getElementById('myIframe');
+                if (iframe) {
+                    iframe.src = iframe.src; 
+                }
+                scheduleReload(); 
+            }, delay);
+        }
+
+        scheduleReload();
+    </script>
+
+</body>
+</html>

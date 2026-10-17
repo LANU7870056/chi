@@ -23,11 +23,12 @@
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: #5a0000; /* 深紅背景 */
             color: var(--text-color);
             padding: 12px;
             display: flex;
             justify-content: center;
+
         }
 
         .container {
@@ -248,10 +249,10 @@
         <table>
             <thead>
                 <tr>
-                    <th>日期 (md)</th>
-                    <th>年度 (year)</th>
-                    <th>原始股價 (pri)</th>
-                    <th>調整股價 ADJ (pri2)</th>
+                    <th>日期</th>
+                    <th>年度</th>
+                    <th>月均價</th>
+                    <th>調整價</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
@@ -309,6 +310,8 @@
                 });
             }
         });
+// 依據 sid 由小到大排序 (支援字串數字與補零格式，如 0050、00919、2330)
+    uniqueStocks.sort((a, b) => a.sid.localeCompare(b.sid, undefined, { numeric: true }));
 
         stockSelect.innerHTML = uniqueStocks.map(s => 
             `<option value="${s.sid}">${s.label}</option>`

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>sto2 資料解析與表格顯示</title>
+  <style>
+    body {
+      font-family: "Microsoft JhengHei", Arial, sans-serif;
+      padding: 20px;
+      background-color: #f4f6f9;
+    }
+
+    h2 {
+      color: #2c3e50;
+    }
+
+    /* 表格質感美化 */
+    table {
+      width: 100%;
+      max-width: 650px;
+      border-collapse: collapse;
+      background: #ffffff;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 15px;
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: center;
+      border-bottom: 1px solid #eef2f5;
+    }
+
+    th {
+      background-color: #3498db;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    tr:hover {
+      background-color: #eaf2f8;
+    }
+  </style>
+
+
+</head>
+<body>
+
+  <h2>📊 元大台灣50 (0050) - sto2 資料表</h2>
+
+  <!-- 表格呈現位置 -->
+  <div id="table-box"></div>
+
+
+  <!-- 1. 引入同目錄下的 x.js 檔 -->
+  <script src="x.js"></script>
+<script>  
+
+sto2.forEach(function(item) {
+  if (item.year === 92) {item.year = 100;}
+});
+
+    // 印出 sto2 驗證轉換結果
+    //console.log("已成功存成 sto2 變數：", sto2);
+
+    // 3. 將 sto2 繪製成 HTML 表格
+    function drawTable(data) {
+      var html = '<table>' +
+        '<thead>' +
+          '<tr>' +
+            '<th>代號 (sid)</th>' +
+            '<th>名稱 (na)</th>' +
+            '<th>月日 (md)</th>' +
+            '<th>價格1 (mpri)</th>' +
+            '<th>價格2 (pri2)</th>' +
+            '<th>年份 (year)</th>' +
+          '</tr>' +
+        '</thead>' +
+        '<tbody>';
+
+      data.forEach(function(item) {
+        html += '<tr>' +
+          '<td>' + item.sid + '</td>' +
+          '<td>' + item.na + '</td>' +
+          '<td>' + item.md + '</td>' +
+          '<td>' + item.mpri.toFixed(2) + '</td>' +
+          '<td>' + item.pri2.toFixed(2) + '</td>' +
+          '<td>' + item.year + '</td>' +
+        '</tr>';
+      });
+
+      html += '</tbody></table>';
+
+      document.getElementById('table-box').innerHTML = html;
+    }
+
+    // 執行繪製
+    drawTable(sto2);
+  </script>
+
+</body>
+</html>

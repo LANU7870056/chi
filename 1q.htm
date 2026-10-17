@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>資料對照表</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 300px;
+      font-family: Arial, sans-serif;
+      margin: 20px 0;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 2px 2px;
+      text-align: center;
+    }
+    th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+    }
+    tr:nth-child(even) {
+      background-color: #fafafa;
+    }
+  </style>
+</head>
+<body>
+
+
+  <div id="table-container"></div>
+
+
+
+ <script>
+
+    // 以逗號「,」分隔字串為陣列
+ function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return "";
+        }
+        const pr1 = decodeURIComponent(getCookie("pr2"));
+        const s= decodeURIComponent(getCookie("s"));
+        const s2= decodeURIComponent(getCookie("s2"));
+
+
+   
+  </script>
+
+
+
+  <script>
+
+    // 以逗號「,」分隔字串為陣列
+    const arrayS = s.split(',');
+    const arrayS2 = s2.split(',');
+    const arrayPr1 = pr1.split(',');
+
+    // 取得最大列數
+    const maxLen = Math.max(arrayS.length, arrayPr1.length);
+
+    // 建立 HTML 表格
+    let tableHtml = '<table><thead><tr><th>股票代號</th><th>必稱</th><th>股價</th></tr></thead><tbody>';
+
+    for (let i = 0; i < maxLen; i++) {
+      const valS = arrayS[i] !== undefined ? arrayS[i] : '';
+      const va2S = arrayS2[i] !== undefined ? arrayS2[i] : '';
+      const valPr1 = arrayPr1[i] !== undefined ? arrayPr1[i] : '';
+      tableHtml += `<tr><td style='text-align: left;'>${valS}</td><td style='width: 250px;text-align: left;'>${va2S}</td><td  style='text-align: right;'>${valPr1}</td></tr>`;
+    }
+
+    tableHtml += '</tbody></table>';
+
+    // 將表格渲染至 DOM
+    document.getElementById('table-container').innerHTML = tableHtml;
+  </script>
+
+
+
+
+</body>
+</html>

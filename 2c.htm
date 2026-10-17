@@ -9,10 +9,11 @@
             box-sizing: border-box;
         }
         body {
+            background-color: #5a0000; /* 深紅背景 */
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             margin: 0;
-            padding: 10px;
-            background-color: #f0f2f5;
+            padding: 2px;
+
             color: #333;
             font-size: 15px;
         }
@@ -32,7 +33,7 @@
             justify-content: space-between;
             margin-bottom: 2px;
             border-bottom: 1px solid #f0f0f0;
-            padding-bottom: 12px;
+            padding-bottom: 2px;
         }
         .header-title-area {
             display: flex;
@@ -40,8 +41,8 @@
             gap: 2px;
         }
         .header-icon {
-            width: 40px;
-            height: 40px;
+            width: 60px;
+            height: 60px;
             border-radius: 8px;
             object-fit: cover;
         }
@@ -67,7 +68,7 @@
         select {
             width: 100%;
             padding: 10px 12px;
-            font-size: 15px;
+            font-size: 20px;
             border-radius: 8px;
             border: 1px solid #dcdfe6;
             background-color: #fff;
@@ -110,7 +111,7 @@
         }
         table {
             width: 100%;
-            min-width: 480px;
+            min-width: 400px;
             border-collapse: collapse;
             background-color: #fff;
             white-space: nowrap;
@@ -143,7 +144,8 @@
         }
         td {
             font-family: Arial, sans-serif;
-            color: #606266;
+            color: #00F;
+	    font-size: 18px;
         }
 
         /* 奇數列：淺黃色 */
@@ -186,13 +188,26 @@
 
     <div class="main-card">
         <!-- 頂部標題與圖示 -->
-        <div class="card-header">
-            <div class="header-title-area">
-                <a href="index.htm"><img src="home.png" alt="Home" class="header-icon"></a>
-                <h2>股票資料更新與表格顯示</h2>
-            </div>
-            <div class="header-dots">...</div>
-        </div>
+
+
+
+<div class="card-header grid grid-cols-3 items-center">
+    <!-- 左側：Home 圖示靠左 -->
+    <div class="flex items-center justify-start">
+        <a href="index.htm">
+            <img src="home.png" alt="Home" class="header-icon">
+        </a>
+    </div>
+    
+    <!-- 中間：標題文字置中（並移除原本字串裡多餘的全形空白「 」） -->
+    <div class="text-center">
+        <h2 class="text-lg sm:text-xl font-bold text-gray-800 m-0">買入股票分析</h2>
+    </div>
+
+    <!-- 右側：空白佔位，用來平衡左邊的寬度，確保中間完美置中 -->
+    <div></div>
+</div>
+
 
         <!-- 單一股票下拉選單 -->
         <div class="filter-row">
@@ -214,7 +229,7 @@
                 <thead>
                     <tr>
                         <th class="sortable" onclick="handleSort('md')">日期<span class="sort-icon">▲▼</span></th>         
-                        <th>代號</th>
+
                         <th>股數</th>
                         <th class="sortable" onclick="handleSort('buy')">買價<span class="sort-icon">▲▼</span></th>
                         <th>費用</th>
@@ -258,34 +273,40 @@
             });
         }
 
-        // 2. 初始化下拉式選單（依據 mysto 資料自動建立不重複的 sid & "-" & na）
-        function initSelector() {
-            const selector = document.getElementById("stockSelector");
-            let optionsHtml = '<option value="">全部顯示</option>';
-            
-            const uniqueStocks = new Map();
+      // 2. 初始化下拉式選單（依據 mysto 資料自動建立不重複的 sid & "-" & na，並依 sid 排序）
+function initSelector() {
+    const selector = document.getElementById("stockSelector");
+    let optionsHtml = '<option value="">全部顯示</option>';
+    
+    const uniqueStocks = new Map();
 
-            if (typeof mysto !== 'undefined' && Array.isArray(mysto)) {
-                mysto.forEach(item => {
-                    if (item.sid) {
-                        const sid = item.sid.trim();
-                        const na = item.na ? item.na.trim() : '';
-                        stockNameMap[sid] = na;
-                        if (!uniqueStocks.has(sid)) {
-                            uniqueStocks.set(sid, na);
-                        }
-                    }
-                });
+    if (typeof mysto !== 'undefined' && Array.isArray(mysto)) {
+        mysto.forEach(item => {
+            if (item.sid) {
+                const sid = item.sid.trim();
+                const na = item.na ? item.na.trim() : '';
+                stockNameMap[sid] = na;
+                if (!uniqueStocks.has(sid)) {
+                    uniqueStocks.set(sid, na);
+                }
             }
+        });
+    }
 
-            uniqueStocks.forEach((na, sid) => {
-                const displayText = na ? `${sid}-${na}` : sid;
-                optionsHtml += `<option value="${sid}">${displayText}</option>`;
-            });
+    // 將 Map 轉換為陣列，並依據 sid (key) 進行排序（支援數字與字串自然排序）
+    const sortedStocks = Array.from(uniqueStocks.entries()).sort((a, b) => 
+        a[0].localeCompare(b[0], undefined, { numeric: true })
+    );
 
-            selector.innerHTML = optionsHtml;
-        }
+    sortedStocks.forEach(([sid, na]) => {
+        const displayText = na ? `${sid}-${na}` : sid;
+        optionsHtml += `<option value="${sid}">${displayText}</option>`;
+    });
 
+    if (selector) {
+        selector.innerHTML = optionsHtml;
+    }
+}
         // 3. 取得 S 與 pr2 Cookie
         const sCookie = decodeURIComponent(getCookie("s"));
         const pr2Cookie = decodeURIComponent(getCookie("pr2"));
@@ -432,13 +453,12 @@
                     const stockName = item.na || stockNameMap[item.sid] || '-';
 
                     tr.innerHTML = `
-                        <td>${item.md || ''}</td>
-                        <td style="font-weight: bold; color: #007bff;">${item.sid || ''}</td>
-                        <td>${formattedQty}</td>
+                        <td style="font-size: 14px;">${item.md || ''}</td>
+                        <td style="font-size: 14px;">${formattedQty}</td>
                         <td class="buy-price">${item.buy || ''}</td>
-                        <td style="color: #666;">${item.EX || ''}</td>
+                        <td style="color: #00F;">${item.EX || ''}</td>
                         <td>${formattedCost}</td>
-                        <td class="${raClass}">${item.ra || '-'}</td>
+                        <td style="font-size: 18px;" class="${raClass}">${item.ra || '-'}</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -454,12 +474,14 @@
             const formattedTotalQty = formatNumber(totalQuantity, 0);
 
             document.getElementById("statsInfo").innerHTML = `
-                <span><span style="color: #007bff;">${totalCount}筆</span></span>
-                <span>股數：<span style="color: #6f42c1;">${formattedTotalQty}</span></span>
-                <span>均價：<span style="color: #d9534f;">${avgBuy}</span></span>
-                <span>成本：<span style="color: #28a745;">${avgCost}</span></span>
-                <span>股價：<span style="color: #8B4522;">${displayPrice}</span></span>
+                <span style="font-size: 20px;">股數：<span style="color: #6f42c1;font-size: 20px;">${formattedTotalQty}</span></span>
+                <span style="font-size: 20px;">均價：<span style="color: #d9534f;font-size: 20px;">${avgBuy}</span></span>
+                <span style="font-size: 20px;">成本：<span style="color: #28a745;font-size: 20px;">${avgCost}</span></span>
+                <span style="font-size: 20px;">市價：<span style="color: #8B4522;font-size: 20px;">${displayPrice}</span></span>
             `;
+
+
+
         }
 
         // 初始化執行（預設選取下拉選單第 1 筆）

@@ -17,29 +17,29 @@
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            margin: 10px;
-            background-color: #f8f9fa;
+            margin: 2px;
+           background-color: #5a0000; /* 深紅背景 */
             color: #333;
             font-size: 15px;
         }
         h2 {
             font-size: 20px;
-            margin-bottom: 15px;
+            margin-bottom: 2px;
             color: #333;
         }
         /* 手機端表格水平捲動容器 */
         .table-container {
-            width: 99%;
+            width: 100%;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             background-color: #fff;
             box-shadow: 0 2px 2px rgba(0,0,0,0.1);
-            border-radius: 6px;
-            margin-top: 5px;
+            border-radius: 2px;
+            margin-top: 2px;
         }
         table {
-            width: 98%;
-            min-width: 480px; /* 確保各欄位有足夠空間展開 */
+            width: 100%;
+            min-width: 300px; /* 確保各欄位有足夠空間展開 */
             border-collapse: collapse;
             background-color: #fff;
             white-space: nowrap; /* 防止欄位文字換行擁擠 */
@@ -112,29 +112,34 @@
 <body class="bg-gray-100 p-3 sm:p-6 text-gray-800">
 
     <div class="max-w-4xl mx-auto bg-white p-4 sm:p-6 rounded-2xl shadow-sm">
-        <h1 class="text-lg sm:text-xl font-bold mb-4 text-gray-800 flex items-center justify-between">
-            <!-- 左上角 Home 圖示與超連結 -->
-            <div class="flex items-center gap-3">
-                <a href="index.htm" class="flex items-center hover:opacity-80 transition-opacity" title="回首頁">
-                    <img src="home.png" alt="Home" class="w-[60px] h-[60px] object-contain">
-                </a>
-                <span>股票賣出記錄</span>
-            </div>
-            <span class="text-xs font-normal text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full"></span>
-        </h1>
 
-        <!-- 下拉式選單區塊（改為左右並排或手機上下排列） -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+<h1 class="text-lg sm:text-xl font-bold mb-4 text-gray-800 grid grid-cols-3 items-center">
+    <!-- 左側：Home 圖示 -->
+    <div class="flex items-center justify-start">
+        <a href="index.htm" class="flex items-center hover:opacity-80 transition-opacity" title="回首頁">
+            <img src="home.png" alt="Home" class="w-[50px] h-[50px] object-contain">
+        </a>
+    </div>
+    
+    <!-- 中間：股票賣出記錄（精準置中） -->
+    <div class="text-center">
+        <span>股票賣出記錄</span>
+    </div>
+
+    <!-- 右側：空白佔位（用來平衡左邊的寬度，讓中間完美置中） -->
+    <div></div>
+</h1>
+
+<!-- 下拉式選單區塊（改為左右並排，手機與電腦皆同列） -->
+        <div class="grid grid-cols-2 gap-3 mb-4">
             <!-- 選單 1：股票代號 -->
             <div>
-
                 <select id="fundSelect" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl text-base focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     <!-- 動態載入 -->
                 </select>
             </div>
             <!-- 選單 2：日期篩選 -->
             <div>
-
                 <select id="dateSelect" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl text-base focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     <!-- 動態載入 -->
                 </select>
@@ -149,12 +154,12 @@
             </div>
             <div class="h-4 w-[1px] bg-blue-200"></div>
             <div class="flex items-center gap-1 sm:gap-1.5">
-                <span class="text-xs text-gray-500" style="font-size: 18px">總收入:</span>
+                <span class="text-xs text-gray-500" style="font-size: 18px">收入:</span>
                 <span id="statIncome" class="text-xs sm:text-sm font-bold text-gray-800" style="font-size: 18px">0</span>
             </div>
             <div class="h-4 w-[1px] bg-blue-200"></div>
             <div class="flex items-center gap-1 sm:gap-1.5">
-                <span class="text-xs text-gray-500" style="font-size: 18px">總損益:</span>
+                <span class="text-xs text-gray-500" style="font-size: 18px">損益:</span>
                 <span id="statGL" class="text-xs sm:text-sm font-bold text-gray-800" style="font-size: 18px">0</span>
             </div>
         </div>
@@ -167,8 +172,6 @@
                         <th class="p-3 sm:p-3.5 cursor-pointer hover:bg-gray-200 select-none" onclick="sortData('md2')">
                             日期 ↕<span id="sort-md2"></span>
                         </th>
-                        <th class="p-3 sm:p-3.5">代號</th>
-                        <th class="p-3 sm:p-3.5">名稱</th>
                         <th class="p-3 sm:p-3.5">股數</th>
                         <th class="p-3 sm:p-3.5 cursor-pointer hover:bg-gray-200 select-none" onclick="sortData('sel')">
                             賣價 ↕<span id="sort-sel"></span>
@@ -184,9 +187,6 @@
                     <!-- 動態載入資料 -->
                 </tbody>
             </table>
-        </div>
-        <div class="text-center text-xs text-gray-400 mt-2 sm:hidden">
-            ← 左右滑動表格查看更多欄位 →
         </div>
     </div>
 
@@ -208,6 +208,11 @@
                         uniqueMap.set(item.sid, item.na || '');
                     }
                 });
+
+// 將 Map 轉為陣列並依 sid (代號) 排序（支援純數字與英數混合代號）
+    const sortedOptions = Array.from(uniqueMap.entries()).sort((a, b) => {
+        return a[0].localeCompare(b[0], undefined, { numeric: true, sensitivity: 'base' });
+    });
 
                 // 動態生成「股票選單 (選單 1)」選項
                 uniqueMap.forEach((na, sid) => {
@@ -363,13 +368,11 @@
 
                 tr.innerHTML = `
                     <td class="p-3 sm:p-3.5 font-medium text-gray-900">${row.md2 || ''}</td>
-                    <td class="p-3 sm:p-3.5">${row.sid || ''}</td>
-                    <td class="p-3 sm:p-3.5">${row.na || ''}</td>
                     <td class="p-3 sm:p-3.5">${row.no || ''}</td>
-                    <td class="p-3 sm:p-3.5">${row.sel || ''}</td>
+                    <td  style="font-size: 18px;" class="p-3 sm:p-3.5">${row.sel || ''}</td>
                     <td class="p-3 sm:p-3.5">${row.EX || ''}</td>
-                    <td class="p-3 sm:p-3.5">${row.income || ''}</td>
-                    <td class="p-3 sm:p-3.5 ${glColorClass}">${row.GL || ''}</td>
+                    <td  style="font-size: 18px;" class="p-3 sm:p-3.5">${row.income || ''}</td>
+                    <td style="font-size: 18px;" class="p-3 sm:p-3.5 ${glColorClass}">${row.GL || ''}</td>
                 `;
                 tbody.appendChild(tr);
             });
