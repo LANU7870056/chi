@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>股票資料更新與表格顯示</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background-color: #f0f2f5;
+            color: #333;
+            font-size: 15px;
+        }
+        /* 主卡片容器 */
+        .main-card {
+            background-color: #ffffff;
+            border-radius: 2px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 2px;
+            max-width: 98%;
+            margin: 0 auto;
+        }
+        /* 頂部標題與圖示 */
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 12px;
+        }
+        .header-title-area {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        .header-title-area h2 {
+            font-size: 20px;
+            margin: 0;
+            color: #1a1a1a;
+            font-weight: 700;
+        }
+        .header-dots {
+            color: #ccc;
+            font-size: 20px;
+            letter-spacing: 2px;
+        }
+
+        /* 單選單列 */
+        .filter-row {
+            margin-bottom: 16px;
+        }
+        .control-group {
+            width: 100%;
+        }
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 15px;
+            border-radius: 8px;
+            border: 1px solid #dcdfe6;
+            background-color: #fff;
+            color: #333;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        select:focus {
+            border-color: #007bff;
+        }
+        #stockSelector {
+            background-color: #ffffcc; /* 淺黃底色 */
+            font-weight: bold;       /* 字體加粗 */
+            color: blue;             /* 藍色字體 */
+        }
+
+        /* 統計摘要列 */
+        .info {
+            background: #ffffff;
+            border: 1px solid #e4e7ed;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-size: 15px;
+            font-weight: bold;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        /* 表格容器 */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            background-color: #fff;
+            border-radius: 2px;
+            border: 1px solid #ebeef5;
+        }
+        table {
+            width: 100%;
+            min-width: 480px;
+            border-collapse: collapse;
+            background-color: #fff;
+            white-space: nowrap;
+        }
+        th, td {
+            padding: 8px 2px;
+            text-align: center;
+            border-bottom: 1px solid #ebeef5;
+            font-size: 15px;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            font-weight: 600;
+        }
+        th.sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+        th.sortable:hover {
+            background-color: #0056b3;
+        }
+        .sort-icon {
+            font-size: 12px;
+            margin-left: 4px;
+            opacity: 0.8;
+        }
+        td {
+            font-family: Arial, sans-serif;
+            color: #606266;
+        }
+
+        /* 奇數列：淺黃色 */
+        #mystoTable tbody tr:nth-child(odd) {
+            background-color: #ffffe0; 
+        }
+        /* 偶數列：淺紅色 */
+        #mystoTable tbody tr:nth-child(even) {
+            background-color: #ffe6e6; 
+        }
+
+        tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* 買價字體：咖啡色且加粗 */
+        .buy-price {
+            color: #00F;
+            font-weight: bold;
+	    font-size: 18px;
+        }
+
+        .positive {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .negative {
+            color: #d9534f;
+            font-weight: bold;
+        }
+
+        #myIframe {
+            display: block;
+            margin: 5px auto 0 auto;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-card">
+        <!-- 頂部標題與圖示 -->
+        <div class="card-header">
+            <div class="header-title-area">
+                <a href="index.htm"><img src="home.png" alt="Home" class="header-icon"></a>
+                <h2>股票資料更新與表格顯示</h2>
+            </div>
+            <div class="header-dots">...</div>
+        </div>
+
+        <!-- 單一股票下拉選單 -->
+        <div class="filter-row">
+            <div class="control-group">
+                <select id="stockSelector" onchange="renderTable(this.value)">
+                    <option value="">載入選單中...</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 統計摘要列 -->
+        <div class="info" id="statsInfo">
+            統計資料載入中...
+        </div>
+
+        <!-- 表格捲動外框 -->
+        <div class="table-container">
+            <table id="mystoTable">
+                <thead>
+                    <tr>
+                        <th class="sortable" onclick="handleSort('md')">日期<span class="sort-icon">▲▼</span></th>         
+                        <th>代號</th>
+                        <th>股數</th>
+                        <th class="sortable" onclick="handleSort('buy')">買價<span class="sort-icon">▲▼</span></th>
+                        <th>費用</th>
+                        <th class="sortable" onclick="handleSort('cost')">成本<span class="sort-icon">▲▼</span></th>
+                        <th class="sortable" onclick="handleSort('ra')">報酬率<span class="sort-icon">▲▼</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 動態插入 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 引入外部 mysto.js 檔案 -->
+    <script src="mysto.js"></script>
+    
+    <script>
+        // 全域排序狀態
+        let currentSortKey = "";      
+        let currentSortOrder = "asc"; 
+
+        // 建立股票名稱對照表（從 mysto 資料自動提取 sid 與 na）
+        const stockNameMap = {};
+
+        // 1. 讀取 Cookie 函式
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return "";
+        }
+
+        // 千分位格式化輔助函式
+        function formatNumber(value, decimals = 0) {
+            const num = parseFloat(value);
+            if (isNaN(num)) return value; 
+            return num.toLocaleString('en-US', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            });
+        }
+
+        // 2. 初始化下拉式選單（依據 mysto 資料自動建立不重複的 sid & "-" & na）
+        function initSelector() {
+            const selector = document.getElementById("stockSelector");
+            let optionsHtml = '<option value="">全部顯示</option>';
+            
+            const uniqueStocks = new Map();
+
+            if (typeof mysto !== 'undefined' && Array.isArray(mysto)) {
+                mysto.forEach(item => {
+                    if (item.sid) {
+                        const sid = item.sid.trim();
+                        const na = item.na ? item.na.trim() : '';
+                        stockNameMap[sid] = na;
+                        if (!uniqueStocks.has(sid)) {
+                            uniqueStocks.set(sid, na);
+                        }
+                    }
+                });
+            }
+
+            uniqueStocks.forEach((na, sid) => {
+                const displayText = na ? `${sid}-${na}` : sid;
+                optionsHtml += `<option value="${sid}">${displayText}</option>`;
+            });
+
+            selector.innerHTML = optionsHtml;
+        }
+
+        // 3. 取得 S 與 pr2 Cookie
+        const sCookie = decodeURIComponent(getCookie("s"));
+        const pr2Cookie = decodeURIComponent(getCookie("pr2"));
+
+        // 5. 處理資料更新邏輯與報酬率計算 ((股價-買價)/買價 * 100)
+        if (sCookie && pr2Cookie) {
+            const sList = sCookie.split(',');
+            const pr2List = pr2Cookie.split(',');
+
+            const priceMap = {};
+            sList.forEach((sid, index) => {
+                const cleanSid = sid.replace(/^0+/, ''); 
+                if (pr2List[index] !== undefined) {
+                    priceMap[sid] = pr2List[index];
+                    priceMap[cleanSid] = pr2List[index];
+                }
+            });
+
+            if (typeof mysto !== 'undefined' && Array.isArray(mysto)) {
+                mysto.forEach(item => {
+                    const cleanItemSid = item.sid ? item.sid.replace(/^0+/, '') : '';
+                    let newPrice = "";
+                    
+                    if (item.sid && priceMap[item.sid] !== undefined) {
+                        newPrice = priceMap[item.sid];
+                    } else if (priceMap[cleanItemSid] !== undefined) {
+                        newPrice = priceMap[cleanItemSid];
+                    }
+
+                    if (newPrice !== "") {
+                        item.price = newPrice;
+                        
+                        const buyPrice = parseFloat(item.buy);
+                        const currentPrice = parseFloat(newPrice);
+                        if (!isNaN(buyPrice) && buyPrice > 0 && !isNaN(currentPrice) && currentPrice > 0) {
+                            const returnRate = ((currentPrice - buyPrice) / buyPrice * 100).toFixed(1);
+                            item.ra = returnRate + "%";
+                        }
+                    }
+                });
+            }
+        }
+
+        // 數值轉型輔助函式（供排序使用）
+        function getSortValue(item, key) {
+            if (key === 'md') return item.md || '';
+            if (key === 'buy') {
+                const val = parseFloat(item.buy);
+                return isNaN(val) ? -Infinity : val;
+            }
+            if (key === 'cost') {
+                const val = parseFloat(item.cost);
+                return isNaN(val) ? -Infinity : val;
+            }
+            if (key === 'ra') {
+                if (!item.ra || item.ra === '-') return -Infinity;
+                const val = parseFloat(item.ra.replace('%', ''));
+                return isNaN(val) ? -Infinity : val;
+            }
+            return 0;
+        }
+
+        // 處理點擊標頭排序切換
+        function handleSort(key) {
+            if (currentSortKey === key) {
+                currentSortOrder = currentSortOrder === "asc" ? "desc" : "asc";
+            } else {
+                currentSortKey = key;
+                currentSortOrder = "asc";
+            }
+            const selector = document.getElementById("stockSelector");
+            renderTable(selector ? selector.value : "");
+        }
+
+        // 6. 渲染表格與計算統計資訊函式
+        function renderTable(filterSid = "") {
+            const tbody = document.querySelector("#mystoTable tbody");
+            tbody.innerHTML = ""; 
+
+            let totalCount = 0;
+            let totalQuantity = 0; 
+            let buySum = 0;
+            let buyCount = 0;
+            let costSum = 0;
+            let costCount = 0;
+            let displayPrice = "-";
+
+            let itemsToRender = [];
+
+            if (typeof mysto !== 'undefined' && Array.isArray(mysto)) {
+                mysto.forEach(item => {
+                    if (filterSid !== "" && item.sid !== filterSid) {
+                        return;
+                    }
+
+                    totalCount++;
+
+                    if (item.price !== undefined && item.price !== "") {
+                        displayPrice = item.price;
+                    }
+
+                    const qtyVal = parseFloat(item.no);
+                    if (!isNaN(qtyVal)) {
+                        totalQuantity += qtyVal;
+                    }
+
+                    const buyVal = parseFloat(item.buy);
+                    if (!isNaN(buyVal)) {
+                        buySum += buyVal;
+                        buyCount++;
+                    }
+
+                    const costVal = parseFloat(item.cost);
+                    if (!isNaN(costVal)) {
+                        costSum += costVal;
+                        costCount++;
+                    }
+
+                    itemsToRender.push(item);
+                });
+
+                // 執行排序邏輯
+                if (currentSortKey !== "") {
+                    itemsToRender.sort((a, b) => {
+                        const valA = getSortValue(a, currentSortKey);
+                        const valB = getSortValue(b, currentSortKey);
+                        if (valA < valB) return currentSortOrder === 'asc' ? -1 : 1;
+                        if (valA > valB) return currentSortOrder === 'asc' ? 1 : -1;
+                        return 0;
+                    });
+                }
+
+                // 渲染表格內容
+                itemsToRender.forEach(item => {
+                    const tr = document.createElement("tr");
+                    
+                    let raClass = "";
+                    if (item.ra) {
+                        raClass = item.ra.includes("-") ? "negative" : "positive";
+                    }
+
+                    const formattedCost = item.cost !== undefined && item.cost !== "" ? formatNumber(item.cost, 0) : '';
+                    const formattedQty = item.no !== undefined && item.no !== "" ? formatNumber(item.no, 0) : '';
+                    const stockName = item.na || stockNameMap[item.sid] || '-';
+
+                    tr.innerHTML = `
+                        <td>${item.md || ''}</td>
+                        <td style="font-weight: bold; color: #007bff;">${item.sid || ''}</td>
+                        <td>${formattedQty}</td>
+                        <td class="buy-price">${item.buy || ''}</td>
+                        <td style="color: #666;">${item.EX || ''}</td>
+                        <td>${formattedCost}</td>
+                        <td class="${raClass}">${item.ra || '-'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            if (filterSid === "") {
+                displayPrice = "-";
+            }
+
+            const avgBuy = buyCount > 0 ? (buySum / buyCount).toFixed(2) : "0.00";
+            const avgCostRaw = costCount > 0 ? formatNumber(costSum, 0) : 0;
+            const avgCost = formatNumber(avgCostRaw, 2);
+            const formattedTotalQty = formatNumber(totalQuantity, 0);
+
+            document.getElementById("statsInfo").innerHTML = `
+                <span><span style="color: #007bff;">${totalCount}筆</span></span>
+                <span>股數：<span style="color: #6f42c1;">${formattedTotalQty}</span></span>
+                <span>均價：<span style="color: #d9534f;">${avgBuy}</span></span>
+                <span>成本：<span style="color: #28a745;">${avgCost}</span></span>
+                <span>股價：<span style="color: #8B4522;">${displayPrice}</span></span>
+            `;
+        }
+
+        // 初始化執行（預設選取下拉選單第 1 筆）
+        initSelector();
+
+        const selector = document.getElementById("stockSelector");
+        if (selector.options.length > 1) {
+            const firstStockVal = selector.options[1].value;
+            selector.value = firstStockVal;
+            renderTable(firstStockVal);
+        } else {
+            renderTable();
+        }
+    </script>
+
+    <iframe id="myIframe" src="1p.htm" width="400" height="80" scrolling="no" style="display: block; margin: 0 auto; border: none; overflow: hidden;"></iframe>
+
+    <script>
+        function scheduleReload() {
+            var now = new Date();
+            var totalMinutes = now.getHours() * 60 + now.getMinutes();
+
+            // 09:00 (540 分鐘) ~ 13:30 (810 分鐘)
+            var isPeakTime = totalMinutes >= 540 && totalMinutes <= 810;
+            var delay = isPeakTime ? 5000 : 20000; 
+
+            setTimeout(function() {
+                var iframe = document.getElementById('myIframe');
+                if (iframe) {
+                    iframe.src = iframe.src; 
+                }
+                scheduleReload(); 
+            }, delay);
+        }
+
+        scheduleReload();
+    </script>
+
+</body>
+</html>

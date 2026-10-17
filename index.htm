@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberOS - 超炫賽博手機主頁</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts: Orbitron & Rajdhani -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            orbitron: ['Orbitron', 'sans-serif'],
+            rajdhani: ['Rajdhani', 'sans-serif'],
+          },
+          colors: {
+            cyber: {
+              cyan: '#00f3ff',
+              pink: '#ff007f',
+              purple: '#a855f7',
+              gold: '#ffd700',
+              green: '#00ff87',
+              orange: '#ff9900'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* 全域滾動條隱藏與選擇禁止 */
+    ::-webkit-scrollbar { display: none; }
+    * {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background-color: #020617;
+      color: #f3f4f6;
+      overflow: hidden;
+    }
+
+    /* 規範需求：圖示下方文字大小務必固定為 20px (font-size: 20px !important) */
+    .icon-label {
+      font-size: 20px !important;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      line-height: 1.25;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    /* 立體圓形按鈕 3D 浮雕與擬物鏡面質感 */
+    .sphere-btn {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform-style: preserve-3d;
+      cursor: pointer;
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      flex-shrink: 0;
+    }
+
+    /* 頂部高光與擬物玻璃層 */
+    .sphere-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 25%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.2) 38%, rgba(0,0,0,0.65) 80%, rgba(0,0,0,0.95) 100%);
+      mix-blend-mode: overlay;
+      pointer-events: none;
+    }
+
+    .sphere-btn::after {
+      content: '';
+      position: absolute;
+      top: 8%;
+      left: 18%;
+      width: 45%;
+      height: 28%;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 100%);
+      filter: blur(1px);
+      pointer-events: none;
+    }
+
+    /* 8 款圖示獨立立體球體漸層色及懸浮 Glow 陰影 */
+    .sphere-stock {
+      background: radial-gradient(circle at 35% 35%, #00f3ff, #0099ff, #030712);
+      box-shadow: 0 12px 28px rgba(0, 243, 255, 0.5), inset 0 -6px 12px rgba(0,0,0,0.85);
+    }
+    .sphere-camera {
+      background: radial-gradient(circle at 35% 35%, #3b82f6, #1d4ed8, #050a24);
+      box-shadow: 0 12px 28px rgba(59, 130, 246, 0.5), inset 0 -6px 12px rgba(0,0,0,0.85);
+    }
+    .sphere-music {
+      background: radial-gradient(circle at 35% 35%, #ff007f, #9d00ff, #24002e);
+      box-shadow: 0 12px 28px rgba(255, 0, 127, 0.5), inset 0 -6px 12px rgba(0,0,0,0.85);
+    }
+    .sphere-ai {
+      background: radial-gradient(circle at 35% 35%, #00ff87, #00b4d8, #00221a);
+      box-shadow: 0 12px 28px rgba(0, 255, 135, 0.5), inset 0 -6px 12px rgba(0,0,0,0.85);
+    }
+    .sphere-game {
+      background: radial-gradient(circle at 35% 35%, #ff9900, #ff0055, #3a0010);
+      box-shadow: 0 12px 28px rgba(255, 153, 0, 0.5), inset 0 -6px 12px rgba(0,0,0,0.85);
+    }
+    .sphere-wallet {
+      background: radial-gradient(circle at 35% 35%, #ffd700, #ff8c00, #2e1a00);
+      box-shadow: 0 12px 28px rgba(255, 215, 0, 0.5), inset 0 -6px 12px rgba(0,0,0,0.85);
+    }
+    .sphere-map {
+      background: radial-gradient(circle at 35% 35%, #00ffff, #0088ff, #001f3f);
+      box-shadow: 0 12px 28px rgba(0, 255, 255, 0.5), inset 0 -6px 12px rgba(0,0,0,0.85);
+    }
+    .sphere-settings {
+      background: radial-gradient(circle at 35% 35%, #f8fafc, #64748b, #0f172a);
+      box-shadow: 0 12px 28px rgba(226, 232, 240, 0.4), inset 0 -6px 12px rgba(0,0,0,0.85);
+    }
+
+    /* Hover 與 Active 懸浮回饋 */
+    .sphere-btn:hover {
+      transform: translateY(-8px) scale(1.08) rotateX(10deg);
+      filter: brightness(1.2);
+    }
+
+    .sphere-btn:active {
+      transform: translateY(2px) scale(0.92);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.8);
+    }
+
+    /* 毛玻璃卡片質感 */
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    /* 雷達掃描動畫 */
+    @keyframes radar-sweep {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .animate-radar {
+      animation: radar-sweep 3.5s linear infinite;
+    }
+
+    /* 旋轉黑膠動畫 */
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .animate-spin-slow {
+      animation: spin-slow 8s linear infinite;
+    }
+    .paused {
+      animation-play-state: paused;
+    }
+
+    /* 霓虹波紋擴散特效 */
+    @keyframes ripple {
+      0% { transform: scale(0.8); opacity: 0.9; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+    .ripple-effect {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid currentColor;
+      pointer-events: none;
+      animation: ripple 0.6s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-0 md:p-6 bg-slate-950 font-rajdhani">
+
+  <!-- 桌上型電腦背板氛圍效果 (隱約賽博背景網格) -->
+  <div class="fixed inset-0 pointer-events-none opacity-25 bg-[radial-gradient(#00f3ff_1px,transparent_1px)] [background-size:28px_28px]"></div>
+
+  <!-- 外層手機容器 Shell -->
+  <div id="phone-container" class="relative w-full h-screen md:h-[920px] md:max-w-[450px] md:rounded-[54px] shadow-[0_0_90px_rgba(0,243,255,0.3)] border-0 md:border-[12px] border-slate-900 bg-black overflow-hidden flex flex-col justify-between transition-all duration-500">
+
+    <!-- 手機邊框擬真高光 (桌機尺寸顯示) -->
+    <div class="hidden md:block absolute inset-0 rounded-[42px] border border-white/20 pointer-events-none z-40"></div>
+
+    <!-- 頂部動態狀態列 Status Bar & Dynamic Island -->
+    <div class="relative z-30 px-6 pt-3 pb-2 flex justify-between items-center text-xs font-orbitron tracking-widest text-slate-300">
+      <!-- 即時時間 -->
+      <span id="status-time" class="font-bold text-cyan-400 drop-shadow-[0_0_6px_#00f3ff]">15:00</span>
+      
+      <!-- 動態島 Dynamic Island -->
+      <div class="w-28 h-5 bg-black/90 rounded-full border border-white/15 flex items-center justify-center gap-2 px-2.5 shadow-inner">
+        <div class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
+        <div class="w-2 h-2 rounded-full bg-slate-700"></div>
+        <span class="text-[9px] text-cyan-300/80 tracking-tighter">CyberOS</span>
+      </div>
+
+      <!-- 狀態圖示 (訊號/Wi-Fi/電池) -->
+      <div class="flex items-center gap-2">
+        <i data-lucide="signal" class="w-3.5 h-3.5 text-cyan-400"></i>
+        <i data-lucide="wifi" class="w-3.5 h-3.5 text-cyan-400"></i>
+        <div class="flex items-center gap-1">
+          <span id="battery-level" class="text-[10px] text-emerald-400 font-bold">98%</span>
+          <i data-lucide="battery-charging" class="w-4 h-4 text-emerald-400"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 超炫動態 Canvas 桌布背景 (可切換 5 種主題) -->
+    <canvas id="wallpaper-canvas" class="absolute inset-0 w-full h-full z-0 pointer-events-none"></canvas>
+
+    <!-- 手機主畫面主要內容區 -->
+    <div class="relative z-10 flex-1 flex flex-col justify-between p-5 overflow-y-auto">
+
+      <!-- 1. 頂部動態 Widget 卡片 (時鐘 + 天氣) -->
+      <div class="space-y-3">
+        <div class="glass-card rounded-3xl p-4 flex justify-between items-center shadow-xl border-cyan-500/40">
+          <div>
+            <div id="widget-date" class="text-xs font-semibold tracking-wider text-cyan-300/90 uppercase font-orbitron">2026 年 10 月 16 日 星期五</div>
+            <div id="widget-clock" class="text-3xl font-orbitron font-extrabold tracking-wider text-white drop-shadow-[0_0_14px_rgba(0,243,255,0.9)] mt-0.5">15:00:00</div>
+          </div>
+          <div class="text-right flex flex-col items-end">
+            <div class="flex items-center gap-1.5 text-amber-400">
+              <i data-lucide="cloud-lightning" class="w-7 h-7 animate-bounce"></i>
+              <span class="text-2xl font-bold font-orbitron drop-shadow-[0_0_8px_#ff9900]">24°C</span>
+            </div>
+            <span class="text-[11px] text-slate-300 tracking-wide font-medium">新東京 • 雷暴粒子雨</span>
+          </div>
+        </div>
+      </div>
+
+   
+
+<!-- ... existing code ... -->
+      <!-- 2. 主畫面圖示按鈕區：一列2個圖示模式 (Grid 2 Columns, 8顆圖示) -->
+      <div class="my-auto py-3">
+        <div class="grid grid-cols-2 gap-y-6 gap-x-6 place-items-center">
+
+          <!-- 圖示 1: 股票分析 (點擊音效並跳轉連結至 1.HTM) -->
+          <a href="2c.htm" onclick="audioSys.playClick(); createRipple(event);" class="flex flex-col items-center group w-full text-decoration-none">
+            <div class="sphere-btn sphere-stock">
+              <i data-lucide="trending-up" class="w-9 h-9 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]"></i>
+            </div>
+            <span class="icon-label text-cyan-300 drop-shadow-[0_0_10px_rgba(0,243,255,0.85)] font-orbitron">我的股票</span>
+          </a>
+
+          <!-- 圖示 2: 極速相機 (點擊音效並跳轉連結至 1.HTM) -->
+          <a href="2d.htm" onclick="audioSys.playClick(); createRipple(event);" class="flex flex-col items-center group w-full text-decoration-none">
+            <div class="sphere-btn sphere-camera">
+              <i data-lucide="camera" class="w-9 h-9 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]"></i>
+            </div>
+            <span class="icon-label text-blue-300 drop-shadow-[0_0_10px_rgba(59,130,246,0.85)] font-orbitron">股票賣出記錄</span>
+          </a>
+
+          <!-- 圖示 3: 賽博音樂 (點擊音效並跳轉連結至 1.HTM) -->
+          <a href="3a.HTM" onclick="audioSys.playClick(); createRipple(event);" class="flex flex-col items-center group w-full text-decoration-none">
+            <div class="sphere-btn sphere-music">
+              <i data-lucide="disc" class="w-9 h-9 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] animate-spin-slow"></i>
+            </div>
+            <span class="icon-label text-pink-300 drop-shadow-[0_0_10px_rgba(255,0,127,0.85)] font-orbitron">股票分析戰情室</span>
+          </a>
+
+          <!-- 圖示 4: AI 助理 (點擊音效並跳轉連結至 1.HTM) -->
+          <a href="1.HTM" onclick="audioSys.playClick(); createRipple(event);" class="flex flex-col items-center group w-full text-decoration-none">
+            <div class="sphere-btn sphere-ai">
+              <i data-lucide="bot" class="w-9 h-9 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]"></i>
+            </div>
+            <span class="icon-label text-emerald-300 drop-shadow-[0_0_10px_rgba(0,255,135,0.85)] font-orbitron">配息分析戰情室</span>
+          </a>
+
+          <!-- 圖示 5: 賽博遊戲 (點擊音效並跳轉連結至 1.HTM) -->
+          <a href="1.HTM" onclick="audioSys.playClick(); createRipple(event);" class="flex flex-col items-center group w-full text-decoration-none">
+            <div class="sphere-btn sphere-game">
+              <i data-lucide="gamepad-2" class="w-9 h-9 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]"></i>
+            </div>
+            <span class="icon-label text-amber-300 drop-shadow-[0_0_10px_rgba(255,153,0,0.85)] font-orbitron">股票資產配置</span>
+          </a>
+
+          <!-- 圖示 6: 加密錢包 (點擊音效並跳轉連結至 1.HTM) -->
+          <a href="1.HTM" onclick="audioSys.playClick(); createRipple(event);" class="flex flex-col items-center group w-full text-decoration-none">
+            <div class="sphere-btn sphere-wallet">
+              <i data-lucide="wallet" class="w-9 h-9 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]"></i>
+            </div>
+            <span class="icon-label text-yellow-300 drop-shadow-[0_0_10px_rgba(255,215,0,0.85)] font-orbitron">即時股價</span>
+          </a>
+
+         
+
+        </div>
+      </div>
+
+      <!-- 底部導覽條 -->
+<!-- ... existing code ... -->
+
+
+      <div class="flex flex-col items-center justify-center pt-1">
+        <div class="w-36 h-1.5 bg-cyan-400/70 rounded-full shadow-[0_0_12px_#00f3ff]"></div>
+      </div>
+    </div>
+
+    <!-- 3. 微型 App 彈出視窗 (App Modal Container) -->
+    <div id="app-modal" class="absolute inset-0 z-50 glass-card bg-slate-950/95 flex flex-col transition-all duration-300 translate-y-full opacity-0 pointer-events-none">
+      
+      <!-- App 頂部導覽列 -->
+      <div class="px-5 py-3.5 border-b border-white/15 flex justify-between items-center bg-black/50">
+        <div class="flex items-center gap-2.5">
+          <i id="modal-app-icon" data-lucide="app-window" class="w-5 h-5 text-cyan-400"></i>
+          <span id="modal-app-title" class="font-orbitron font-bold text-base tracking-wider text-cyan-300">APP TITLE</span>
+        </div>
+        <button onclick="appLauncher.close()" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-rose-500/80 active:scale-90 transition-all border border-white/20">
+          <i data-lucide="x" class="w-5 h-5 text-white"></i>
+        </button>
+      </div>
+
+      <!-- App 內容區域 -->
+      <div id="modal-body" class="flex-1 p-4 overflow-y-auto relative">
+        <!-- 動態渲染各個微型 App 介面 -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JavaScript 核心邏輯 -->
+  <script>
+    /* ===================================================
+       1. 音效生成器 (Web Audio API - 無外部檔案依賴)
+    =================================================== */
+    class AudioSystem {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+
+      init() {
+        if (!this.ctx) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      }
+
+      playClick() {
+        if (!this.enabled) return;
+        this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(850, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(220, this.ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.08);
+      }
+
+      playLaser() {
+        if (!this.enabled) return;
+        this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(1400, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(120, this.ctx.currentTime + 0.18);
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.18);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.18);
+      }
+
+      playExplode() {
+        if (!this.enabled) return;
+        this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(180, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.3);
+      }
+    }
+    const audioSys = new AudioSystem();
+
+
+    /* ===================================================
+       2. 超炫 Canvas 動態桌布引擎 (5 種主題切換)
+    =================================================== */
+    class WallpaperEngine {
+      constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.theme = 'nebula'; // 主題: nebula, grid, liquid, matrix, aurora
+        this.particles = [];
+        this.matrixCols = [];
+        this.angle = 0;
+
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        this.initParticles();
+        this.animate();
+      }
+
+      resize() {
+        if (!this.canvas.parentElement) return;
+        this.canvas.width = this.canvas.parentElement.clientWidth;
+        this.canvas.height = this.canvas.parentElement.clientHeight;
+        this.initMatrix();
+      }
+
+      setTheme(newTheme) {
+        this.theme = newTheme;
+        this.initParticles();
+      }
+
+      initParticles() {
+        this.particles = [];
+        for (let i = 0; i < 50; i++) {
+          this.particles.push({
+            x: Math.random() * (this.canvas.width || 300),
+            y: Math.random() * (this.canvas.height || 600),
+            radius: Math.random() * 3.5 + 1,
+            vx: (Math.random() - 0.5) * 1.4,
+            vy: (Math.random() - 0.5) * 1.4,
+            color: ['#00f3ff', '#ff007f', '#a855f7', '#00ff87', '#ffd700'][Math.floor(Math.random() * 5)]
+          });
+        }
+      }
+
+      initMatrix() {
+        const cols = Math.floor((this.canvas.width || 300) / 16);
+        this.matrixCols = Array(cols).fill(0);
+      }
+
+      animate() {
+        this.angle += 0.02;
+        const w = this.canvas.width;
+        const h = this.canvas.height;
+        if (!w || !h) {
+          requestAnimationFrame(() => this.animate());
+          return;
+        }
+
+        switch (this.theme) {
+          case 'nebula': // 宇宙星雲粒子
+            this.ctx.fillStyle = 'rgba(2, 6, 23, 0.25)';
+            this.ctx.fillRect(0, 0, w, h);
+            this.particles.forEach(p => {
+              p.x += p.vx;
+              p.y += p.vy;
+              if (p.x < 0 || p.x > w) p.vx *= -1;
+              if (p.y < 0 || p.y > h) p.vy *= -1;
+
+              this.ctx.beginPath();
+              this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+              this.ctx.fillStyle = p.color;
+              this.ctx.shadowBlur = 14;
+              this.ctx.shadowColor = p.color;
+              this.ctx.fill();
+            });
+            break;
+
+          case 'grid': // 賽博朋克 3D 網格
+            this.ctx.fillStyle = '#020617';
+            this.ctx.fillRect(0, 0, w, h);
+            this.ctx.strokeStyle = 'rgba(0, 243, 255, 0.22)';
+            this.ctx.lineWidth = 1;
+
+            const gridStep = 32;
+            const offsetY = (this.angle * 22) % gridStep;
+
+            for (let x = 0; x < w; x += gridStep) {
+              this.ctx.beginPath();
+              this.ctx.moveTo(x, 0);
+              this.ctx.lineTo(x, h);
+              this.ctx.stroke();
+            }
+            for (let y = offsetY; y < h; y += gridStep) {
+              this.ctx.beginPath();
+              this.ctx.moveTo(0, y);
+              this.ctx.lineTo(w, y);
+              this.ctx.stroke();
+            }
+            break;
+
+          case 'liquid': // 液態流光
+            this.ctx.fillStyle = '#030712';
+            this.ctx.fillRect(0, 0, w, h);
+            const grad = this.ctx.createRadialGradient(
+              w / 2 + Math.cos(this.angle) * 110,
+              h / 2 + Math.sin(this.angle) * 110,
+              15,
+              w / 2, h / 2, w * 0.85
+            );
+            grad.addColorStop(0, 'rgba(255, 0, 127, 0.55)');
+            grad.addColorStop(0.5, 'rgba(168, 85, 247, 0.35)');
+            grad.addColorStop(1, 'rgba(0, 243, 255, 0.08)');
+            this.ctx.fillStyle = grad;
+            this.ctx.fillRect(0, 0, w, h);
+            break;
+
+          case 'matrix': // 數碼矩陣綠光雨
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
+            this.ctx.fillRect(0, 0, w, h);
+            this.ctx.fillStyle = '#00ff87';
+            this.ctx.font = '14px monospace';
+
+            this.matrixCols.forEach((y, index) => {
+              const char = String.fromCharCode(0x30A0 + Math.random() * 96);
+              const x = index * 16;
+              this.ctx.fillText(char, x, y);
+              if (y > h + Math.random() * 1000) this.matrixCols[index] = 0;
+              else this.matrixCols[index] = y + 16;
+            });
+            break;
+
+          case 'aurora': // 深海極光
+            this.ctx.fillStyle = 'rgba(2, 6, 23, 0.28)';
+            this.ctx.fillRect(0, 0, w, h);
+            this.ctx.beginPath();
+            for (let x = 0; x < w; x += 8) {
+              const y = h / 2 + Math.sin(x * 0.012 + this.angle) * 65 + Math.cos(x * 0.024) * 35;
+              this.ctx.lineTo(x, y);
+            }
+            this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.65)';
+            this.ctx.lineWidth = 4;
+            this.ctx.shadowBlur = 22;
+            this.ctx.shadowColor = '#00ffff';
+            this.ctx.stroke();
+            break;
+        }
+
+        requestAnimationFrame(() => this.animate());
+      }
+    }
+
+
+    /* ===================================================
+       3. App 管理器與 7 個互動式微型 App 視窗
+    =================================================== */
+    class AppLauncher {
+      constructor() {
+        this.modal = document.getElementById('app-modal');
+        this.title = document.getElementById('modal-app-title');
+        this.icon = document.getElementById('modal-app-icon');
+        this.body = document.getElementById('modal-body');
+        this.activeApp = null;
+        this.musicPlaying = false;
+      }
+
+      open(appName, event) {
+        audioSys.playClick();
+        if (event) createRipple(event);
+
+        this.activeApp = appName;
+        this.modal.classList.remove('translate-y-full', 'opacity-0', 'pointer-events-none');
+        this.modal.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+
+        this.renderApp(appName);
+      }
+
+      close() {
+        audioSys.playClick();
+        this.modal.classList.add('translate-y-full', 'opacity-0', 'pointer-events-none');
+        this.modal.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+        this.body.innerHTML = '';
+        this.activeApp = null;
+
+        if (window.gameLoopId) {
+          cancelAnimationFrame(window.gameLoopId);
+          window.gameLoopId = null;
+        }
+      }
+
+      renderApp(name) {
+        const apps = {
+          camera: {
+            title: 'EXTREME CAMERA • 極速相機',
+            icon: 'camera',
+            render: () => `
+              <div class="flex flex-col items-center h-full justify-between space-y-4">
+                <div class="relative w-full h-72 bg-slate-900 rounded-2xl overflow-hidden border border-cyan-500/40 flex items-center justify-center group" id="camera-preview">
+                  <div class="absolute inset-0 bg-[radial-gradient(#00f3ff_1px,transparent_1px)] opacity-30 [background-size:14px_14px]"></div>
+                  <!-- HUD 輔助線 -->
+                  <div class="absolute inset-4 border border-cyan-500/20 rounded-lg pointer-events-none flex justify-between p-2 text-[10px] text-cyan-400 font-orbitron">
+                    <span>HUD 4K 60FPS</span>
+                    <span>AI LOCK: ACTIVE</span>
+                  </div>
+                  <!-- 模擬鏡頭畫面 -->
+                  <div id="lens-feed" class="text-center transition-all duration-300">
+                    <i data-lucide="crosshair" class="w-16 h-16 text-cyan-400 mx-auto animate-spin-slow"></i>
+                    <p class="text-xs text-cyan-300 mt-3 font-orbitron tracking-widest">AI 視覺動態追蹤中...</p>
+                  </div>
+                  <div id="shutter-flash" class="absolute inset-0 bg-white opacity-0 pointer-events-none transition-opacity duration-150"></div>
+                </div>
+                <div class="flex justify-center gap-2 w-full flex-wrap">
+                  <button onclick="setFilter('cyan')" class="px-3 py-1.5 text-xs bg-cyan-950 text-cyan-300 rounded-lg border border-cyan-500/50 hover:bg-cyan-900 font-orbitron">霓虹青</button>
+                  <button onclick="setFilter('pink')" class="px-3 py-1.5 text-xs bg-pink-950 text-pink-300 rounded-lg border border-pink-500/50 hover:bg-pink-900 font-orbitron">賽博粉</button>
+                  <button onclick="setFilter('matrix')" class="px-3 py-1.5 text-xs bg-emerald-950 text-emerald-300 rounded-lg border border-emerald-500/50 hover:bg-emerald-900 font-orbitron">矩陣綠</button>
+                  <button onclick="setFilter('gold')" class="px-3 py-1.5 text-xs bg-amber-950 text-amber-300 rounded-lg border border-amber-500/50 hover:bg-amber-900 font-orbitron">黃金光</button>
+                </div>
+                <button onclick="takeSnap()" class="w-16 h-16 rounded-full border-4 border-white bg-cyan-500 hover:scale-110 active:scale-95 transition-all shadow-[0_0_25px_#00f3ff] flex items-center justify-center">
+                  <div class="w-9 h-9 rounded-full bg-white"></div>
+                </button>
+              </div>
+            `
+          },
+          music: {
+            title: 'CYBER AUDIO • 賽博音樂',
+            icon: 'disc',
+            render: () => `
+              <div class="flex flex-col items-center h-full justify-between py-2 space-y-4">
+                <div id="vinyl-record" class="relative w-48 h-48 rounded-full border-4 border-pink-500/60 bg-gradient-to-tr from-pink-900 via-purple-900 to-slate-950 flex items-center justify-center shadow-[0_0_35px_rgba(255,0,127,0.45)] animate-spin-slow ${appLauncher.musicPlaying ? '' : 'paused'}">
+                  <div class="w-16 h-16 rounded-full bg-slate-950 border-2 border-white/50 flex items-center justify-center">
+                    <div class="w-6 h-6 rounded-full bg-pink-500 shadow-[0_0_10px_#ff007f]"></div>
+                  </div>
+                </div>
+                <div class="text-center">
+                  <h3 class="text-xl font-bold font-orbitron text-pink-300 drop-shadow-[0_0_8px_#ff007f]">NEON HORIZON 2077</h3>
+                  <p class="text-xs text-slate-400 mt-1 font-orbitron">Synthwave Protocol Vol.4</p>
+                </div>
+                <!-- 波形動畫條 -->
+                <div class="flex items-end justify-center gap-1.5 h-12 w-full px-8">
+                  <div class="w-2 bg-pink-500 rounded-t h-8 animate-pulse"></div>
+                  <div class="w-2 bg-pink-400 rounded-t h-12 animate-pulse"></div>
+                  <div class="w-2 bg-purple-500 rounded-t h-6 animate-pulse"></div>
+                  <div class="w-2 bg-cyan-400 rounded-t h-10 animate-pulse"></div>
+                  <div class="w-2 bg-pink-500 rounded-t h-7 animate-pulse"></div>
+                  <div class="w-2 bg-purple-400 rounded-t h-11 animate-pulse"></div>
+                </div>
+                <div class="flex items-center gap-6">
+                  <button onclick="audioSys.playClick()" class="text-slate-300 hover:text-pink-400 active:scale-90"><i data-lucide="skip-back" class="w-7 h-7"></i></button>
+                  <button onclick="toggleMusicPlay()" id="music-play-btn" class="w-14 h-14 rounded-full bg-pink-500 text-white flex items-center justify-center shadow-lg shadow-pink-500/50 hover:scale-105 active:scale-95 transition-all">
+                    <i data-lucide="${appLauncher.musicPlaying ? 'pause' : 'play'}" class="w-7 h-7 fill-current"></i>
+                  </button>
+                  <button onclick="audioSys.playClick()" class="text-slate-300 hover:text-pink-400 active:scale-90"><i data-lucide="skip-forward" class="w-7 h-7"></i></button>
+                </div>
+              </div>
+            `
+          },
+          ai: {
+            title: 'CYRA • AI 助理',
+            icon: 'bot',
+            render: () => `
+              <div class="flex flex-col h-[420px] justify-between">
+                <div id="chat-box" class="flex-1 space-y-3 overflow-y-auto pr-1 text-sm">
+                  <div class="flex gap-2">
+                    <div class="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-emerald-300 font-bold text-xs font-orbitron shrink-0">AI</div>
+                    <div class="glass-card p-3 rounded-2xl rounded-tl-none max-w-[85%] text-slate-200 border-emerald-500/30">
+                      你好！我是 CYRA (Cyber Assistant)。請問今天需要執行何種賽博系統指令或查詢？
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-3 flex gap-2">
+                  <input id="ai-input" type="text" placeholder="輸入指令或問題..." onkeydown="if(event.key==='Enter') sendAiMsg()" class="flex-1 bg-slate-900/90 border border-emerald-500/40 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-400 font-orbitron">
+                  <button onclick="sendAiMsg()" class="bg-emerald-500 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs hover:bg-emerald-400 active:scale-95 transition-all font-orbitron">傳送</button>
+                </div>
+              </div>
+            `
+          },
+          game: {
+            title: 'CYBER RUNNER • 賽博遊戲',
+            icon: 'gamepad-2',
+            render: () => `
+              <div class="flex flex-col items-center h-full justify-between relative">
+                <div class="relative w-full h-64 bg-slate-950 rounded-2xl border border-amber-500/40 overflow-hidden flex flex-col items-center justify-center">
+                  <canvas id="game-canvas" class="w-full h-full"></canvas>
+                  
+                  <!-- 自訂遊戲結束 Overlay (替代 alert) -->
+                  <div id="game-over-modal" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md flex-col items-center justify-center space-y-3 p-4 z-20">
+                    <h3 class="text-2xl font-orbitron font-extrabold text-rose-500 drop-shadow-[0_0_10px_#f43f5e]">SYSTEM FAILURE</h3>
+                    <p class="text-sm text-slate-200 font-orbitron">最終得分: <span id="final-score" class="text-amber-400 font-bold text-lg">0</span></p>
+                    <button onclick="startGame()" class="px-5 py-2 bg-amber-500 hover:bg-amber-400 text-black font-extrabold rounded-xl font-orbitron text-xs shadow-lg shadow-amber-500/40">
+                      重新開始
+                    </button>
+                  </div>
+                </div>
+                <div class="flex justify-between w-full items-center text-xs text-amber-300 font-orbitron px-2 py-1">
+                  <span>得分: <span id="game-score" class="font-bold text-sm">0</span></span>
+                  <span>點擊畫面上半部切換方向</span>
+                </div>
+                <button onclick="startGame()" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-black font-extrabold rounded-xl font-orbitron tracking-widest shadow-lg shadow-amber-500/30 active:scale-98 transition-all">
+                  開始遊戲 (START GAME)
+                </button>
+              </div>
+            `
+          },
+          wallet: {
+            title: 'NEXUS PAY • 加密錢包',
+            icon: 'wallet',
+            render: () => `
+              <div class="space-y-4">
+                <div class="glass-card p-4 rounded-2xl border-yellow-500/40">
+                  <span class="text-xs text-slate-400 uppercase tracking-wider font-orbitron">總資產估值 (USD)</span>
+                  <div class="text-3xl font-orbitron font-extrabold text-amber-300 mt-1 drop-shadow-[0_0_10px_#ffd700]">$142,890.50</div>
+                  <div class="text-xs text-emerald-400 mt-1 font-orbitron">▲ +12.8% 今日收益</div>
+                </div>
+                <!-- 虛擬趨勢線圖 -->
+                <div class="h-28 bg-slate-900/80 rounded-xl border border-yellow-500/20 p-2.5 flex items-end justify-between gap-1.5">
+                  <div class="w-1/6 bg-amber-500/30 h-[40%] rounded-t"></div>
+                  <div class="w-1/6 bg-amber-500/50 h-[65%] rounded-t"></div>
+                  <div class="w-1/6 bg-amber-500/40 h-[35%] rounded-t"></div>
+                  <div class="w-1/6 bg-amber-500/70 h-[85%] rounded-t"></div>
+                  <div class="w-1/6 bg-amber-500/90 h-[60%] rounded-t"></div>
+                  <div class="w-1/6 bg-amber-400 h-[100%] rounded-t shadow-[0_0_12px_#ffd700]"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2.5">
+                  <button onclick="audioSys.playClick()" class="py-3 bg-yellow-500/20 border border-yellow-500/40 text-yellow-300 font-bold rounded-xl text-xs hover:bg-yellow-500/30 font-orbitron">快速轉帳</button>
+                  <button onclick="audioSys.playClick()" class="py-3 bg-yellow-500 text-black font-bold rounded-xl text-xs hover:bg-yellow-400 font-orbitron shadow-lg shadow-yellow-500/30">質押挖礦</button>
+                </div>
+              </div>
+            `
+          },
+          map: {
+            title: 'STELLAR MAP • 星際地圖',
+            icon: 'compass',
+            render: () => `
+              <div class="flex flex-col items-center justify-between h-full space-y-4">
+                <div class="relative w-64 h-64 rounded-full border-2 border-sky-500/50 bg-slate-950 flex items-center justify-center overflow-hidden shadow-[0_0_35px_rgba(0,255,255,0.25)]">
+                  <div class="absolute inset-0 border border-sky-500/20 rounded-full scale-75"></div>
+                  <div class="absolute inset-0 border border-sky-500/20 rounded-full scale-50"></div>
+                  <!-- 雷達掃描扇形 -->
+                  <div class="absolute inset-0 bg-[conic-gradient(from_0deg,transparent_0_300deg,rgba(0,255,255,0.45)_360deg)] rounded-full animate-radar"></div>
+                  <!-- 目標亮點 -->
+                  <div class="absolute top-14 right-16 w-3 h-3 bg-sky-400 rounded-full animate-ping"></div>
+                  <div class="absolute bottom-16 left-12 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse"></div>
+                </div>
+                <div class="text-center font-orbitron text-xs text-sky-300 space-y-1">
+                  <p>目前座標: [ Sector 07-X : Alpha Centauri ]</p>
+                  <p class="text-slate-400">已定位 2 個周邊星際艦隊訊號</p>
+                </div>
+              </div>
+            `
+          },
+          settings: {
+            title: 'SYSTEM • 系統設定',
+            icon: 'settings',
+            render: () => `
+              <div class="space-y-5 text-xs font-orbitron">
+                <div>
+                  <label class="block text-slate-300 mb-2.5 font-bold">切換 Canvas 動態桌布主題</label>
+                  <div class="grid grid-cols-2 gap-2">
+                    <button onclick="wallpaperEngine.setTheme('nebula'); audioSys.playClick();" class="py-2.5 bg-slate-900 border border-cyan-500/40 text-cyan-300 rounded-xl hover:bg-cyan-950 font-orbitron">宇宙星雲 (Nebula)</button>
+                    <button onclick="wallpaperEngine.setTheme('grid'); audioSys.playClick();" class="py-2.5 bg-slate-900 border border-cyan-500/40 text-cyan-300 rounded-xl hover:bg-cyan-950 font-orbitron">賽博網格 (Grid)</button>
+                    <button onclick="wallpaperEngine.setTheme('liquid'); audioSys.playClick();" class="py-2.5 bg-slate-900 border border-pink-500/40 text-pink-300 rounded-xl hover:bg-pink-950 font-orbitron">液態流光 (Liquid)</button>
+                    <button onclick="wallpaperEngine.setTheme('matrix'); audioSys.playClick();" class="py-2.5 bg-slate-900 border border-emerald-500/40 text-emerald-300 rounded-xl hover:bg-emerald-950 font-orbitron">數碼矩陣 (Matrix)</button>
+                    <button onclick="wallpaperEngine.setTheme('aurora'); audioSys.playClick();" class="py-2.5 bg-slate-900 border border-sky-500/40 text-sky-300 rounded-xl hover:bg-sky-950 font-bold col-span-2 font-orbitron">深海極光 (Aurora)</button>
+                  </div>
+                </div>
+                <div class="pt-3 border-t border-white/10 flex justify-between items-center">
+                  <span class="text-slate-200 font-bold">Web Audio 音效反饋</span>
+                  <input type="checkbox" checked onchange="audioSys.enabled = this.checked; audioSys.playClick();" class="w-4 h-4 accent-cyan-400 cursor-pointer">
+                </div>
+                <div class="pt-3 border-t border-white/10">
+                  <button onclick="toggleFullscreen()" class="w-full py-3 bg-slate-800 border border-slate-600 rounded-xl text-white hover:bg-slate-700 active:scale-98 transition-all font-orbitron">
+                    切換全螢幕模式 (Toggle Fullscreen)
+                  </button>
+                </div>
+              </div>
+            `
+          }
+        };
+
+        const config = apps[name];
+        if (config) {
+          this.title.innerText = config.title;
+          this.icon.setAttribute('data-lucide', config.icon);
+          this.body.innerHTML = config.render();
+          lucide.createIcons();
+        }
+      }
+    }
+
+    const appLauncher = new AppLauncher();
+
+
+    /* ===================================================
+       4. 輔助函式 (波紋、音樂播放、相機濾鏡與遊戲)
+    =================================================== */
+    function createRipple(event) {
+      const btn = event.currentTarget.querySelector('.sphere-btn');
+      if (!btn) return;
+      const ripple = document.createElement('div');
+      ripple.className = 'ripple-effect text-cyan-400';
+      btn.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    }
+
+    function toggleMusicPlay() {
+      audioSys.playClick();
+      appLauncher.musicPlaying = !appLauncher.musicPlaying;
+      const record = document.getElementById('vinyl-record');
+      const btnIcon = document.getElementById('music-play-btn');
+
+      if (record) {
+        if (appLauncher.musicPlaying) {
+          record.classList.remove('paused');
+        } else {
+          record.classList.add('paused');
+        }
+      }
+      if (btnIcon) {
+        btnIcon.innerHTML = `<i data-lucide="${appLauncher.musicPlaying ? 'pause' : 'play'}" class="w-7 h-7 fill-current"></i>`;
+        lucide.createIcons();
+      }
+    }
+
+    function setFilter(filter) {
+      audioSys.playClick();
+      const feed = document.getElementById('lens-feed');
+      if (!feed) return;
+      if (filter === 'cyan') feed.style.filter = 'drop-shadow(0 0 12px #00f3ff) hue-rotate(180deg)';
+      if (filter === 'pink') feed.style.filter = 'drop-shadow(0 0 12px #ff007f) hue-rotate(300deg)';
+      if (filter === 'matrix') feed.style.filter = 'drop-shadow(0 0 12px #00ff87) hue-rotate(90deg)';
+      if (filter === 'gold') feed.style.filter = 'drop-shadow(0 0 12px #ffd700) hue-rotate(40deg)';
+    }
+
+    function takeSnap() {
+      audioSys.playLaser();
+      const flash = document.getElementById('shutter-flash');
+      if (!flash) return;
+      flash.style.opacity = '1';
+      setTimeout(() => flash.style.opacity = '0', 150);
+    }
+
+    function sendAiMsg() {
+      const input = document.getElementById('ai-input');
+      const box = document.getElementById('chat-box');
+      if (!input || !input.value.trim()) return;
+
+      audioSys.playClick();
+      const userText = input.value.trim();
+      box.innerHTML += `
+        <div class="flex justify-end gap-2">
+          <div class="bg-cyan-600/30 p-3 rounded-2xl rounded-tr-none max-w-[85%] text-white border border-cyan-500/40">
+            ${userText}
+          </div>
+        </div>
+      `;
+      input.value = '';
+
+      setTimeout(() => {
+        box.innerHTML += `
+          <div class="flex gap-2">
+            <div class="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-emerald-300 font-bold text-xs font-orbitron shrink-0">AI</div>
+            <div class="glass-card p-3 rounded-2xl rounded-tl-none max-w-[85%] text-slate-200 border-emerald-500/30">
+              已收到指令「${userText}」，核心運算單元已完成分析！
+            </div>
+          </div>
+        `;
+        box.scrollTop = box.scrollHeight;
+      }, 500);
+    }
+
+    /* 迷你避障遊戲邏輯 */
+    window.gameLoopId = null;
+    function startGame() {
+      audioSys.playClick();
+      const modal = document.getElementById('game-over-modal');
+      if (modal) modal.classList.add('hidden');
+
+      const canvas = document.getElementById('game-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+
+      let playerX = canvas.width / 2;
+      let dir = 1;
+      let score = 0;
+      let obstacles = [];
+
+      canvas.onclick = () => { dir *= -1; audioSys.playClick(); };
+
+      function update() {
+        ctx.fillStyle = '#020617';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 繪製玩家
+        playerX += dir * 3.5;
+        if (playerX < 12) playerX = 12;
+        if (playerX > canvas.width - 12) playerX = canvas.width - 12;
+
+        ctx.fillStyle = '#ff9900';
+        ctx.beginPath();
+        ctx.arc(playerX, canvas.height - 28, 9, 0, Math.PI * 2);
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = '#ff9900';
+        ctx.fill();
+
+        // 生成障礙物
+        if (Math.random() < 0.06) {
+          obstacles.push({ x: Math.random() * canvas.width, y: 0, speed: 2.5 + Math.random() * 2.5 });
+        }
+
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+          const obs = obstacles[i];
+          obs.y += obs.speed;
+          ctx.fillStyle = '#ff0055';
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = '#ff0055';
+          ctx.fillRect(obs.x - 7, obs.y - 7, 14, 14);
+
+          // 碰撞檢測
+          if (Math.hypot(playerX - obs.x, (canvas.height - 28) - obs.y) < 16) {
+            audioSys.playExplode();
+            cancelAnimationFrame(window.gameLoopId);
+            window.gameLoopId = null;
+
+            const modal = document.getElementById('game-over-modal');
+            const scoreEl = document.getElementById('final-score');
+            if (scoreEl) scoreEl.innerText = score;
+            if (modal) {
+              modal.classList.remove('hidden');
+              modal.classList.add('flex');
+            }
+            return;
+          }
+
+          if (obs.y > canvas.height) {
+            obstacles.splice(i, 1);
+            score += 10;
+            const scoreDisplay = document.getElementById('game-score');
+            if (scoreDisplay) scoreDisplay.innerText = score;
+          }
+        }
+
+        window.gameLoopId = requestAnimationFrame(update);
+      }
+
+      if (window.gameLoopId) cancelAnimationFrame(window.gameLoopId);
+      update();
+    }
+
+    function toggleFullscreen() {
+      audioSys.playClick();
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+
+    /* ===================================================
+       5. 頁面初始化與時間更新
+    =================================================== */
+    let wallpaperEngine;
+
+    window.onload = () => {
+      // 初始化 Lucide 圖示
+      lucide.createIcons();
+
+      // 初始化 Canvas 桌布引擎
+      wallpaperEngine = new WallpaperEngine('wallpaper-canvas');
+
+      // 更新時間 Widget
+      function updateTime() {
+        const now = new Date();
+        const hrs = String(now.getHours()).padStart(2, '0');
+        const mins = String(now.getMinutes()).padStart(2, '0');
+        const secs = String(now.getSeconds()).padStart(2, '0');
+
+        const statusTime = document.getElementById('status-time');
+        const widgetClock = document.getElementById('widget-clock');
+
+        if (statusTime) statusTime.innerText = `${hrs}:${mins}`;
+        if (widgetClock) widgetClock.innerText = `${hrs}:${mins}:${secs}`;
+      }
+      setInterval(updateTime, 1000);
+      updateTime();
+    };
+  </script>
+</body>
+</html>
