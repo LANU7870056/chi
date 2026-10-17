@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>交易資料查詢</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        /* 讓手機上的表格橫向滑動更流暢 */
+        .table-scroll-container {
+            -webkit-overflow-scrolling: touch;
+        }
+
+        * {
+            box-sizing: border-box; /* 確保 padding 不會撐破版面 */
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 10px;
+            background-color: #f8f9fa;
+            color: #333;
+            font-size: 15px;
+        }
+        h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        /* 手機端表格水平捲動容器 */
+        .table-container {
+            width: 99%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            background-color: #fff;
+            box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+            border-radius: 6px;
+            margin-top: 5px;
+        }
+        table {
+            width: 98%;
+            min-width: 480px; /* 確保各欄位有足夠空間展開 */
+            border-collapse: collapse;
+            background-color: #fff;
+            white-space: nowrap; /* 防止欄位文字換行擁擠 */
+        }
+        th, td {
+            padding: 2px 2px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 16px;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        /* 讓可排序的欄位呈現滑鼠游標提示 */
+        th.sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+        th.sortable:hover {
+            background-color: #0056b3;
+        }
+
+        /* 表格內資料（td）全面套用 Arial 字體，確保數字顯示一致 */
+        td {
+            font-family: Arial, sans-serif;
+        }
+
+        /* 奇數列呈現淺黃色 */
+        tr:nth-child(odd) {
+            background-color: #fffde7;
+        }
+
+        /* 滑鼠懸停時的背景色 */
+        tr:hover {
+            background-color: #ffe0b2;
+        }
+
+        .buyt {
+            font-weight: bold;
+            color: #00F;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #8B4522;
+        }
+
+        .info {
+            background: #e9ecef;
+            padding: 3px 2px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            font-size: 13.5px;
+        }
+        .positive {
+            color: #28a745; /* 正報酬綠字 */
+            font-weight: bold;
+        }
+        .negative {
+            color: #d9534f; /* 負報酬紅字 */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-3 sm:p-6 text-gray-800">
+
+    <div class="max-w-4xl mx-auto bg-white p-4 sm:p-6 rounded-2xl shadow-sm">
+        <h1 class="text-lg sm:text-xl font-bold mb-4 text-gray-800 flex items-center justify-between">
+            <!-- 左上角 Home 圖示與超連結 -->
+            <div class="flex items-center gap-3">
+                <a href="index.htm" class="flex items-center hover:opacity-80 transition-opacity" title="回首頁">
+                    <img src="home.png" alt="Home" class="w-[60px] h-[60px] object-contain">
+                </a>
+                <span>股票賣出記錄</span>
+            </div>
+            <span class="text-xs font-normal text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full"></span>
+        </h1>
+
+        <!-- 下拉式選單區塊（改為左右並排或手機上下排列） -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+            <!-- 選單 1：股票代號 -->
+            <div>
+
+                <select id="fundSelect" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl text-base focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <!-- 動態載入 -->
+                </select>
+            </div>
+            <!-- 選單 2：日期篩選 -->
+            <div>
+
+                <select id="dateSelect" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl text-base focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <!-- 動態載入 -->
+                </select>
+            </div>
+        </div>
+
+        <!-- 統計資訊看板 -->
+        <div class="flex items-center justify-between gap-2 mb-4 bg-blue-50/60 border border-blue-100 px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl text-center">
+            <div class="flex items-center gap-1 sm:gap-1.5">
+                <span class="text-xs text-gray-500" style="font-size: 18px">筆數:</span>
+                <span id="statCount" class="text-xs sm:text-sm font-bold text-gray-800" style="font-size: 18px;color: #28a745;">0</span>
+            </div>
+            <div class="h-4 w-[1px] bg-blue-200"></div>
+            <div class="flex items-center gap-1 sm:gap-1.5">
+                <span class="text-xs text-gray-500" style="font-size: 18px">總收入:</span>
+                <span id="statIncome" class="text-xs sm:text-sm font-bold text-gray-800" style="font-size: 18px">0</span>
+            </div>
+            <div class="h-4 w-[1px] bg-blue-200"></div>
+            <div class="flex items-center gap-1 sm:gap-1.5">
+                <span class="text-xs text-gray-500" style="font-size: 18px">總損益:</span>
+                <span id="statGL" class="text-xs sm:text-sm font-bold text-gray-800" style="font-size: 18px">0</span>
+            </div>
+        </div>
+
+        <!-- 表格容器 -->
+        <div class="table-scroll-container overflow-x-auto border border-gray-200 rounded-xl shadow-inner">
+            <table class="w-full border-collapse bg-white text-left text-xs sm:text-sm text-gray-600 whitespace-nowrap">
+                <thead class="bg-gray-100 text-gray-700 uppercase tracking-wider text-[11px] sm:text-xs">
+                    <tr>
+                        <th class="p-3 sm:p-3.5 cursor-pointer hover:bg-gray-200 select-none" onclick="sortData('md2')">
+                            日期 ↕<span id="sort-md2"></span>
+                        </th>
+                        <th class="p-3 sm:p-3.5">代號</th>
+                        <th class="p-3 sm:p-3.5">名稱</th>
+                        <th class="p-3 sm:p-3.5">股數</th>
+                        <th class="p-3 sm:p-3.5 cursor-pointer hover:bg-gray-200 select-none" onclick="sortData('sel')">
+                            賣價 ↕<span id="sort-sel"></span>
+                        </th>
+                        <th class="p-3 sm:p-3.5">費用</th>
+                        <th class="p-3 sm:p-3.5">收入</th>
+                        <th class="p-3 sm:p-3.5 cursor-pointer hover:bg-gray-200 select-none" onclick="sortData('GL')">
+                            損益 ↕<span id="sort-GL"></span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody" class="divide-y divide-gray-200">
+                    <!-- 動態載入資料 -->
+                </tbody>
+            </table>
+        </div>
+        <div class="text-center text-xs text-gray-400 mt-2 sm:hidden">
+            ← 左右滑動表格查看更多欄位 →
+        </div>
+    </div>
+
+    <!-- 引入外部 sell.js 檔案 -->
+    <script src="sell.js"></script>
+    <script>
+        let currentFilterCode = 'ALL';
+        let currentFilterDate = 'ALL'; // 新增：目前選取的日期
+        let currentSortColumn = null; 
+        let isAscending = true;      
+
+        function init() {
+            const selectEl = document.getElementById('fundSelect');
+            
+            if (typeof mysell !== 'undefined' && Array.isArray(mysell) && mysell.length > 0) {
+                const uniqueMap = new Map();
+                mysell.forEach(item => {
+                    if (item.sid && !uniqueMap.has(item.sid)) {
+                        uniqueMap.set(item.sid, item.na || '');
+                    }
+                });
+
+                // 動態生成「股票選單 (選單 1)」選項
+                uniqueMap.forEach((na, sid) => {
+                    const option = document.createElement('option');
+                    option.value = sid;
+                    option.textContent = na ? `${sid} - ${na}` : sid;
+                    selectEl.appendChild(option);
+                });
+
+                // 預設選取第一筆股票
+                const firstSid = selectEl.options[0].value;
+                currentFilterCode = firstSid;
+                selectEl.value = firstSid;
+
+                // 根據選中的股票初始化選單 2（日期）
+                updateDateOptions(firstSid);
+            }
+
+            // 監聽選單 1 變動：當股票改變時，更新日期選單並重新渲染
+            selectEl.addEventListener('change', (e) => {
+                currentFilterCode = e.target.value;
+                updateDateOptions(currentFilterCode);
+                renderTable();
+            });
+
+            // 監聽選單 2 變動：當日期改變時，重新渲染
+            document.getElementById('dateSelect').addEventListener('change', (e) => {
+                currentFilterDate = e.target.value;
+                renderTable();
+            });
+
+            renderTable();
+        }
+
+        // 根據選中的股票代號，動態產生對應的日期選項 (選單 2)
+        function updateDateOptions(sid) {
+            const dateSelectEl = document.getElementById('dateSelect');
+            dateSelectEl.innerHTML = ''; // 清空舊選項
+
+            // 加入「全部日期」選項
+            const allOption = document.createElement('option');
+            allOption.value = 'ALL';
+            allOption.textContent = '全部日期';
+            dateSelectEl.appendChild(allOption);
+
+            if (typeof mysell === 'undefined' || !Array.isArray(mysell)) return;
+
+            // 篩選出屬於該股票的資料，並取出所有不重複的日期
+            const matchedDates = [...new Set(
+                mysell
+                    .filter(item => sid === 'ALL' || item.sid === sid)
+                    .map(item => item.md2)
+                    .filter(Boolean)
+            )];
+
+            // 依照日期排序（可依需求遞增或遞減）
+            matchedDates.sort();
+
+            // 動態加入日期選項
+            matchedDates.forEach(dateStr => {
+                const option = document.createElement('option');
+                option.value = dateStr;
+                option.textContent = dateStr;
+                dateSelectEl.appendChild(option);
+            });
+
+            // 預設選單 2 回到「全部日期」
+            currentFilterDate = 'ALL';
+            dateSelectEl.value = 'ALL';
+        }
+
+        function sortData(column) {
+            if (currentSortColumn === column) {
+                isAscending = !isAscending;
+            } else {
+                currentSortColumn = column;
+                isAscending = true;
+            }
+            renderTable();
+        }
+
+        function updateSortIndicators() {
+            ['md2', 'sel', 'GL'].forEach(col => {
+                const indicator = document.getElementById(`sort-${col}`);
+                if (indicator) {
+                    if (currentSortColumn === col) {
+                        indicator.textContent = isAscending ? ' ▲' : ' ▼';
+                    } else {
+                        indicator.textContent = '';
+                    }
+                }
+            });
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            updateSortIndicators();
+
+            const dataList = (typeof mysell !== 'undefined' && Array.isArray(mysell)) ? mysell : [];
+
+            // 同時過濾「股票代號」與「日期」
+            let filteredData = dataList.filter(item => {
+                const matchCode = (currentFilterCode === 'ALL' || item.sid === currentFilterCode || currentFilterCode.includes(item.sid));
+                const matchDate = (currentFilterDate === 'ALL' || item.md2 === currentFilterDate);
+                return matchCode && matchDate;
+            });
+
+            let totalCount = filteredData.length;
+            let totalIncome = 0;
+            let totalGL = 0;
+
+            filteredData.forEach(item => {
+                totalIncome += Number(item.income) || 0;
+                totalGL += Number(item.GL) || 0;
+            });
+
+            document.getElementById('statCount').textContent = totalCount;
+            document.getElementById('statIncome').textContent = totalIncome.toLocaleString();
+            
+            const statGLEl = document.getElementById('statGL');
+            statGLEl.textContent = totalGL.toLocaleString();
+            statGLEl.className = `text-xs sm:text-sm font-bold ${totalGL > 0 ? 'text-red-500' : (totalGL < 0 ? 'text-green-600' : 'text-gray-800')}`;
+
+            if (currentSortColumn) {
+                filteredData.sort((a, b) => {
+                    let valA = a[currentSortColumn];
+                    let valB = b[currentSortColumn];
+
+                    if (currentSortColumn === 'sel' || currentSortColumn === 'GL') {
+                        valA = Number(valA) || 0;
+                        valB = Number(valB) || 0;
+                    }
+
+                    if (valA < valB) return isAscending ? -1 : 1;
+                    if (valA > valB) return isAscending ? 1 : -1;
+                    return 0;
+                });
+            }
+
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-gray-400">查無相關資料</td></tr>`;
+                return;
+            }
+
+            filteredData.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50 transition-colors';
+                
+                const glVal = Number(row.GL) || 0;
+                const glColorClass = glVal > 0 ? 'text-red-500 font-bold' : (glVal < 0 ? 'text-green-600 font-bold' : 'text-gray-700');
+
+                tr.innerHTML = `
+                    <td class="p-3 sm:p-3.5 font-medium text-gray-900">${row.md2 || ''}</td>
+                    <td class="p-3 sm:p-3.5">${row.sid || ''}</td>
+                    <td class="p-3 sm:p-3.5">${row.na || ''}</td>
+                    <td class="p-3 sm:p-3.5">${row.no || ''}</td>
+                    <td class="p-3 sm:p-3.5">${row.sel || ''}</td>
+                    <td class="p-3 sm:p-3.5">${row.EX || ''}</td>
+                    <td class="p-3 sm:p-3.5">${row.income || ''}</td>
+                    <td class="p-3 sm:p-3.5 ${glColorClass}">${row.GL || ''}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
