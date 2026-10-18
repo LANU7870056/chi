@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>類型總金額與股票明細統計表</title>
+
+    <!-- 1. 引入 jQuery 與 Fancybox 燈箱套件 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
     <style>
         body {
             background-color: #5a0000; /* 深紅背景 */
@@ -96,6 +102,22 @@
             font-weight: bold;
         }
 
+        /* 查看連結樣式 */
+        .btn-view {
+            color: #2b7cd3;
+            text-decoration: underline;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* 設定 Fancybox 彈出 iframe 視窗的尺寸 */
+        .fancybox-slide--iframe .fancybox-content {
+            width: 800px;
+            height: 600px;
+            max-width: 120%;
+            max-height: 120%;
+        }
+
         /* === 針對手機版 (螢幕寬度小於 600px 時) 的優化 === */
         @media screen and (max-width: 600px) {
             table {
@@ -108,6 +130,37 @@
             .home-icon img {
                 width: 50px !important;
                 height: 50px !important;
+            }
+        }
+
+
+/* === 針對手機版 (螢幕寬度小於 600px 時) 的優化 === */
+        @media screen and (max-width: 600px) {
+            table {
+                font-size: 14px;
+            }
+            th, td {
+                padding: 2px 2px;
+            }
+            /* 將手機版 Home 圖示放大至 50px */
+            .home-icon img {
+                width: 50px !important;
+                height: 50px !important;
+            }
+
+            /* 手機版 Fancybox 外框：去除邊距並讓內容靠頂部對齊 */
+            .fancybox-slide {
+                padding: 0 !important;
+                align-items: flex-start !important;
+            }
+
+            /* 手機版 Fancybox iframe 內容：寬度與高度皆設為 100% */
+            .fancybox-slide--iframe .fancybox-content {
+                width: 100% !important;
+                height: 100% !important;
+                max-width: 100% !important;
+                max-height: 100% !important;
+                margin: 0 !important;
             }
         }
     </style>
@@ -147,7 +200,8 @@
         <table id="stoTable2">
             <thead>
                 <tr>
-                    <th>股票SID</th>
+                    <th>查看</th>
+                    <th>股票</th>
                     <th>名稱</th>
                     <th>股數</th>
                     <th>買價</th>
@@ -310,18 +364,20 @@
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
+                    <td><a class="btn-view" data-fancybox data-type="iframe" href="2CB.htm?p=${stock.sid}">查看</a></td>
                     <td class="table-dark-text">${stock.sid}</td>
                     <td class="table-dark-text" style="text-align: left;">${stock.name}</td>
                     <td class="table-dark-text" style="text-align: right;">${stock.totalNo.toLocaleString()}</td>
                     <td class="table-dark-text" style="text-align: right;">${avgBuy.toFixed(2)}</td>
                     <td class="table-dark-text" style="text-align: right;">${stock.price.toFixed(2)}</td>
-                    <td class="text-align: right; ${profitClass}">${Math.round(profit).toLocaleString()}</td>
+                    <td style="text-align: right;" class="${profitClass}">${Math.round(profit).toLocaleString()}</td>
                 `;
                 tbody2.appendChild(tr);
             });
         }
     </script>
- <iframe id="myIframe" src="1p.htm" width="400" height="80" scrolling="no" style="display: block; margin: 0 auto; border: none; overflow: hidden;"></iframe>
+
+    <iframe id="myIframe" src="1p.htm" width="400" height="80" scrolling="no" style="display: block; margin: 0 auto; border: none; overflow: hidden;"></iframe>
 
     <script>
         function scheduleReload() {

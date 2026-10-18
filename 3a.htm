@@ -28,7 +28,6 @@
             padding: 12px;
             display: flex;
             justify-content: center;
-
         }
 
         .container {
@@ -223,7 +222,6 @@
             <select id="stockSelect"></select>
         </div>
         <div class="form-control">
-
             <select id="yearSelect"></select>
         </div>
     </div>
@@ -252,7 +250,6 @@
                     <th>日期</th>
                     <th>年度</th>
                     <th>月均價</th>
-                    <th>調整價</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
@@ -310,8 +307,9 @@
                 });
             }
         });
-// 依據 sid 由小到大排序 (支援字串數字與補零格式，如 0050、00919、2330)
-    uniqueStocks.sort((a, b) => a.sid.localeCompare(b.sid, undefined, { numeric: true }));
+
+        // 依據 sid 由小到大排序 (支援字串數字與補零格式，如 0050、00919、2330)
+        uniqueStocks.sort((a, b) => a.sid.localeCompare(b.sid, undefined, { numeric: true }));
 
         stockSelect.innerHTML = uniqueStocks.map(s => 
             `<option value="${s.sid}">${s.label}</option>`
@@ -418,14 +416,20 @@
             return;
         }
 
-        tableBody.innerHTML = filteredData.map(item => `
-            <tr>
-                <td>${item.md}</td>
-                <td>${item.year}</td>
-                <td>${parseFloat(item.pri).toFixed(2)}</td>
-                <td>${parseFloat(item.pri2).toFixed(2)}</td>
-            </tr>
-        `).join('');
+        tableBody.innerHTML = filteredData.map(item => {
+            const pri = parseFloat(item.pri);
+            const pri2 = parseFloat(item.pri2);
+            // 當 pri 與 pri2 數值不同時顯示 ▲ 符號
+            const mark = (pri !== pri2) ? ' ▲' : '';
+
+            return `
+                <tr>
+                    <td>${item.md}</td>
+                    <td>${item.year}</td>
+                    <td>${pri2.toFixed(2)}${mark}</td>
+                </tr>
+            `;
+        }).join('');
     }
 
     // 頁面載入時執行
