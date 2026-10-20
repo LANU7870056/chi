@@ -11,37 +11,28 @@
     <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
 
     <style>
-        body {
-            background-color: #5a0000; /* 深紅背景 */
-            font-family: "Microsoft JhengHei", Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 2px 2px;
-            box-sizing: border-box;
-            position: relative;
-        }
+  body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh; /* 確保高度佔滿整個視窗 */
+      background-color: #580000; /* 背景顏色（深紅/暗紅） */
+      
+      display: flex;
+      justify-content: center; /* 水平居中 */
+      align-items: center;     /* 垂直居中 */
+    }
 
-        /* 左上角回首頁圖示樣式 (PC 預設 40px) */
-        .home-icon {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            z-index: 1000;
-        }
+    /* 2. 中間卡片主體 */
+    .card {
+      background-color: #ffffff;
+      border-radius: 16px; /* 圓角效果 */
+      padding: 24px;
+      width: 90%;
+      max-width: 800px;  /* 設定最大寬度，避免在大螢幕上太寬 */
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 陰影提升質感 */
+    }
 
-        .home-icon img {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
-            transition: transform 0.2s;
-        }
-
-        .home-icon img:hover {
-            transform: scale(1.1);
-        }
+       
 
         /* 讓表格容器支援手機橫向滑動，避免螢幕太小破版 */
         .table-container {
@@ -90,6 +81,12 @@
         .table-dark-text {
             color: #4a2e1b;
             font-weight: bold;
+        }
+
+     .table-dark-text2 {
+            color: #006946;
+            font-weight: bold;
+
         }
 
         /* 損益顏色樣式 */
@@ -163,18 +160,57 @@
                 margin: 0 !important;
             }
         }
+
+
+/* 頂部標題列與 Home 圖示 */
+        .header-bar {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            min-height: 36px;
+        }
+
+        .home-link {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .home-icon {
+            height: 50px;
+            width: auto;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .home-icon:hover {
+            transform: scale(1.1);
+            opacity: 0.85;
+        }
+
+
     </style>
 </head>
 <body>
 
-    <!-- 左上角回首頁圖示 -->
-    <a href="index.htm" class="home-icon" title="回首頁">
-        <img src="home.png" alt="Home">
-    </a>
+ <div class="card">
+ <!-- 頂部標題區域 (包含左上角 HOME 圖示) -->
+    <div class="header-bar">
+        <a href="index.htm" class="home-link" title="返回首頁">
+            <img src="home.png" alt="首頁" class="home-icon">
+        </a>
+        <h2 style="font-size: 20px;color:#00F;">股票資產群組配置</h2>
+    </div>
 
     <!-- 表格 1：類型總金額統計表 -->
     <div class="table-container">
-        <h2 style="color: #fff; text-align: center; font-size: 20px;">股票資產群組配置</h2>
+
         <table id="stoTable">
             <thead>
                 <tr>
@@ -196,7 +232,7 @@
 
     <!-- 表格 2：股票明細與損益統計表 -->
     <div class="table-container">
-        <h2 style="color: #fff; text-align: center; font-size: 20px;">股票明細損益</h2>
+        <h2 style="color: #00f; text-align: center; font-size: 20px;">股票明細損益</h2>
         <table id="stoTable2">
             <thead>
                 <tr>
@@ -214,6 +250,7 @@
             </tbody>
         </table>
     </div>
+
 
     <!-- 載入外部資料 -->
     <script src="mysto.js"></script>
@@ -275,7 +312,7 @@
             const predefinedGroups = [
                 { name: "市值ETF", remark: "0052,9816" },
                 { name: "高息", remark: "高股息" },
-                { name: "主動息", remark: "代表為A" },
+                { name: "主動息", remark: "代號為A" },
                 { name: "其它", remark: "" }
             ];
 
@@ -299,7 +336,7 @@
                     <td style="text-align: right;">${Math.round(cost).toLocaleString()}</td>
                     <td style="text-align: right;">${Math.round(cost2).toLocaleString()}</td>
                     <td>${ratio}</td>
-                    <td style="text-align: left;">${group.remark}</td>
+                    <td style="text-align: center;font-size:14px;color:#00F;">${group.remark}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -380,8 +417,8 @@ tol9+=profit2;
                     <td class="table-dark-text">${stock.sid}</td>
                     <td class="table-dark-text" style="text-align: left;">${stock.name}</td>
                     <td class="table-dark-text" style="text-align: right;">${stock.totalNo.toLocaleString()}</td>
-                    <td class="table-dark-text" style="text-align: right;">${avgBuy.toFixed(3)}</td>
-                    <td class="table-dark-text" style="text-align: right;">${stock.price.toFixed(3)}</td>
+                    <td class="table-dark-text" style="text-align: right;">${avgBuy.toFixed(2)}</td>
+                    <td class="table-dark-text2" style="text-align: right;">${stock.price.toFixed(2)}</td>
                     <td style="text-align: right;" class="${profitClass}">${Math.round(profit2).toLocaleString()}</td>
                 `;
                 tbody2.appendChild(tr);
@@ -392,7 +429,7 @@ document.getElementById('profit-cell').textContent = tol9.toLocaleString();
         }
     </script>
 
-    <iframe id="myIframe" src="1p.htm" width="400" height="80" scrolling="no" style="display: block; margin: 0 auto; border: none; overflow: hidden;"></iframe>
+
 
     <script>
         function scheduleReload() {

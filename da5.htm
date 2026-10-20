@@ -28,12 +28,7 @@
     }
   </script>
 
-  <style>
-
-
-
-
-
+<style>
 
 body {
       margin: 0;
@@ -51,7 +46,7 @@ body {
       background-color: #ffffff;
       border-radius: 16px; /* 圓角效果 */
       padding: 2px;
-      width: 90%;
+      width: 95%;
       max-width: 800px;  /* 設定最大寬度，避免在大螢幕上太寬 */
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 陰影提升質感 */
     }
@@ -109,14 +104,55 @@ padding: 1px 1px;
             transform: scale(1.1);
         }
 
+ .header-bar {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            min-height: 36px;
+        }
+
+        .home-link {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .home-icon {
+            height: 50px;
+            width: auto;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .home-icon:hover {
+            transform: scale(1.1);
+            opacity: 0.85;
+        }
+h2 {
+            text-align: center;
+            font-size: 2.3rem;
+            color: var(--primary-color);
+            margin: 0;
+        }
   </style>
 </head>
 <body >
 <div class="card">
-    <!-- 左上角回首頁圖示 -->
-    <a href="index.htm" class="home-icon" title="回首頁">
-        <img src="home.png" alt="Home">
-    </a>
+ <!-- 頂部標題區域 (包含左上角 HOME 圖示) -->
+    <div class="header-bar">
+        <a href="index.htm" class="home-link" title="返回首頁">
+            <img src="home.png" alt="首頁" class="home-icon">
+        </a>
+        <h2 style="font-size: 20px;color:#00F;">股票分析戰情室</h2>
+    </div>
+
+
 
   <!-- Header -->
   <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-md sticky top-0 z-30">
@@ -127,19 +163,14 @@ padding: 1px 1px;
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
     <!-- Controls Box -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-6 transition-all">
-      <div class="space-y-2">
+   
 
-        <div class="relative">
+
           <select id="stockSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-base sm:text-lg rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 p-3 pr-10 appearance-none font-medium cursor-pointer shadow-sm transition-all">
             <!-- Dynamically populated options -->
           </select>
-          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
-            <i class="fa-solid fa-chevron-down text-sm"></i>
-          </div>
-        </div>
-      </div>
-    </div>
+          
+
 
     <!-- Data Display Section -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">

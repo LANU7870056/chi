@@ -3,43 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>多檔股票即時查詢</title>
-<div class="loading-dots">
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-</div><BR><BR><BR><BR><BR><BR>
-<a href="index.htm" class="home-link" title="返回首頁">
-    <img src="home.png" alt="首頁" class="home-icon w-[20px] h-[20px] object-contain">
-</a>
+
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-            background-color: #5a0000; /* 深紅背景 */
+      background-color: #5a0000; /* 深紅背景 */
+      color: #333;
     }
-.home-icon {
-    width: 50px;
-    height: 50px;
-    object-fit: contain; /* 確保圖片不變形 */
-}
+
+    .home-icon {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+    }
+
     .card {
       background: white;
       padding: 20px;
       border-radius: 8px;
       max-width: 480px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
     }
+
     .result-box {
       background: #eef2f7;
       padding: 12px;
@@ -49,6 +37,7 @@
       word-break: break-all;
       margin: 10px 0;
     }
+
     button {
       padding: 8px 16px;
       background-color: #0066cc;
@@ -57,141 +46,155 @@
       border-radius: 4px;
       cursor: pointer;
     }
+
     button:hover {
       background-color: #0052a3;
     }
 
-.loading-dots {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 6px; /* 圓點間距 */
-}
+    #tim {
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      min-height: 30px;
+    }
 
-.loading-dots span {
-  width: 10px;
-  height: 10px;
-  background-color: #3498db;
-  border-radius: 50%;
-  /* 執行上下跳動動畫 */
-  animation: bounce 1.4s infinite ease-in-out both;
-}
+    .loading-dots {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 6px;
+    }
 
-/* 利用時間差（Delay）創造出流暢的波浪效果 */
-.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
-.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+    .loading-dots span {
+      width: 10px;
+      height: 10px;
+      background-color: #3498db;
+      border-radius: 50%;
+      animation: bounce 1.4s infinite ease-in-out both;
+    }
 
-/* 定義跳動與縮放動畫 */
-@keyframes bounce {
-  0%, 80%, 100% { 
-    transform: scale(0);
-  } 
-  40% { 
-    transform: scale(1.0);
-  }
-}
+    .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
 
+    @keyframes bounce {
+      0%, 80%, 100% { 
+        transform: scale(0);
+      } 
+      40% { 
+        transform: scale(1.0);
+      }
+    }
+
+    /* 表格樣式 */
+    table {
+      width: 100%;
+      max-width: 480px;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #0066cc;
+      color: white;
+    }
   </style>
 </head>
 <body>
 
+  <!-- 時間/載入狀態顯示區域 -->
+  <div id="tim">
+    <div class="loading-dots">
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <a href="index.htm" class="home-link" title="返回首頁">
+    <img src="home.png" alt="首頁" class="home-icon">
+  </a>
+
   <div class="card">
-   
     <button onclick="queryStocks()">開始查詢</button>
-
     <div id="pr1-display" class="result-box">尚未查詢</div>
-
     <p id="update-time" style="font-size: 12px; color: #666;"></p>
   </div>
 
   <div id="table-container"></div>
+
   <script>
-// 1. 設定查詢字串
+    // 1. 設定查詢字串
+    var s = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A";
+    var s2 = "中鋼,鴻海,台積電,鴻準,華航,正文,合晶,力積電,AES-KY,統一台股50,主動中信台灣,元大台灣50,富邦台灣科技,中信綠能,群益台灣高息,復華台灣科技,統一台灣高息動能,臺灣永續高息,凱基台灣50,群益,主動統一全球,群益台灣科技";
 
-var s="2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A";
-var s2="中鋼,鴻海,台積電,鴻準,華航,正文,合晶,力積電,AES-KY,統一台股50,主動中信台灣,元大台灣50,富邦台灣科技,中信綠能,群益台灣高息,復華台灣科技,統一台灣高息動能,臺灣永續高息,凱基台灣50,群益,主動統一全球,群益台灣科技";
-
-    // 2. 宣告存放結果的變數 pr1
     let pr1 = "";
-
-    // 3. 替換為你的 GAS Web App 部署 URL
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwojQgeaMXg-dftk4d9nzRy7VVcZT1Szx36b2aLP-yQBHNef8A2W2r3c1lgD2WEAbM8mQ/exec";
+
+
+
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return "";
+    }
+
+    // 繪製表格函式
+    function renderTable(pr1Data) {
+      const arrayS = s.split(',');
+      const arrayPr1 = pr1Data ? pr1Data.split(',') : [];
+
+      const maxLen = Math.max(arrayS.length, arrayPr1.length);
+      let tableHtml = '<table><thead><tr><th>s</th><th>pr1</th></tr></thead><tbody>';
+
+      for (let i = 0; i < maxLen; i++) {
+        const valS = arrayS[i] !== undefined ? arrayS[i] : '';
+        const valPr1 = arrayPr1[i] !== undefined ? arrayPr1[i] : '';
+        tableHtml += `<tr><td>${valS}</td><td>${valPr1}</td></tr>`;
+      }
+
+      tableHtml += '</tbody></table>';
+      document.getElementById('table-container').innerHTML = tableHtml;
+    }
 
     async function queryStocks() {
       const displayEl = document.getElementById("pr1-display");
       const timeEl = document.getElementById("update-time");
-      
+      const timEl = document.getElementById("tim");
+
       displayEl.innerText = "查詢中...";
 
+      // 查詢開始時顯示 Loading 動畫
+      timEl.innerHTML = `
+        <div class="loading-dots">
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+        </div>`;
+
       try {
-        // 帶入參數 s 發送請求
         const response = await fetch(`${GAS_URL}?s=${encodeURIComponent(s)}`);
         const data = await response.json();
 
         if (data.status === "success") {
-          // 4. 將回傳結果賦值給變數 pr1
           pr1 = data.pr1;
 
-          // 印出確認
-          console.log("查詢成功，變數 pr1 =", pr1);
-      // 2. 寫入 Cookie
-      document.cookie = `s=${encodeURIComponent(s)}; path=/; max-age=86400`;
-      document.cookie = `s2=${encodeURIComponent(s2)}; path=/; max-age=86400`;
-      document.cookie = `pr2=${encodeURIComponent(pr1)}; path=/; max-age=86400`;
-
+          // 寫入 Cookie
+          document.cookie = `s=${encodeURIComponent(s)}; path=/; max-age=86400`;
+          document.cookie = `s2=${encodeURIComponent(s2)}; path=/; max-age=86400`;
+          document.cookie = `pr2=${encodeURIComponent(pr1)}; path=/; max-age=86400`;
 
           // 顯示在畫面上
           displayEl.innerText = pr1;
           timeEl.innerText = `更新時間：${data.time}`;
-        } else {
-          displayEl.innerText = "查詢失敗：" + data.message;
-        }
-      } catch (err) {
-        displayEl.innerText = "連線失敗";
-        console.error("Fetch Error:", err);
-      }
-    }
 
-    // 頁面載入時自動執行一次
-    window.onload = queryStocks;
-  </script>
-
-
-
-
- <script>
-
-    // 以逗號「,」分隔字串為陣列
- function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-            return "";
-        }
-        const pr1 = decodeURIComponent(getCookie("pr2"));
-
-
-    const arrayS = s.split(',');
-    const arrayPr1 = pr1.split(',');
-
-    // 取得最大列數
-    const maxLen = Math.max(arrayS.length, arrayPr1.length);
-
-    // 建立 HTML 表格
-    let tableHtml = '<table><thead><tr><th>s</th><th>pr1</th></tr></thead><tbody>';
-
-    for (let i = 0; i < maxLen; i++) {
-      const valS = arrayS[i] !== undefined ? arrayS[i] : '';
-      const valPr1 = arrayPr1[i] !== undefined ? arrayPr1[i] : '';
-      tableHtml += `<tr><td>${valS}</td><td>${valPr1}</td></tr>`;
-    }
-
-    tableHtml += '</tbody></table>';
-
-    // 將表格渲染至 DOM
-    document.getElementById('table-container').innerHTML = tableHtml;
-  </script>
-
-
-</body>
-</html>
+          // ★ 資料

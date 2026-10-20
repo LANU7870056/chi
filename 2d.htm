@@ -15,13 +15,30 @@
         * {
             box-sizing: border-box; /* 確保 padding 不會撐破版面 */
         }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            margin: 2px;
-           background-color: #5a0000; /* 深紅背景 */
-            color: #333;
-            font-size: 15px;
-        }
+
+
+
+ body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh; /* 確保高度佔滿整個視窗 */
+      background-color: #580000; /* 背景顏色（深紅/暗紅） */
+      
+      display: flex;
+      justify-content: center; /* 水平居中 */
+      align-items: top;     /* 垂直居中 */
+    }
+
+    /* 2. 中間卡片主體 */
+    .card {
+      background-color: #ffffff;
+      border-radius: 2px; /* 圓角效果 */
+      padding: 2px;
+      width: 100%;
+      max-width: 800px;  /* 設定最大寬度，避免在大螢幕上太寬 */
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 陰影提升質感 */
+    }
+
         h2 {
             font-size: 20px;
             margin-bottom: 2px;
@@ -93,8 +110,8 @@
 
         .info {
             background: #e9ecef;
-            padding: 3px 2px;
-            border-radius: 6px;
+            padding: 2px 2px;
+            border-radius: 2px;
             margin-bottom: 15px;
             line-height: 1.5;
             font-size: 13.5px;
@@ -109,10 +126,10 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 p-3 sm:p-6 text-gray-800">
+<body>
 
-    <div class="max-w-4xl mx-auto bg-white p-4 sm:p-6 rounded-2xl shadow-sm">
 
+ <div class="card">
 <h1 class="text-lg sm:text-xl font-bold mb-4 text-gray-800 grid grid-cols-3 items-center">
     <!-- 左側：Home 圖示 -->
     <div class="flex items-center justify-start">
