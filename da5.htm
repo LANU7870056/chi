@@ -30,14 +30,31 @@
 
   <style>
 
-   body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            margin: 2px;
-           background-color: #5a0000; /* 深紅背景 */
-            color: #333;
-            font-size: 15px;
-        }
 
+
+
+
+
+body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh; /* 確保高度佔滿整個視窗 */
+      background-color: #580000; /* 背景顏色（深紅/暗紅） */
+      
+      display: flex;
+      justify-content: center; /* 水平居中 */
+      align-items: center;     /* 垂直居中 */
+    }
+
+    /* 2. 中間卡片主體 */
+    .card {
+      background-color: #ffffff;
+      border-radius: 16px; /* 圓角效果 */
+      padding: 2px;
+      width: 90%;
+      max-width: 800px;  /* 設定最大寬度，避免在大螢幕上太寬 */
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 陰影提升質感 */
+    }
      /* 手機端表格水平捲動容器 */
         .table-container {
             width: 100%;
@@ -55,14 +72,15 @@
             background-color: #fff;
             white-space: nowrap; /* 防止欄位文字換行擁擠 */
         }
-        th, td {
-            padding: 2px 2px;
+       td {
+            padding: 1px 1px;
             text-align: center;
             border-bottom: 1px solid #dee2e6;
-            font-size: 20px;
+            font-size: 16px;
         }
         th {
-            background-color: #007bff;
+            background-color: #007bff;.
+padding: 1px 1px;
             color: white;
             position: sticky;
             top: 0;
@@ -75,8 +93,8 @@
         /* 左上角回首頁圖示樣式 (PC 預設 40px) */
         .home-icon {
             position: fixed;
-            top: 15px;
-            left: 15px;
+            top: 2px;
+            left: 2px;
             z-index: 1000;
         }
 
@@ -94,6 +112,7 @@
   </style>
 </head>
 <body >
+<div class="card">
     <!-- 左上角回首頁圖示 -->
     <a href="index.htm" class="home-icon" title="回首頁">
         <img src="home.png" alt="Home">
@@ -101,21 +120,7 @@
 
   <!-- Header -->
   <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-md sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="p-2 bg-blue-600 rounded-lg text-white">
-          <i class="fa-solid fa-chart-line text-xl"></i>
-        </div>
-        <div>
-          <h1 class="text-xl sm:text-2xl font-bold tracking-tight">ETF股利配息分析</h1>
-          <p class="text-xs sm:text-sm text-slate-400">Dividend & Yield Data Analysis</p>
-        </div>
-      </div>
-      <div id="statusBadge" class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-        <span class="w-2 h-2 mr-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
-        <span id="statusText">已載入數據</span>
-      </div>
-    </div>
+    
   </header>
 
   <!-- Main Content Container -->
@@ -124,9 +129,7 @@
     <!-- Controls Box -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-6 transition-all">
       <div class="space-y-2">
-        <label for="stockSelect" class="block text-sm font-semibold text-slate-700">
-          <i class="fa-solid fa-list-check text-blue-600 mr-1.5"></i>選擇股票 / ETF
-        </label>
+
         <div class="relative">
           <select id="stockSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-base sm:text-lg rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 p-3 pr-10 appearance-none font-medium cursor-pointer shadow-sm transition-all">
             <!-- Dynamically populated options -->
@@ -158,14 +161,14 @@
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse text-[16px] sm:text-[18px] whitespace-nowrap">
           <thead>
-            <tr class="bg-slate-100 border-b border-slate-200 font-semibold">
-              <th class="py-3.5 px-4 text-right responsive-th">股利</th>
-              <th class="py-3.5 px-4 responsive-th">除息日</th>
-              <th class="py-3.5 px-4 responsive-th">發放日</th>
-              <th class="py-3.5 px-4 text-right responsive-th">股價</th>
-              <th class="py-3.5 px-4 text-right responsive-th">股價2</th>
-              <th class="py-3.5 px-4 text-right responsive-th">年化殖利率</th>
-            </tr>
+<tr class="bg-slate-100 border-b border-slate-200 font-semibold">
+  <th class="py-1 px-1 text-center responsive-th">股利</th>
+  <th class="py-1 px-1 text-center responsive-th">除息日</th>
+  <th class="py-1 px-1 text-center responsive-th">發放日</th>
+  <th class="py-1 px-1 text-center responsive-th">股價</th>
+  <th class="py-1 px-1 text-center responsive-th">調整價</th>
+  <th class="py-1 px-1 text-center responsive-th">年化殖利率</th>
+</tr>
           </thead>
           <tbody id="tableBody" class="divide-y divide-slate-200/50">
             <!-- Dynamic rows -->
@@ -183,10 +186,8 @@
 
   </main>
 
-  <!-- Footer -->
-  <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
-    <p>© 2026 股利殖利率查詢平台. All rights reserved.</p>
-  </footer>
+
+</div>
 
   <!-- Include external JS file as required -->
   <script src="da5.js"></script>
@@ -204,10 +205,10 @@
     document.addEventListener('DOMContentLoaded', () => {
       if (typeof da5 !== 'undefined' && Array.isArray(da5) && da5.length > 0) {
         dataSource = da5;
-        updateStatus('已成功從 da5.js 載入', 'emerald');
+        //updateStatus('已成功從 da5.js 載入', 'emerald');
       } else {
         dataSource = fallbackData;
-        updateStatus('使用預備資料庫', 'amber');
+        //updateStatus('使用預備資料庫', 'amber');
       }
 
       initDropdown();
@@ -326,21 +327,19 @@
         const isOddRow = (index % 2 === 0);
         const rowBgClass = isOddRow ? 'bg-[#fef9c3] hover:bg-yellow-200/80' : 'bg-[#e0f2fe] hover:bg-sky-200/80';
 
-        const tr = document.createElement('tr');
+
+const tr = document.createElement('tr');
         tr.className = `${rowBgClass} transition-colors border-b border-slate-200/60`;
         tr.innerHTML = `
-          <td style="font-size: 20px; color: #1d4ed8;" class="py-3.5 px-4 text-right font-semibold text-slate-900">${item.ra}</td>
-          <td style="font-size: 20px; color: #1d4ed8;" class="py-3.5 px-4">
+          <td style="font-size: 18px; color: #1d4ed8; padding: 2px;" class="text-right font-semibold text-slate-900">${item.ra}</td>
+          <td style="font-size: 18px; color: #1d4ed8; padding: 2px;">
             <div class="font-medium text-slate-800">${da1Date.formatted}</div>
-
           </td>
-          <td  class="py-3.5 px-4">
-            <div class="font-medium text-slate-800">${da2Date.formatted}</div>
-          </td>
-          <td class="py-3.5 px-4 text-right font-medium text-slate-900">${item.price}</td>
-          <td  style="font-size: 20px; color: #1d4ed8;" class="py-3.5 px-4 text-right text-slate-700">${item.DJ}</td>
-          <td  style="font-size: 20px; color: #1d4ed8;" class="py-3.5 px-4 text-right">
-            <span class="inline-flex items-center px-3 py-1 rounded-md ${badgeClass}">
+          <td style="padding: 2px;"><div class="font-medium text-slate-800">${da2Date.formatted}</div></td>
+          <td style="padding: 2px;" class="text-right font-medium text-slate-900">${item.price}</td>
+          <td style="font-size: 16px; color: #1d4ed8; padding: 2px;" class="text-right text-slate-700">${item.DJ}</td>
+          <td style="font-size: 18px; color: #1d4ed8; padding: 2px;" class="text-right">
+            <span class="inline-flex items-center px-2 py-0.5 rounded-md ${badgeClass}">
               ${rateFormatted}
             </span>
           </td>
