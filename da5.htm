@@ -46,7 +46,7 @@ body {
       background-color: #ffffff;
       border-radius: 16px; /* 圓角效果 */
       padding: 2px;
-      width: 95%;
+      width: 98%;
       max-width: 800px;  /* 設定最大寬度，避免在大螢幕上太寬 */
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 陰影提升質感 */
     }
@@ -160,34 +160,32 @@ h2 {
   </header>
 
   <!-- Main Content Container -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-1 sm:px-1 lg:px-1 py-1 space-y-1">
 
     <!-- Controls Box -->
    
 
 
-          <select id="stockSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-base sm:text-lg rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 p-3 pr-10 appearance-none font-medium cursor-pointer shadow-sm transition-all">
+          <select id="stockSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-base sm:text-lg rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 p-1 pr-1 appearance-none font-medium cursor-pointer shadow-sm transition-all">
             <!-- Dynamically populated options -->
           </select>
-          
 
-
-    <!-- Data Display Section -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+<!-- Data Display Section -->
+<div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
       <!-- Table Header & Summary Statistics -->
-      <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="p-1 sm:p-1 border-b border-slate-100 flex flex-row items-center justify-between gap-1">
         
-        <!-- 表格上方統計：最新股利 & 高殖利率筆數 -->
-        <div class="flex flex-wrap items-center gap-3 sm:gap-6 text-sm font-semibold text-slate-700">
-          <div  style="font-size: 20px; color: #1d4ed8;" class="bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg text-amber-900">
-            最新股利：<span id="statLatestDividend" class="text-amber-700 font-bold text-base">--</span>
+        <!-- 表格上方統計：最新股利 & 高殖利率筆數 (強制橫向同一列 flex-row flex-nowrap) -->
+        <div class="flex flex-row flex-nowrap items-center gap-1.5 text-sm font-semibold text-slate-700 w-full overflow-x-auto">
+          <div style="color: #1d4ed8;" class="bg-amber-50 border border-amber-200 px-2 py-1 rounded-lg text-amber-900 whitespace-nowrap text-sm sm:text-base flex-1 text-center">
+            最新股利：<span id="statLatestDividend" class="text-amber-700 font-bold">--</span>
           </div>
-          <div  style="font-size: 20px; color: #1d4ed8;" class="bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg text-emerald-900">
-            高殖利率 (≥8%)：<span id="statHighYieldCount" class="text-emerald-700 font-bold text-base">0</span> 筆
+          <div style="color: #1d4ed8;" class="bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-lg text-emerald-900 whitespace-nowrap text-sm sm:text-base flex-1 text-center">
+            高殖利率(≥8%)：<span id="statHighYieldCount" class="text-emerald-700 font-bold">0</span> 筆
           </div>
         </div>
       </div>
-
+</div>
       <!-- Table View -->
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse text-[16px] sm:text-[18px] whitespace-nowrap">
@@ -362,18 +360,18 @@ h2 {
 const tr = document.createElement('tr');
         tr.className = `${rowBgClass} transition-colors border-b border-slate-200/60`;
         tr.innerHTML = `
-          <td style="font-size: 18px; color: #1d4ed8; padding: 2px;" class="text-right font-semibold text-slate-900">${item.ra}</td>
-          <td style="font-size: 18px; color: #1d4ed8; padding: 2px;">
-            <div class="font-medium text-slate-800">${da1Date.formatted}</div>
+          <td style="font-size: 18px; color: #1d4ed8; padding: 1px;" class="text-center font-semibold text-slate-900">${item.ra}</td>
+          <td style="font-size: 18px; color: #1d4ed8; padding: 1px;">
+            <div class="font-medium text-slate-800"  style="font-size:14px;">${da1Date.formatted}</div>
           </td>
-          <td style="padding: 2px;"><div class="font-medium text-slate-800">${da2Date.formatted}</div></td>
-          <td style="padding: 2px;" class="text-right font-medium text-slate-900">${item.price}</td>
-          <td style="font-size: 16px; color: #1d4ed8; padding: 2px;" class="text-right text-slate-700">${item.DJ}</td>
-          <td style="font-size: 18px; color: #1d4ed8; padding: 2px;" class="text-right">
-            <span class="inline-flex items-center px-2 py-0.5 rounded-md ${badgeClass}">
-              ${rateFormatted}
-            </span>
-          </td>
+          <td style="padding: 1px;"><div class="font-medium text-slate-800" style="font-size:14px;">${da2Date.formatted}</div></td>
+          <td style="padding: 1px;" class="text-center font-medium text-slate-900">${item.price}</td>
+          <td style="font-size: 16px; color: #1d4ed8; padding: 1px;" class="text-center text-slate-700">${item.DJ}</td>
+<td style="font-size: 18px; color: #1d4ed8; padding: 1px;" class="align-middle text-center">
+  <span class="inline-flex items-center px-2 py-0.5 rounded-md ${badgeClass}">
+    ${rateFormatted}
+  </span>
+</td>
         `;
         tBody.appendChild(tr);
       });

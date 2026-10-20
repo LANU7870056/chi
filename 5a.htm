@@ -26,8 +26,8 @@
     .card {
       background-color: #ffffff;
       border-radius: 16px; /* 圓角效果 */
-      padding: 24px;
-      width: 90%;
+      padding: 8px;
+      width: 98%;
       max-width: 800px;  /* 設定最大寬度，避免在大螢幕上太寬 */
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 陰影提升質感 */
     }
@@ -39,7 +39,7 @@
             width: 100%;
             max-width: 800px;
             overflow-x: auto;
-            margin-bottom: 30px;
+            margin-bottom: 0px;
         }
 
         table {
@@ -53,7 +53,7 @@
 
         th, td {
             border: 1px solid #000;
-            padding: 10px 16px;
+            padding: 8px 8px;
             white-space: nowrap;
         }
 
@@ -121,12 +121,12 @@
                 font-size: 14px;
             }
             th, td {
-                padding: 2px 2px;
+                padding: 1px 1px;
             }
             /* 將手機版 Home 圖示放大至 120px，並加上 !important 確保強制生效 */
             .home-icon img {
-                width: 50px !important;
-                height: 50px !important;
+                width: 5px !important;
+                height: 5px !important;
             }
         }
 
@@ -137,7 +137,7 @@
                 font-size: 14px;
             }
             th, td {
-                padding: 2px 2px;
+                padding: 2px 1px;
             }
             /* 將手機版 Home 圖示放大至 50px */
             .home-icon img {
@@ -215,8 +215,8 @@
             <thead>
                 <tr>
                     <th>類型</th>
-                    <th>總金額</th>
-                    <th>總金額2</th>
+                    <th>買入金額</th>
+                    <th>目前市價</th>
                     <th>比例</th>
                     <th>備註</th>
                 </tr>
@@ -313,7 +313,7 @@
                 { name: "市值ETF", remark: "0052,9816" },
                 { name: "高息", remark: "高股息" },
                 { name: "主動息", remark: "代號為A" },
-                { name: "其它", remark: "" }
+                { name: "其它", remark: "一般股票" }
             ];
 
             const tbody = document.getElementById('tableBody');
@@ -413,13 +413,13 @@ tol9+=profit2;
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><a class="btn-view" data-fancybox data-type="iframe" href="2CB.htm?p=${stock.sid}">查看</a></td>
-                    <td class="table-dark-text">${stock.sid}</td>
-                    <td class="table-dark-text" style="text-align: left;">${stock.name}</td>
+              <td style="font-size:18px;"><a class="btn-view" data-fancybox data-type="iframe" href="2CB.htm?p=${stock.sid}">查看</a></td>
+              <td class="table-dark-text">${stock.sid}</td>
+              <td class="table-dark-text" style="text-align: left;font-size:13px;">${stock.name}</td>
                     <td class="table-dark-text" style="text-align: right;">${stock.totalNo.toLocaleString()}</td>
-                    <td class="table-dark-text" style="text-align: right;">${avgBuy.toFixed(2)}</td>
-                    <td class="table-dark-text2" style="text-align: right;">${stock.price.toFixed(2)}</td>
-                    <td style="text-align: right;" class="${profitClass}">${Math.round(profit2).toLocaleString()}</td>
+                    <td class="table-dark-text" style="font-size:18px;text-align: right;">${avgBuy.toFixed(2)}</td>
+                    <td class="table-dark-text2" style="font-size:18px;text-align: right;">${stock.price.toFixed(2)}</td>
+                    <td style="font-size:18px;text-align: right;" class="${profitClass}">${Math.round(profit2).toLocaleString()}</td>
                 `;
                 tbody2.appendChild(tr);
             });
