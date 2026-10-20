@@ -174,7 +174,7 @@
 
     <!-- 表格 1：類型總金額統計表 -->
     <div class="table-container">
-        <h2 style="color: #fff; text-align: center; font-size: 20px;">類型總金額統計</h2>
+        <h2 style="color: #fff; text-align: center; font-size: 20px;">股票資產群組配置</h2>
         <table id="stoTable">
             <thead>
                 <tr>
@@ -196,7 +196,7 @@
 
     <!-- 表格 2：股票明細與損益統計表 -->
     <div class="table-container">
-        <h2 style="color: #fff; text-align: center; font-size: 20px;">股票明細損益統計 (表格2)</h2>
+        <h2 style="color: #fff; text-align: center; font-size: 20px;">股票明細損益</h2>
         <table id="stoTable2">
             <thead>
                 <tr>
@@ -311,7 +311,7 @@
                 <td style="text-align: right;">${Math.round(totalSum).toLocaleString()}</td>
                 <td style="text-align: right;">${Math.round(totalSum2).toLocaleString()}</td>
                 <td>損益</td>
-                <td style="text-align: right;">431,518</td>
+                <td style="text-align: right;" id="profit-cell">XX</td>
             `;
             tfoot.appendChild(footTr);
 
@@ -349,11 +349,21 @@
 
             const tbody2 = document.getElementById('tableBody2');
 
+var tol9=0;
+var tol91=0;
+var profit2=0;
             sortedStocks.forEach(stock => {
                 const avgBuy = stock.totalNo > 0 ? (stock.totalBuyWeight / stock.totalNo) : 0;
                 const totalMarketValue = stock.totalNo * stock.price;
                 const totalCostValue = stock.totalBuyWeight;
                 const profit = totalMarketValue - totalCostValue;
+
+
+stock.price = Number(stock.price.toFixed(2));
+
+
+const profit2=(stock.price.toFixed(3)-avgBuy.toFixed(3))*stock.totalNo;
+
 
                 let profitClass = 'table-dark-text';
                 if (profit > 0) {
@@ -361,6 +371,8 @@
                 } else if (profit < 0) {
                     profitClass = 'profit-neg';
                 }
+tol9+=profit2;
+
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -368,12 +380,15 @@
                     <td class="table-dark-text">${stock.sid}</td>
                     <td class="table-dark-text" style="text-align: left;">${stock.name}</td>
                     <td class="table-dark-text" style="text-align: right;">${stock.totalNo.toLocaleString()}</td>
-                    <td class="table-dark-text" style="text-align: right;">${avgBuy.toFixed(2)}</td>
-                    <td class="table-dark-text" style="text-align: right;">${stock.price.toFixed(2)}</td>
-                    <td style="text-align: right;" class="${profitClass}">${Math.round(profit).toLocaleString()}</td>
+                    <td class="table-dark-text" style="text-align: right;">${avgBuy.toFixed(3)}</td>
+                    <td class="table-dark-text" style="text-align: right;">${stock.price.toFixed(3)}</td>
+                    <td style="text-align: right;" class="${profitClass}">${Math.round(profit2).toLocaleString()}</td>
                 `;
                 tbody2.appendChild(tr);
             });
+
+tol9=Math.round(tol9)
+document.getElementById('profit-cell').textContent = tol9.toLocaleString();
         }
     </script>
 

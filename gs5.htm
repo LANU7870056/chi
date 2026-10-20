@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>多檔股票即時查詢</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #5a0000; /* 深紅背景 */
+      color: #333;
+    }
+
+    .home-icon {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 480px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    .result-box {
+      background: #eef2f7;
+      padding: 12px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 16px;
+      word-break: break-all;
+      margin: 10px 0;
+    }
+
+    button {
+      padding: 8px 16px;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0052a3;
+    }
+
+    #tim {
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      min-height: 30px;
+    }
+
+    .loading-dots {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .loading-dots span {
+      width: 10px;
+      height: 10px;
+      background-color: #3498db;
+      border-radius: 50%;
+      animation: bounce 1.4s infinite ease-in-out both;
+    }
+
+    .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { 
+        transform: scale(0);
+      } 
+      40% { 
+        transform: scale(1.0);
+      }
+    }
+
+    /* 表格樣式 */
+    table {
+      width: 100%;
+      max-width: 480px;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #0066cc;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 時間/載入狀態顯示區域 -->
+  <div id="tim">
+    <div class="loading-dots">
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <a href="index.htm" class="home-link" title="返回首頁">
+    <img src="home.png" alt="首頁" class="home-icon">
+  </a>
+
+  <div class="card">
+    <button onclick="queryStocks()">開始查詢</button>
+    <div id="pr1-display" class="result-box">尚未查詢</div>
+    <p id="update-time" style="font-size: 12px; color: #666;"></p>
+  </div>
+
+  <div id="table-container"></div>
+
+  <script>
+    var s = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A";
+    var s2 = "中鋼,鴻海,台積電,鴻準,華航,正文,合晶,力積電,AES-KY,統一台股50,主動中信台灣,元大台灣50,富邦台灣科技,中信綠能,群益台灣高息,復華台灣科技,統一台灣高息動能,臺灣永續高息,凱基台灣50,群益,主動統一全球,群益台灣科技";
+
+    let pr1 = "";
+    let tim9 = "";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyzpEJ93ZE2V0-tFNIS2ha2dn8uP7gIOv68hKx2NMAg6gCWTTpTUPIEAOJX-Yk0nMRz/exec";
+
+    // Cookie 讀取函式（自動解碼）
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift());
+      return "";
+    }
+
+    // 繪製表格函式
+    function renderTable(pr1Data) {
+      const arrayS = s.split(',');
+      const arrayPr1 = pr1Data ? pr1Data.split(',') : [];
+
+      const maxLen = Math.max(arrayS.length, arrayPr1.length);
+      let tableHtml = '<table><thead><tr><th>s</th><th>pr1</th></tr></thead><tbody>';
+
+      for (let i = 0; i < maxLen; i++) {
+        const valS = arrayS[i] !== undefined ? arrayS[i] : '';
+        const valPr1 = arrayPr1[i] !== undefined ? arrayPr1[i] : '';
+        tableHtml += `<tr><td>${valS}</td><td>${valPr1}</td></tr>`;
+      }
+
+      tableHtml += '</tbody></table>';
+      document.getElementById('table-container').innerHTML = tableHtml;
+    }
+
+    async function queryStocks() {
+      const displayEl = document.getElementById("pr1-display");
+      const timeEl = document.getElementById("update-time");
+      const timEl = document.getElementById("tim");
+
+      // 1. 讀取 Cookie tim9 並計算時間差 tim8（單位：秒）
+      const tim9Val = getCookie("tim9");
+      let tim8 = null;
+
+      if (tim9Val) {
+        const tim9Time = new Date(tim9Val).getTime();
+        const currentTime = new Date().getTime();
+        if (!isNaN(tim9Time)) {
+          tim8 = Math.floor((currentTime - tim9Time) / 1000);
+        }
+      }
+
+timEl.innerText =tim8;
+
+      // 2. 判斷 tim8 是否 <= 10 秒
+      if (tim8 !== null && tim8 <= 10) {
+        // 小於等於 10 秒：不安裝/不執行 GAS，直接從 Cookie (pr2) 取資料渲染
+        const cachedPr2 = getCookie("pr2");
+        pr1 = cachedPr2;
+
+        displayEl.innerText = pr1 || "快取無資料";
+        timeEl.innerText = `上次更新時間：${tim9Val}（距今 ${tim8} 秒，未滿 10 秒不重複查詢）`;
+        timEl.innerText = "完成時間：使用快取資料";
+
+        renderTable(pr1);
+        return; // 中斷函式，不執行發送 Request 給 GS
+      }
+
+      // 3. tim8 > 10 秒或無 tim9 記錄時，正常執行 GAS 請求
+      displayEl.innerText = "查詢中...";
+      timEl.innerHTML = `
+        <div class="loading-dots">
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+        </div>`;
+
+      try {
+        const response = await fetch(`${GAS_URL}?s=${encodeURIComponent(s)}`);
+        const data = await response.json();
+
+        if (data.status === "success") {
+          const rawPr1 = data.pr1 || "";
+          pr1 = rawPr1.split(',').map(val => {
+            const num = parseFloat(val.trim());
+            return isNaN(num) ? val : num.toFixed(2);
+          }).join(',');
+
+          tim9 = data.time || new Date().toISOString();
+
+          // 寫入 Cookie
+          document.cookie = `s=${encodeURIComponent(s)}; path=/; max-age=86400`;
+          document.cookie = `s2=${encodeURIComponent(s2)}; path=/; max-age=86400`;
+          document.cookie = `pr2=${encodeURIComponent(pr1)}; path=/; max-age=86400`;
+          document.cookie = `tim9=${encodeURIComponent(tim9)}; path=/; max-age=86400`;
+
+          // 顯示畫面結果
+          displayEl.innerText = pr1;
+          timeEl.innerText = `更新時間：${data.time}`;
+
+          const now = new Date();
+          timEl.innerText = "完成時間：" + now.toLocaleString('zh-TW', { hour12: false });
+
+          renderTable(pr1);
+        } else {
+          displayEl.innerText = "查詢失敗：" + data.message;
+          timEl.innerText = "查詢失敗";
+        }
+      } catch (err) {
+        displayEl.innerText = "連線失敗";
+        timEl.innerText = "連線失敗";
+        console.error("Fetch Error:", err);
+      }
+    }
+
+    // 頁面載入時自動執行
+    window.onload = queryStocks;
+  </script>
+</body>
+</html>

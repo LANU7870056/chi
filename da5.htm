@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>台灣股票/ETF股利殖利率查詢</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter & Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+
+ 
+     
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+
+   body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 2px;
+           background-color: #5a0000; /* 深紅背景 */
+            color: #333;
+            font-size: 15px;
+        }
+
+     /* 手機端表格水平捲動容器 */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            background-color: #fff;
+            box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+            border-radius: 2px;
+            margin-top: 2px;
+        }
+        table {
+            width: 100%;
+            min-width: 300px; /* 確保各欄位有足夠空間展開 */
+            border-collapse: collapse;
+            background-color: #fff;
+            white-space: nowrap; /* 防止欄位文字換行擁擠 */
+        }
+        th, td {
+            padding: 2px 2px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 20px;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+    }
+
+
+
+        /* 左上角回首頁圖示樣式 (PC 預設 40px) */
+        .home-icon {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1000;
+        }
+
+        .home-icon img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            transition: transform 0.2s;
+        }
+
+        .home-icon img:hover {
+            transform: scale(1.1);
+        }
+
+  </style>
+</head>
+<body >
+    <!-- 左上角回首頁圖示 -->
+    <a href="index.htm" class="home-icon" title="回首頁">
+        <img src="home.png" alt="Home">
+    </a>
+
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="p-2 bg-blue-600 rounded-lg text-white">
+          <i class="fa-solid fa-chart-line text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-bold tracking-tight">ETF股利配息分析</h1>
+          <p class="text-xs sm:text-sm text-slate-400">Dividend & Yield Data Analysis</p>
+        </div>
+      </div>
+      <div id="statusBadge" class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+        <span class="w-2 h-2 mr-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
+        <span id="statusText">已載入數據</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- Controls Box -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-6 transition-all">
+      <div class="space-y-2">
+        <label for="stockSelect" class="block text-sm font-semibold text-slate-700">
+          <i class="fa-solid fa-list-check text-blue-600 mr-1.5"></i>選擇股票 / ETF
+        </label>
+        <div class="relative">
+          <select id="stockSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-base sm:text-lg rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 p-3 pr-10 appearance-none font-medium cursor-pointer shadow-sm transition-all">
+            <!-- Dynamically populated options -->
+          </select>
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+            <i class="fa-solid fa-chevron-down text-sm"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Display Section -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+      <!-- Table Header & Summary Statistics -->
+      <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        
+        <!-- 表格上方統計：最新股利 & 高殖利率筆數 -->
+        <div class="flex flex-wrap items-center gap-3 sm:gap-6 text-sm font-semibold text-slate-700">
+          <div  style="font-size: 20px; color: #1d4ed8;" class="bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg text-amber-900">
+            最新股利：<span id="statLatestDividend" class="text-amber-700 font-bold text-base">--</span>
+          </div>
+          <div  style="font-size: 20px; color: #1d4ed8;" class="bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg text-emerald-900">
+            高殖利率 (≥8%)：<span id="statHighYieldCount" class="text-emerald-700 font-bold text-base">0</span> 筆
+          </div>
+        </div>
+      </div>
+
+      <!-- Table View -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-[16px] sm:text-[18px] whitespace-nowrap">
+          <thead>
+            <tr class="bg-slate-100 border-b border-slate-200 font-semibold">
+              <th class="py-3.5 px-4 text-right responsive-th">股利</th>
+              <th class="py-3.5 px-4 responsive-th">除息日</th>
+              <th class="py-3.5 px-4 responsive-th">發放日</th>
+              <th class="py-3.5 px-4 text-right responsive-th">股價</th>
+              <th class="py-3.5 px-4 text-right responsive-th">股價2</th>
+              <th class="py-3.5 px-4 text-right responsive-th">年化殖利率</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="divide-y divide-slate-200/50">
+            <!-- Dynamic rows -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="hidden py-12 text-center text-slate-500">
+        <i class="fa-solid fa-folder-open text-4xl mb-3 text-slate-300"></i>
+        <p class="text-base font-medium">沒有符合條件的數據資料</p>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
+    <p>© 2026 股利殖利率查詢平台. All rights reserved.</p>
+  </footer>
+
+  <!-- Include external JS file as required -->
+  <script src="da5.js"></script>
+
+  <!-- Application Script -->
+  <script>
+    const fallbackData = [
+      {sid:"0052", na:"富邦台灣科技", ra:"1.199", da1:"46132", da2:"46157", price:"50.05", DJ:"0050.05", rate:"0.024"},
+      {sid:"0052", na:"富邦台灣科技", ra:"3.23", da1:"45770", da2:"45796", price:"153", DJ:"21.86", rate:"0.085"},
+      {sid:"0052", na:"富邦台灣科技", ra:"6.43", da1:"45400", da2:"45427", price:"160.75", DJ:"22.96", rate:"0.105"}
+    ];
+
+    let dataSource = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof da5 !== 'undefined' && Array.isArray(da5) && da5.length > 0) {
+        dataSource = da5;
+        updateStatus('已成功從 da5.js 載入', 'emerald');
+      } else {
+        dataSource = fallbackData;
+        updateStatus('使用預備資料庫', 'amber');
+      }
+
+      initDropdown();
+      bindEvents();
+      renderData();
+    });
+
+    function updateStatus(message, color) {
+      const badge = document.getElementById('statusBadge');
+      const text = document.getElementById('statusText');
+      badge.classList.remove('hidden');
+      text.innerText = message;
+      if (color === 'amber') {
+        badge.className = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20";
+      }
+    }
+
+    function convertExcelDate(excelSerial) {
+      const serial = Number(excelSerial);
+      if (isNaN(serial) || serial <= 0) return { formatted: excelSerial || '--', raw: excelSerial };
+      
+      const jsDate = new Date((serial - 25569) * 86400 * 1000);
+      if (isNaN(jsDate.getTime())) return { formatted: excelSerial, raw: excelSerial };
+
+      const yyyy = jsDate.getUTCFullYear();
+      const mm = String(jsDate.getUTCMonth() + 1).padStart(2, '0');
+      const dd = String(jsDate.getUTCDate()).padStart(2, '0');
+      
+      return {
+        formatted: `${yyyy}-${mm}-${dd}`,
+        raw: serial
+      };
+    }
+
+    function formatPercentage(rateVal) {
+      const num = parseFloat(rateVal);
+      if (isNaN(num)) return rateVal || '0.00%';
+      return (num * 100).toFixed(2) + '%';
+    }
+
+    function getRateBadgeClass(rateVal) {
+      const num = parseFloat(rateVal);
+      if (isNaN(num)) return "bg-slate-100 text-slate-800";
+
+      if (num >= 0.10) {
+        return "bg-red-100 text-red-600 font-extrabold";
+      }
+      if (num >= 0.08) {
+        return "bg-blue-100 text-blue-600 font-bold";
+      }
+      return "bg-emerald-100 text-emerald-800 font-bold";
+    }
+
+    function initDropdown() {
+      const selectEl = document.getElementById('stockSelect');
+      selectEl.innerHTML = '';
+
+      const uniqueStocks = [];
+      const map = new Map();
+
+      dataSource.forEach(item => {
+        const key = `${item.sid}_${item.na}`;
+        if (!map.has(key)) {
+          map.set(key, true);
+          uniqueStocks.push({ sid: item.sid, na: item.na });
+        }
+      });
+
+      uniqueStocks.forEach(stock => {
+        const opt = document.createElement('option');
+        opt.value = stock.sid;
+        opt.textContent = `${stock.sid} ${stock.na}`;
+        selectEl.appendChild(opt);
+      });
+
+      if (uniqueStocks.length > 0) {
+        selectEl.value = uniqueStocks[0].sid;
+      }
+    }
+
+    function bindEvents() {
+      const selectEl = document.getElementById('stockSelect');
+      selectEl.addEventListener('change', () => renderData());
+    }
+
+    function renderData() {
+      const selectedSid = document.getElementById('stockSelect').value;
+      let filtered = dataSource.filter(item => item.sid === selectedSid);
+
+      const tBody = document.getElementById('tableBody');
+      const emptyState = document.getElementById('emptyState');
+
+      tBody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        emptyState.classList.remove('hidden');
+        updateTopStats(null, 0);
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      let highYieldCount = 0;
+
+      filtered.forEach((item, index) => {
+        const da1Date = convertExcelDate(item.da1);
+        const da2Date = convertExcelDate(item.da2);
+        const rateFormatted = formatPercentage(item.rate);
+        const badgeClass = getRateBadgeClass(item.rate);
+
+        const rateNum = parseFloat(item.rate);
+        if (!isNaN(rateNum) && rateNum >= 0.08) {
+          highYieldCount++;
+        }
+
+        const isOddRow = (index % 2 === 0);
+        const rowBgClass = isOddRow ? 'bg-[#fef9c3] hover:bg-yellow-200/80' : 'bg-[#e0f2fe] hover:bg-sky-200/80';
+
+        const tr = document.createElement('tr');
+        tr.className = `${rowBgClass} transition-colors border-b border-slate-200/60`;
+        tr.innerHTML = `
+          <td style="font-size: 20px; color: #1d4ed8;" class="py-3.5 px-4 text-right font-semibold text-slate-900">${item.ra}</td>
+          <td style="font-size: 20px; color: #1d4ed8;" class="py-3.5 px-4">
+            <div class="font-medium text-slate-800">${da1Date.formatted}</div>
+
+          </td>
+          <td  class="py-3.5 px-4">
+            <div class="font-medium text-slate-800">${da2Date.formatted}</div>
+          </td>
+          <td class="py-3.5 px-4 text-right font-medium text-slate-900">${item.price}</td>
+          <td  style="font-size: 20px; color: #1d4ed8;" class="py-3.5 px-4 text-right text-slate-700">${item.DJ}</td>
+          <td  style="font-size: 20px; color: #1d4ed8;" class="py-3.5 px-4 text-right">
+            <span class="inline-flex items-center px-3 py-1 rounded-md ${badgeClass}">
+              ${rateFormatted}
+            </span>
+          </td>
+        `;
+        tBody.appendChild(tr);
+      });
+
+      const firstItem = filtered.length > 0 ? filtered[0] : null;
+      updateTopStats(firstItem, highYieldCount);
+    }
+
+    function updateTopStats(firstItem, highYieldCount) {
+      const latestDivEl = document.getElementById('statLatestDividend');
+      const highYieldEl = document.getElementById('statHighYieldCount');
+
+      if (firstItem && firstItem.ra) {
+        const raVal = parseFloat(firstItem.ra);
+        if (!isNaN(raVal)) {
+          latestDivEl.innerText = `${(raVal * 1000).toLocaleString('zh-TW')} 元`;
+        } else {
+          latestDivEl.innerText = '--';
+        }
+      } else {
+        latestDivEl.innerText = '--';
+      }
+
+      highYieldEl.innerText = highYieldCount;
+    }
+  </script>
+</body>
+</html>
