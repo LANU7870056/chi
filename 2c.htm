@@ -13,11 +13,12 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             margin: 0;
             padding: 2px;
-display: flex;
-justify-content: center; /* 水平居中 */
-      align-items: center;     /* 垂直居中 */
+	display: flex;
+	justify-content: center; /* 水平居中 */
+      
             color: #333;
             font-size: 15px;
+
         }
 
 
@@ -201,7 +202,7 @@ justify-content: center; /* 水平居中 */
 </head>
 <body>
 
-    <div class="main-card">
+    <div class="card">
         <!-- 頂部標題與圖示 -->
 
 
@@ -493,7 +494,7 @@ function initSelector() {
             document.getElementById("statsInfo").innerHTML = `
                 <span style="font-size: 20px;">股數：<span style="color: #6f42c1;font-size: 20px;">${formattedTotalQty}</span></span>
                 <span style="font-size: 20px;">均價：<span style="color: #d9534f;font-size: 20px;">${avgBuy}</span></span>
-                <span style="font-size: 20px;">成本：<span style="color: #28a745;font-size: 20px;">${avgCost}</span></span>
+
                 <span style="font-size: 20px;">市價：<span style="color: #8B4522;font-size: 20px;">${displayPrice}</span></span>
             `;
 
