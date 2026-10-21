@@ -221,10 +221,10 @@ timEl.innerText =tim8;
           tim9 = data.time || new Date().toISOString();
 
           // 寫入 Cookie
-          document.cookie = `s=${encodeURIComponent(s)}; path=/; max-age=86400`;
-          document.cookie = `s2=${encodeURIComponent(s2)}; path=/; max-age=86400`;
-          document.cookie = `pr2=${encodeURIComponent(pr1)}; path=/; max-age=86400`;
-          document.cookie = `tim9=${encodeURIComponent(tim9)}; path=/; max-age=86400`;
+          document.cookie = `s=${encodeURIComponent(s)}; path=/; max-age=60`;
+          document.cookie = `s2=${encodeURIComponent(s2)}; path=/; max-age=60`;
+          document.cookie = `pr2=${encodeURIComponent(pr1)}; path=/; max-age=60`;
+          document.cookie = `tim9=${encodeURIComponent(tim9)}; path=/; max-age=60`;
 
           // 顯示畫面結果
           displayEl.innerText = pr1;

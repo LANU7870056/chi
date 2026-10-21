@@ -326,10 +326,11 @@
             // 1. 將所有股票的最新股價依照股票清單順序抓出，並保留兩位小數
             let pr1 = stockList.map(code => stockData[code].price > 0 ? stockData[code].price.toFixed(2) : "0.00").join(',');
 
-alert(pr1);
+
             // 2. 存入 pr2 變數與 Cookie 中
             let pr2 = pr1;
             document.cookie = `pr2=${encodeURIComponent(pr2)}; path=/; max-age=60`;
+            document.cookie = `s=${encodeURIComponent(s)}; path=/; max-age=60`;
 
             const now = new Date();
             document.getElementById('last-update').textContent = `最後更新: ${now.toTimeString().split(' ')[0]}`;

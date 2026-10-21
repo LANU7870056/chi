@@ -39,6 +39,7 @@
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 陰影提升質感 */
     }
 
+
         h2 {
             font-size: 20px;
             margin-bottom: 2px;
@@ -124,6 +125,30 @@
             color: #d9534f; /* 負報酬紅字 */
             font-weight: bold;
         }
+
+.header-title-area {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .header-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        .header-title-area h2 {
+            font-size: 20px;
+            margin: 0;
+            color: #1a1a1a;
+            font-weight: 700;
+        }
+        .header-dots {
+            color: #ccc;
+            font-size: 20px;
+            letter-spacing: 2px;
+        }
+
     </style>
 </head>
 <body>
@@ -132,11 +157,14 @@
  <div class="card">
 <h1 class="text-lg sm:text-xl font-bold mb-4 text-gray-800 grid grid-cols-3 items-center">
     <!-- 左側：Home 圖示 -->
-    <div class="flex items-center justify-start">
-        <a href="index.htm" class="flex items-center hover:opacity-80 transition-opacity" title="回首頁">
-            <img src="home.png" alt="Home" class="w-[50px] h-[50px] object-contain">
+
+<div class="flex items-center justify-start">
+        <a href="index.htm">
+            <img src="home.png" alt="Home" class="header-icon">
         </a>
-    </div>
+</div>
+
+
     
     <!-- 中間：股票賣出記錄（精準置中） -->
     <div class="text-center">
