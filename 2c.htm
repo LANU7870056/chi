@@ -26,7 +26,7 @@
       background-color: #ffffff;
       border-radius: 16px; /* 圓角效果 */
       padding: 24px;
-      width: 100%;
+      width: 95%;
       max-width: 800px;  /* 設定最大寬度，避免在大螢幕上太寬 */
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 陰影提升質感 */
     }
@@ -39,7 +39,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             padding: 2px;
             max-width: 98%;
- width: 98%;
+ width: 95%;
             margin: 0 auto;
         }
         /* 頂部標題與圖示 */
@@ -57,8 +57,8 @@
             gap: 2px;
         }
         .header-icon {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border-radius: 8px;
             object-fit: cover;
         }
@@ -133,7 +133,7 @@
             white-space: nowrap;
         }
         th, td {
-            padding: 8px 2px;
+            padding: 2px 2px;
             text-align: center;
             border-bottom: 1px solid #ebeef5;
             font-size: 15px;
@@ -198,6 +198,45 @@
             margin: 5px auto 0 auto;
             border: none;
         }
+
+
+/* === 針對手機版 (螢幕寬度小於 600px 時) 的優化 === */
+        @media screen and (max-width: 600px) {
+            table {
+                font-size: 14px;
+            }
+            th, td {
+                padding: 1px 1px;
+            }
+            /* 將手機版 Home 圖示放大至 50px */
+            .home-icon img {
+                width: 30px !important;
+                height: 30px !important;
+            }    
+
+ table {
+            width: 100%;
+            min-width: 300px;
+            border-collapse: collapse;
+            background-color: #fff;
+            white-space: nowrap;
+        }
+        th, td {
+            padding: 2px 2px;
+            text-align: center;
+            border-bottom: 1px solid #ebeef5;
+            font-size: 15px;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            font-weight: 600;
+        }     
+        }
+
     </style>
 </head>
 <body>
@@ -212,6 +251,9 @@
     <div class="flex items-center justify-start">
         <a href="index.htm">
             <img src="home.png" alt="Home" class="header-icon">
+        </a>
+   <a href="2cq.htm">
+            <img src="look.png" alt="Home" class="header-icon">
         </a>
     </div>
     
@@ -244,12 +286,11 @@
             <table id="mystoTable">
                 <thead>
                     <tr>
-                        <th class="sortable" onclick="handleSort('md')">日期<span class="sort-icon">▲▼</span></th>         
-
+                        <th class="sortable" onclick="handleSort('md')">日期<span class="sort-icon">▲▼</span></th>
                         <th>股數</th>
                         <th class="sortable" onclick="handleSort('buy')">買價<span class="sort-icon">▲▼</span></th>
                         <th>費用</th>
-                        <th class="sortable" onclick="handleSort('cost')">成本<span class="sort-icon">▲▼</span></th>
+                        <th class="sortable" onclick="handleSort('cost')">成本<span class="sort-icon"></span></th>
                         <th class="sortable" onclick="handleSort('ra')">報酬率<span class="sort-icon">▲▼</span></th>
                     </tr>
                 </thead>

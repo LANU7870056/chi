@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>股票交易明細查詢</title>
+    <!-- 引入 Tailwind CSS (用於首頁 Home 圖示等樣式) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 mysto.js -->
+    <script src="mysto.js"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --sidebar-bg: #2c3e50;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #eef2f5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 2px;
+            min-height: 100vh;
+            background-color: #580000;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        /* 中間卡片主體設定 */
+        .card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 900px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 頂部導覽列區塊 */
+        .card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: #f8fafc;
+        }
+
+        /* 主容器：固定左右分欄 */
+        .app-container {
+            display: flex;
+            height: 600px;
+            width: 100%;
+        }
+
+.header-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 2px;
+            object-fit: cover;
+        }
+
+        /* 左側日期導覽列 */
+        .sidebar {
+            width: 100px;
+            background-color: var(--sidebar-bg);
+            color: #fff;
+            padding: 10px 0;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            height: 100%;
+        }
+
+        .sidebar h2 {
+            font-size: 0.95rem;
+            padding: 0 10px 10px 10px;
+            border-bottom: 1px solid #34495e;
+            color: #ecf0f1;
+            text-align: center;
+        }
+
+        .date-list {
+            list-style: none;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .date-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: background 0.2s, border-left 0.2s;
+            font-size: 0.9rem;
+            border-left: 4px solid transparent;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .date-item:hover {
+            background-color: #34495e;
+        }
+
+        .date-item.active {
+            background-color: #1a252f;
+            border-left-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        /* 右側主要內容區 */
+        .main-content {
+            flex: 1;
+            padding: 2px;
+            overflow-y: auto;
+            height: 100%;
+            min-width: 0;
+        }
+
+        .header-title {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        /* 表格容器與基本樣式 */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 2px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 10px 8px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 800;
+        }
+
+        /* 表格列顏色設定 */
+        tbody tr:nth-child(odd) {
+            background-color: #fffdf0; /* 奇數列：淺黃色 */
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f0f7ff; /* 偶數列：淺藍色 */
+        }
+
+        tbody tr:hover {
+            opacity: 0.9;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #94a3b8;
+            padding: 40px;
+            background-color: #ffffff !important;
+        }
+
+        /* --- 手機版微調 --- */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 90px;
+            }
+
+            .date-item {
+                font-size: 0.8rem;
+                padding: 8px 6px;
+            }
+
+            .main-content {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <!-- 頂部導覽列：包含 Home 圖示 -->
+    <div class="card-header flex items-center">
+        <a href="2c.htm" class="flex items-center hover:opacity-80 transition-opacity" title="回首頁">
+            <img src="back.png" alt="Home"  class="header-icon">
+        </a>
+        <span class="ml-3 text-lg font-bold text-gray-800">買入股票日期查詢</span>
+    </div>
+
+    <!-- 左右分欄主容器 -->
+    <div class="app-container">
+        <!-- 左側日期選擇欄 -->
+        <div class="sidebar">
+            <h2>交易日期</h2>
+            <ul id="dateList" class="date-list"></ul>
+        </div>
+
+        <!-- 右側資料顯示區 -->
+        <div class="main-content">
+            <h1 id="selectedDateTitle" class="header-title">請選擇交易日期</h1>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="text-align: center; font-size: 16px;">股票</th>
+                            <th style="text-align: center; font-size: 16px;">股數</th>
+                            <th style="text-align: center; font-size: 16px;">買價</th>
+                            <th style="text-align: center; font-size: 16px;">成本</th>
+                            <th style="text-align: center; font-size: 16px;">報酬率</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stockTableBody">
+                        <tr>
+                            <td colspan="6" class="no-data">載入中...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getCookie(name) {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + '=')) {
+                try {
+                    return decodeURIComponent(cookie.substring(name.length + 1));
+                } catch (e) {
+                    return cookie.substring(name.length + 1);
+                }
+            }
+        }
+        return null;
+    }
+
+    function getCustomStockNames() {
+        const rawCookie = getCookie('s');
+        if (!rawCookie) return {};
+        try {
+            return JSON.parse(rawCookie);
+        } catch (e) {
+            return {};
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const rawData = (typeof mysto !== 'undefined') ? mysto : [];
+        const nameMapFromCookie = getCustomStockNames();
+
+        const dateListEl = document.getElementById("dateList");
+        const tableBodyEl = document.getElementById("stockTableBody");
+        const titleEl = document.getElementById("selectedDateTitle");
+
+        const uniqueDates = [...new Set(rawData.map(item => item.md))].sort().reverse();
+
+        if (uniqueDates.length === 0) {
+            tableBodyEl.innerHTML = `<tr><td colspan="6" class="no-data">查無任何交易資料</td></tr>`;
+            return;
+        }
+
+        uniqueDates.forEach((date, index) => {
+            const li = document.createElement("li");
+            li.className = "date-item";
+            li.textContent = date;
+            
+            li.addEventListener("click", () => {
+                document.querySelectorAll(".date-item").forEach(el => el.classList.remove("active"));
+                li.classList.add("active");
+                renderTable(date);
+            });
+
+            dateListEl.appendChild(li);
+
+            if (index === 0) {
+                li.click();
+            }
+        });
+
+        function renderTable(selectedDate) {
+            titleEl.textContent = `日期：${selectedDate} 交易明細`;
+
+            const filteredData = rawData.filter(item => item.md === selectedDate);
+
+            if (filteredData.length === 0) {
+                tableBodyEl.innerHTML = `<tr><td colspan="6" class="no-data">該日期無資料</td></tr>`;
+                return;
+            }
+
+            const rowsHTML = filteredData.map(item => {
+                return `
+                  <tr>
+               <td style="text-align: center;font-weight: bold;">${item.sid}</td>
+                     <td style="text-align: center;font-weight: bold;">${Number(item.no).toLocaleString()}</td>
+                     <td style="text-align: center; color: #F00; font-size: 16px;font-weight: bold;">${item.buy}</td>
+                     <td style="text-align: center; color: #00F; font-size: 16px;font-weight: bold;">${Number(item.cost).toLocaleString()}		</td>
+                     <td style="text-align: center;">${item.ra}</td>
+                    </tr>
+                `;
+            }).join("");
+
+            tableBodyEl.innerHTML = rowsHTML;
+        }
+    });
+</script>
+</body>
+</html>

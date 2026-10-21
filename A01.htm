@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>mysto 資料表格呈現</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px 12px;
+      text-align: center;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .loading {
+      color: #666;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>mysto 資料清單</h2>
+  <div id="loading" class="loading">正在載入資料，請稍候...</div>
+  
+  <div id="table-container"></div>
+
+  <script>
+    // 請替換為您的 GAS Web App 部署網址
+    const gasAppUrl = "https://script.google.com/macros/s/AKfycbyy4rAVnptz8uuqZMZXuAE-1JGAxd3MLd46CrUDw5oVXSZq6nDY2ct4SBkesTmz1QcR/exec";
+
+    window.addEventListener("DOMContentLoaded", () => {
+      fetchMystoData();
+    });
+
+    function fetchMystoData() {
+      const requestUrl = `${gasAppUrl}?na=mysto&n=M`;
+
+      fetch(requestUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("網路回應不正常");
+          }
+          return response.json();
+        })
+        .then(data => {
+          const mysto = data.mysto;
+          console.log("已成功讀取 mysto 資料陣列：", mysto);
+
+          document.getElementById("loading").style.display = "none";
+          renderTable(mysto);
+        })
+        .catch(error => {
+          console.error("讀取資料失敗：", error);
+          document.getElementById("loading").textContent = "讀取失敗，請檢查主控台訊息或確認 GAS 網址是否正確。";
+        });
+    }
+
+    function renderTable(dataArray) {
+      const container = document.getElementById("table-container");
+
+      if (!dataArray || dataArray.length === 0) {
+        container.innerHTML = "<p>目前沒有資料</p>";
+        return;
+      }
+
+      // 定義您想要的欄位與中文名稱
+      const columns = [
+        { key: 'md', label: '日期' },
+        { key: 'sid', label: '股票' },
+        { key: 'na', label: '名稱' },
+        { key: 'no', label: '股買數' },
+        { key: 'buy', label: '買價' },
+        { key: 'EX', label: '手續費' },
+        { key: 'cost', label: '成本' },
+        { key: 'price', label: '價格率' },
+        { key: 'ra', label: '率' },
+        { key: 'gro', label: '類別' }
+      ];
+
+      let table = document.createElement("table");
+      let thead = document.createElement("thead");
+      let tbody = document.createElement("tbody");
+
+      // 產生表頭
+      let headerRow = document.createElement("tr");
+      columns.forEach(col => {
+        let th = document.createElement("th");
+        th.textContent = col.label;
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      // 產生資料列（具備大小寫容錯與防呆）
+      dataArray.forEach(item => {
+        let row = document.createElement("tr");
+        columns.forEach(col => {
+          let td = document.createElement("td");
+          
+          // 自動尋找物件中相符的屬性（忽略大小寫比對）
+          let matchedKey = Object.keys(item).find(k => k.toLowerCase() === col.key.toLowerCase());
+          let val = matchedKey ? item[matchedKey] : undefined;
+
+          td.textContent = (val !== undefined && val !== null) ? val : "";
+          row.appendChild(td);
+        });
+        tbody.appendChild(row);
+      });
+      table.appendChild(tbody);
+
+      container.appendChild(table);
+    }
+  </script>
+
+</body>
+</html>
