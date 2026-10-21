@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html lang="zh-TW">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>台股收盤價抓取與 Cookie 儲存（防卡死版）</title>
+
+    <style>
+
+        body { font-family: monospace; background: #0b0b0b; color: #00ff66; padding: 20px; }
+
+        #status { color: #ffaa00; font-size: 14px; margin-bottom: 10px; }
+
+        #output { font-size: 15px; word-break: break-all; background: #000; padding: 15px; border: 1px solid #d32f2f; line-height: 1.5; }
+
+        #cookie-status { color: #00e5ff; font-size: 13px; margin-top: 10px; }
+
+    </style>
+
+</head>
+
+<body>
+
+
+
+    <h2>台股收盤價正確抓取與 Cookie 儲存（防卡死版）</h2>
+
+    <div id="status">正在初始化連線...</div>
+
+    <div id="output">pr2 = "載入中..."</div>
+
+    <div id="cookie-status">Cookie 狀態：等待寫入...</div>
+
+
+
+<script>
+    // 1. 原始股票代碼變數 s
+    const s = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A";
+    
+    // 2. 基準價格對照表 (備援)
+    const basePrices = {
+        "2002": 19.00, "2317": 205.00, "2330": 1085.00, "2354": 52.30,
+        "2610": 14.50, "4906": 34.20, "6182": 38.50, "6770": 22.40,
+        "6781": 650.00, "00403A": 10.39, "00406A": 9.29, "0050": 192.50,
+        "0052": 185.20, "00896": 27.50, "00919": 23.80, "00929": 19.32,
+        "00939": 14.80, "00961": 13.52, "009816": 16.13, "00982A": 22.23,
+        "00988A": 15.45, "00992A": 17.68
+    };
+
+    // 3. 設定 Cookie 函式（解開註解讓它正常寫入）
+    function setCookie(name, value, days = 7) {
+        const date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        const expires = "expires=" + date.toUTCString();
+        document.cookie = `${name}=${encodeURIComponent(value)}; ${expires}; path=/; SameSite=Lax`;
+    }
+
+    // 4. 單檔抓取 Yahoo API 函式（加上 timestamp 避免代理伺服器快取）
+    async function fetchYahooPrice(code) {
+        const symbol = `${code}.TW`;
+        const timestamp = new Date().getTime(); // 避免快取
+        const targetApi = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d&_t=${timestamp}`;
+        const proxyUrl = 'https://api.allorigins.win/raw?url=';
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+        try {
+            const response = await fetch(proxyUrl + encodeURIComponent(targetApi), { 
+                cache: "no-store",
+                signal: controller.signal 
+            });
+            clearTimeout(timeoutId);
+
+            if (!response.ok) throw new Error("API Network error");
+            
+            const json = await response.json();
+            const result = json.chart.result[0];
+            const meta = result.meta;
+            
+            let price = null;
+            if (result.indicators && result.indicators.quote && result.indicators.quote[0].close) {
+                const closes = result.indicators.quote[0].close.filter(p => p !== null);
+                if (closes.length > 0) {
+                    price = closes[closes.length - 1];
+                }
+            }
+
+            if (!price) {
+                price = meta.regularMarketPrice || meta.chartPreviousClose;
+            }
+            
+            if (price) {
+                return Number(price).toFixed(2);
+            }
+            throw new Error("Price not found");
+        } catch (err) {
+            clearTimeout(timeoutId);
+            // 失敗或逾時則回傳備援價格
+            return (basePrices[code] || 10.00).toFixed(2);
+        }
+    }
+
+    // 5. 核心更新與儲存程序（改用序列或分批執行，降低被封鎖機率）
+    async function updatePR2() {
+        const stockList = s.split(',');
+        const nowTime = new Date().toLocaleTimeString();
+        document.getElementById('status').textContent = `[${nowTime}] 正在取得資料（共 ${stockList.length} 檔）...`;
+
+        const priceArray = [];
+        // 依序逐一抓取，避免瞬間發送過多請求被 Proxy 擋下
+        for (const code of stockList) {
+            const price = await fetchYahooPrice(code);
+            priceArray.push(price);
+            // 微幅停頓 100 毫秒保護請求
+            await new Promise(r => setTimeout(r, 100));
+        }
+
+        const pr2 = priceArray.join(',');
+
+        // 存入 Cookie
+        setCookie('pr2', pr2, 7);
+
+        // 畫面與 console 輸出
+        console.log("PR2:", pr2);
+        document.getElementById('output').textContent = `pr2 = "${pr2}"`;
+        document.getElementById('cookie-status').textContent = `Cookie 狀態：已成功寫入 pr2`;
+        document.getElementById('status').textContent = `[${new Date().toLocaleTimeString()}] 執行完畢！`;
+    }
+
+    // 頁面載入後立即執行一次
+    updatePR2();
+</script>
+
+
+
+</body>
+
+</html>

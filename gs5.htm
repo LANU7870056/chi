@@ -245,8 +245,16 @@ timEl.innerText =tim8;
       }
     }
 
-    // 頁面載入時自動執行
-    window.onload = queryStocks;
+    // 頁面載入時自動執行10秒執行1次
+
+window.onload = function() {
+      queryStocks();
+      
+      // 設定每 10 秒（10000 毫秒）自動執行一次查詢
+      setInterval(queryStocks, 10000);
+    };
+
+
   </script>
 </body>
 </html>

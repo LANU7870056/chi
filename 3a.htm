@@ -364,7 +364,7 @@
         // 尋找選取股票的名稱並顯示在資訊欄
         const currentStockObj = sto2.find(item => item.sid === selectedSid);
         const stockName = currentStockObj ? currentStockObj.na : '';
-        stockDisplay.textContent = selectedSid ? `${selectedSid} ${stockName}`.trim() : '--';
+        stockDisplay.textContent = selectedSid ? `${selectedSid}`.trim() : '--';
 
         // 1. 篩選資料：大於等於選取年度 (選擇年度 ~ 本年度)
         let filteredData = sto2.filter(item => item.sid === selectedSid);

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>股票交易明細查詢</title>
-    <!-- 引入 Tailwind CSS (用於首頁 Home 圖示等樣式) -->
+    <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 mysto.js -->
     <script src="mysto.js"></script>
@@ -35,7 +35,6 @@
             align-items: flex-start;
         }
 
-        /* 中間卡片主體設定 */
         .card {
             background-color: #ffffff;
             border-radius: 8px;
@@ -47,28 +46,25 @@
             flex-direction: column;
         }
 
-        /* 頂部導覽列區塊 */
         .card-header {
             padding: 15px 20px;
             border-bottom: 1px solid var(--border-color);
             background-color: #f8fafc;
         }
 
-        /* 主容器：固定左右分欄 */
         .app-container {
             display: flex;
             height: 600px;
             width: 100%;
         }
 
-.header-icon {
+        .header-icon {
             width: 50px;
             height: 50px;
             border-radius: 2px;
             object-fit: cover;
         }
 
-        /* 左側日期導覽列 */
         .sidebar {
             width: 100px;
             background-color: var(--sidebar-bg);
@@ -115,7 +111,6 @@
             font-weight: bold;
         }
 
-        /* 右側主要內容區 */
         .main-content {
             flex: 1;
             padding: 2px;
@@ -131,7 +126,6 @@
             font-weight: bold;
         }
 
-        /* 表格容器與基本樣式 */
         .table-container {
             background: var(--card-bg);
             border-radius: 2px;
@@ -157,13 +151,12 @@
             font-weight: 800;
         }
 
-        /* 表格列顏色設定 */
         tbody tr:nth-child(odd) {
-            background-color: #fffdf0; /* 奇數列：淺黃色 */
+            background-color: #fffdf0;
         }
 
         tbody tr:nth-child(even) {
-            background-color: #f0f7ff; /* 偶數列：淺藍色 */
+            background-color: #f0f7ff;
         }
 
         tbody tr:hover {
@@ -177,17 +170,14 @@
             background-color: #ffffff !important;
         }
 
-        /* --- 手機版微調 --- */
         @media (max-width: 768px) {
             .sidebar {
                 width: 90px;
             }
-
             .date-item {
                 font-size: 0.8rem;
                 padding: 8px 6px;
             }
-
             .main-content {
                 padding: 10px;
             }
@@ -197,23 +187,22 @@
 <body>
 
 <div class="card">
-    <!-- 頂部導覽列：包含 Home 圖示 -->
     <div class="card-header flex items-center">
-        <a href="2c.htm" class="flex items-center hover:opacity-80 transition-opacity" title="回首頁">
-            <img src="back.png" alt="Home"  class="header-icon">
+        <a href="index.htm" class="flex items-center hover:opacity-80 transition-opacity" title="回首頁">
+            <img src="home.png" alt="Home" class="header-icon">
+        </a>
+        <a href="2c.htm" class="flex items-center hover:opacity-80 transition-opacity" title="上一頁">
+            <img src="back.png" alt="Home" class="header-icon">
         </a>
         <span class="ml-3 text-lg font-bold text-gray-800">買入股票日期查詢</span>
     </div>
 
-    <!-- 左右分欄主容器 -->
     <div class="app-container">
-        <!-- 左側日期選擇欄 -->
         <div class="sidebar">
             <h2>交易日期</h2>
             <ul id="dateList" class="date-list"></ul>
         </div>
 
-        <!-- 右側資料顯示區 -->
         <div class="main-content">
             <h1 id="selectedDateTitle" class="header-title">請選擇交易日期</h1>
 
@@ -225,12 +214,12 @@
                             <th style="text-align: center; font-size: 16px;">股數</th>
                             <th style="text-align: center; font-size: 16px;">買價</th>
                             <th style="text-align: center; font-size: 16px;">成本</th>
-                            <th style="text-align: center; font-size: 16px;">報酬率</th>
+                            <th style="text-align: center; font-size: 16px;">現價</th>
                         </tr>
                     </thead>
                     <tbody id="stockTableBody">
                         <tr>
-                            <td colspan="6" class="no-data">載入中...</td>
+                            <td colspan="5" class="no-data">載入中...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -240,6 +229,7 @@
 </div>
 
 <script>
+    // 通用 Cookie 讀取函式
     function getCookie(name) {
         const cookies = document.cookie.split(';');
         for (let i = 0; i < cookies.length; i++) {
@@ -252,22 +242,35 @@
                 }
             }
         }
-        return null;
+        return "";
     }
 
-    function getCustomStockNames() {
-        const rawCookie = getCookie('s');
-        if (!rawCookie) return {};
-        try {
-            return JSON.parse(rawCookie);
-        } catch (e) {
-            return {};
+    
+
+    // 建立穩健的對照表
+    function getMappedStockPrices() {
+        const sCookie = getCookie("s");   // 例如: "2330,2317,2454"
+        const pr2Cookie = getCookie("pr2"); // 例如: "580,105,900"
+
+        const sList = sCookie ? sCookie.split(',') : [];
+        const pr2List = pr2Cookie ? pr2Cookie.split(',') : [];
+
+        const priceMap = {};
+        
+        // 迴圈比對，同時清除前後空白避免對不到
+        for (let i = 0; i < sList.length; i++) {
+            const sid = sList[i].trim();
+            const price = pr2List[i] !== undefined ? pr2List[i].trim() : "";
+            if (sid !== "") {
+                priceMap[sid] = price;
+            }
         }
+        return priceMap;
     }
 
     document.addEventListener("DOMContentLoaded", () => {
         const rawData = (typeof mysto !== 'undefined') ? mysto : [];
-        const nameMapFromCookie = getCustomStockNames();
+        const stockPriceMap = getMappedStockPrices(); 
 
         const dateListEl = document.getElementById("dateList");
         const tableBodyEl = document.getElementById("stockTableBody");
@@ -276,7 +279,7 @@
         const uniqueDates = [...new Set(rawData.map(item => item.md))].sort().reverse();
 
         if (uniqueDates.length === 0) {
-            tableBodyEl.innerHTML = `<tr><td colspan="6" class="no-data">查無任何交易資料</td></tr>`;
+            tableBodyEl.innerHTML = `<tr><td colspan="5" class="no-data">查無任何交易資料</td></tr>`;
             return;
         }
 
@@ -304,18 +307,41 @@
             const filteredData = rawData.filter(item => item.md === selectedDate);
 
             if (filteredData.length === 0) {
-                tableBodyEl.innerHTML = `<tr><td colspan="6" class="no-data">該日期無資料</td></tr>`;
+                tableBodyEl.innerHTML = `<tr><td colspan="5" class="no-data">該日期無資料</td></tr>`;
                 return;
             }
 
             const rowsHTML = filteredData.map(item => {
+                // 確保 item.sid 轉為字串並去除空白來進行精準對應
+                const currentSid = String(item.sid).trim();
+                
+                if (stockPriceMap[currentSid] !== undefined && stockPriceMap[currentSid] !== "") {
+                    item.ra = stockPriceMap[currentSid];
+                } else if (!item.ra || item.ra === "=") {
+                    item.ra = "-";
+                }
+
+                // 數值轉換以進行比較
+                const buyPrice = parseFloat(item.buy);
+                const currentPrice = parseFloat(item.ra);
+
+                // 判斷買價顏色：低於現價顯示紅色，大於現價顯示藍色
+                let buyColor = "#333"; // 預設顏色
+                if (!isNaN(buyPrice) && !isNaN(currentPrice)) {
+                    if (buyPrice < currentPrice) {
+                        buyColor = "#00f"; // 低於現價 -> 紅色
+                    } else if (buyPrice > currentPrice) {
+                        buyColor = "#f00"; // 大於現價 -> 藍色
+                    }
+                }
+
                 return `
-                  <tr>
-               <td style="text-align: center;font-weight: bold;">${item.sid}</td>
-                     <td style="text-align: center;font-weight: bold;">${Number(item.no).toLocaleString()}</td>
-                     <td style="text-align: center; color: #F00; font-size: 16px;font-weight: bold;">${item.buy}</td>
-                     <td style="text-align: center; color: #00F; font-size: 16px;font-weight: bold;">${Number(item.cost).toLocaleString()}		</td>
-                     <td style="text-align: center;">${item.ra}</td>
+                    <tr>
+                        <td style="text-align: center; font-weight: bold;">${item.sid}</td>
+                        <td style="text-align: center; font-weight: bold;">${Number(item.no).toLocaleString()}</td>
+                        <td style="text-align: center; color: ${buyColor}; font-size: 16px; font-weight: bold;">${item.buy}</td>
+                        <td style="text-align: center; color: #466900; font-size: 16px; font-weight: bold;">${Number(item.cost).toLocaleString()}</td>
+                        <td style="text-align: center; font-size: 16px; font-weight: bold; color: #333;">${item.ra}</td>
                     </tr>
                 `;
             }).join("");
