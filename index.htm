@@ -189,6 +189,19 @@
       pointer-events: none;
       animation: ripple 0.6s ease-out forwards;
     }
+
+/* 預設（PC 版或其他較大螢幕） */
+.custom-translate {
+  transform: translateY(-120px);
+}
+
+/* 手機版（螢幕寬度小於 768px，可根據需求調整斷點） */
+@media (max-width: 767.98px) {
+  .custom-translate {
+    transform: translateY(-20px);
+  }
+}
+
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-0 md:p-6 bg-slate-950 font-rajdhani">
@@ -238,7 +251,7 @@
       </div>
 
       <!-- 2. 主畫面圖示按鈕區：一列2個圖示模式 (Grid 2 Columns, 6顆圖示, 上移 100px) -->
-      <div class="my-auto py-3" style="transform: translateY(-60px);">
+      <div class="my-auto py-3 custom-translate"> 
         <div class="grid grid-cols-2 gap-y-6 gap-x-6 place-items-center">
 
           <!-- 圖示 1: 我的股票 -->
