@@ -13,24 +13,20 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             margin: 0;
             padding: 2px;
-	display: flex;
-	justify-content: center; /* 水平居中 */
-      
+            display: flex;
+            justify-content: center; /* 水平居中 */
             color: #333;
             font-size: 15px;
-
         }
 
-
-.card {
-      background-color: #ffffff;
-      border-radius: 16px; /* 圓角效果 */
-      padding: 2px;
-      width: 98%;
-      max-width: 800px;  /* 設定最大寬度，避免在大螢幕上太寬 */
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 陰影提升質感 */
-    }
-
+        .card {
+            background-color: #ffffff;
+            border-radius: 16px; /* 圓角效果 */
+            padding: 2px;
+            width: 98%;
+            max-width: 800px;  /* 設定最大寬度，避免在大螢幕上太寬 */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 陰影提升質感 */
+        }
 
         /* 主卡片容器 */
         .main-card {
@@ -39,7 +35,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             padding: 2px;
             max-width: 98%;
- width: 95%;
+            width: 95%;
             margin: 0 auto;
         }
         /* 頂部標題與圖示 */
@@ -98,7 +94,7 @@
         #stockSelector {
             background-color: #ffffcc; /* 淺黃底色 */
             font-weight: bold;       /* 字體加粗 */
-            color: blue;             /* 藍色字體 */
+            color: blue;              /* 藍色字體 */
         }
 
         /* 統計摘要列 */
@@ -161,7 +157,7 @@
         td {
             font-family: Arial, sans-serif;
             color: #00F;
-	    font-size: 18px;
+            font-size: 18px;
         }
 
         /* 奇數列：淺黃色 */
@@ -177,11 +173,11 @@
             background-color: rgba(0, 0, 0, 0.05);
         }
 
-        /* 買價字體：咖啡色且加粗 */
+        /* 買價字體：藍色且加粗 */
         .buy-price {
             color: #00F;
             font-weight: bold;
-	    font-size: 18px;
+            font-size: 18px;
         }
 
         .positive {
@@ -199,73 +195,60 @@
             border: none;
         }
 
-
-/* === 針對手機版 (螢幕寬度小於 600px 時) 的優化 === */
+        /* === 針對手機版 (螢幕寬度小於 600px 時) 的優化 === */
         @media screen and (max-width: 600px) {
             table {
                 font-size: 14px;
+                width: 100%;
+                min-width: 300px;
+                border-collapse: collapse;
+                background-color: #fff;
+                white-space: nowrap;
             }
             th, td {
-                padding: 1px 1px;
+                padding: 2px 2px;
+                text-align: center;
+                border-bottom: 1px solid #ebeef5;
+                font-size: 15px;
             }
-            /* 將手機版 Home 圖示放大至 50px */
             .home-icon img {
                 width: 30px !important;
                 height: 30px !important;
             }    
-
- table {
-            width: 100%;
-            min-width: 300px;
-            border-collapse: collapse;
-            background-color: #fff;
-            white-space: nowrap;
+            th {
+                background-color: #007bff;
+                color: white;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+                font-weight: 600;
+            }      
         }
-        th, td {
-            padding: 2px 2px;
-            text-align: center;
-            border-bottom: 1px solid #ebeef5;
-            font-size: 15px;
-        }
-        th {
-            background-color: #007bff;
-            color: white;
-            position: sticky;
-            top: 0;
-            z-index: 1;
-            font-weight: 600;
-        }     
-        }
-
     </style>
 </head>
 <body>
 
     <div class="card">
         <!-- 頂部標題與圖示 -->
+        <div class="card-header grid grid-cols-3 items-center">
+            <!-- 左側：Home 圖示靠左 -->
+            <div class="flex items-center justify-start">
+                <a href="index.htm">
+                    <img src="home.png" alt="Home" class="header-icon">
+                </a>
+                <a href="2cq.htm">
+                    <img src="look.png" alt="Look" class="header-icon">
+                </a>
+            </div>
+            
+            <!-- 中間：標題文字置中 -->
+            <div class="text-center">
+                <h2 class="text-lg sm:text-xl font-bold text-gray-800 m-0">買入股票分析</h2>
+            </div>
 
-
-
-<div class="card-header grid grid-cols-3 items-center">
-    <!-- 左側：Home 圖示靠左 -->
-    <div class="flex items-center justify-start">
-        <a href="index.htm">
-            <img src="home.png" alt="Home" class="header-icon">
-        </a>
-   <a href="2cq.htm">
-            <img src="look.png" alt="Home" class="header-icon">
-        </a>
-    </div>
-    
-    <!-- 中間：標題文字置中（並移除原本字串裡多餘的全形空白「 」） -->
-    <div class="text-center">
-        <h2 class="text-lg sm:text-xl font-bold text-gray-800 m-0">買入股票分析</h2>
-    </div>
-
-    <!-- 右側：空白佔位，用來平衡左邊的寬度，確保中間完美置中 -->
-    <div></div>
-</div>
-
+            <!-- 右側：空白佔位 -->
+            <div></div>
+        </div>
 
         <!-- 單一股票下拉選單 -->
         <div class="filter-row">
@@ -290,7 +273,7 @@
                         <th>股數</th>
                         <th class="sortable" onclick="handleSort('buy')">買價<span class="sort-icon">▲▼</span></th>
                         <th>費用</th>
-                        <th class="sortable" onclick="handleSort('cost')">成本<span class="sort-icon"></span></th>
+                        <th class="sortable" onclick="handleSort('cost')">成本<span class="sort-icon">▲▼</span></th>
                         <th class="sortable" onclick="handleSort('ra')">報酬率<span class="sort-icon">▲▼</span></th>
                     </tr>
                 </thead>
@@ -300,18 +283,23 @@
             </table>
         </div>
 
-  <iframe id="myIframe" src="gs5.htm" width="400" height="80" scrolling="no" style="display: block; margin: 0 auto; border: none; overflow: hidden;"></iframe>
     </div>
 
     <!-- 引入外部 mysto.js 檔案 -->
     <script src="mysto.js"></script>
     
     <script>
+        const apiKey = 'AIzaSyBF-GpIzWbymBF8yXeIyePAayAkPr5__us';
+        const fileId = '1diXTdZZMosDjZMAjiNrr2b3ELTY0hknL';
+
+
+
+
         // 全域排序狀態
-        let currentSortKey = "";      
+        let currentSortKey = "";     
         let currentSortOrder = "asc"; 
 
-        // 建立股票名稱對照表（從 mysto 資料自動提取 sid 與 na）
+        // 建立股票名稱對照表
         const stockNameMap = {};
 
         // 1. 讀取 Cookie 函式
@@ -332,55 +320,108 @@
             });
         }
 
-      // 2. 初始化下拉式選單（依據 mysto 資料自動建立不重複的 sid & "-" & na，並依 sid 排序）
-function initSelector() {
-    const selector = document.getElementById("stockSelector");
-    let optionsHtml = '<option value="">全部顯示</option>';
-    
-    const uniqueStocks = new Map();
+        // 2. 初始化下拉式選單
+        function initSelector() {
+            const selector = document.getElementById("stockSelector");
+            const currentSelectedValue = selector ? selector.value : "";
+            let optionsHtml = '<option value="">全部顯示</option>';
+            
+            const uniqueStocks = new Map();
 
-    if (typeof mysto !== 'undefined' && Array.isArray(mysto)) {
-        mysto.forEach(item => {
-            if (item.sid) {
-                const sid = item.sid.trim();
-                const na = item.na ? item.na.trim() : '';
-                stockNameMap[sid] = na;
-                if (!uniqueStocks.has(sid)) {
-                    uniqueStocks.set(sid, na);
+            if (typeof mysto !== 'undefined' && Array.isArray(mysto)) {
+                mysto.forEach(item => {
+                    if (item.sid) {
+                        const sid = item.sid.trim();
+                        const na = item.na ? item.na.trim() : '';
+                        stockNameMap[sid] = na;
+                        if (!uniqueStocks.has(sid)) {
+                            uniqueStocks.set(sid, na);
+                        }
+                    }
+                });
+            }
+
+            const sortedStocks = Array.from(uniqueStocks.entries()).sort((a, b) => 
+                a[0].localeCompare(b[0], undefined, { numeric: true })
+            );
+
+            sortedStocks.forEach(([sid, na]) => {
+                const displayText = na ? `${sid}-${na}` : sid;
+                optionsHtml += `<option value="${sid}">${displayText}</option>`;
+            });
+
+            if (selector) {
+                selector.innerHTML = optionsHtml;
+                if (currentSelectedValue && [...selector.options].some(opt => opt.value === currentSelectedValue)) {
+                    selector.value = currentSelectedValue;
                 }
             }
-        });
-    }
+        }
 
-    // 將 Map 轉換為陣列，並依據 sid (key) 進行排序（支援數字與字串自然排序）
-    const sortedStocks = Array.from(uniqueStocks.entries()).sort((a, b) => 
-        a[0].localeCompare(b[0], undefined, { numeric: true })
-    );
+        // 3. 從 Google 雲端硬碟讀取檔案內容，寫入 Cookie (pr2)，並同步更新畫面
+        async function fetchDriveFileAndSaveCookie() {
+            try {
+                const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${apiKey}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`讀取 Google 雲端硬碟檔案失敗，狀態碼：${response.status}`);
+                }
+                
+                const fileContent = await response.text();
+         
+                // 設定 Cookie 有效時間（1分鐘）
+                const date = new Date();
+                date.setTime(date.getTime() + (60 * 1000));
+                const expires = `expires=${date.toUTCString()}`;
 
-    sortedStocks.forEach(([sid, na]) => {
-        const displayText = na ? `${sid}-${na}` : sid;
-        optionsHtml += `<option value="${sid}">${displayText}</option>`;
-    });
+                // 核心要求：將讀取到的股價內容寫入 pr2 Cookie 中
+                document.cookie = `pr2=${encodeURIComponent(fileContent)}; ${expires}; path=/`;
 
-    if (selector) {
-        selector.innerHTML = optionsHtml;
-    }
-}
-        // 3. 取得 S 與 pr2 Cookie
-        const sCookie = decodeURIComponent(getCookie("s"));
-        const pr2Cookie = decodeURIComponent(getCookie("pr2"));
+                // 解析內容並同步更新畫面的市價與報酬率
+                processPriceData(fileContent);
 
-        // 5. 處理資料更新邏輯與報酬率計算 ((股價-買價)/買價 * 100)
-        if (sCookie && pr2Cookie) {
-            const sList = sCookie.split(',');
-            const pr2List = pr2Cookie.split(',');
+            } catch (error) {
+                console.error('發生錯誤：', error);
+                loadFromCookiesAndRender();
+            }
+        }
+
+        // 4. 解析價格與代號資料，並同步更新 mysto 陣列中的市價與報酬率
+        function processPriceData(dataContent) {
+            let sList = [];
+            let pr2List = [];
+
+            try {
+                const jsonData = JSON.parse(dataContent);
+                if (jsonData.s && jsonData.pr2) {
+                    sList = String(jsonData.s).split(',');
+                    pr2List = String(jsonData.pr2).split(',');
+                }
+            } catch (e) {
+                const lines = dataContent.split('\n');
+                for (let line of lines) {
+                    if (line.includes('s=')) sList = line.split('=')[1].trim().split(',');
+                    if (line.includes('pr2=')) pr2List = line.split('=')[1].trim().split(',');
+                }
+                if (sList.length === 0 && pr2List.length === 0) {
+                    pr2List = dataContent.trim().split(',');
+                }
+            }
+
+            // 同步讀取瀏覽器的 s Cookie 與 pr2 Cookie
+            const sCookie = decodeURIComponent(getCookie("s"));
+            const pr2Cookie = decodeURIComponent(getCookie("pr2"));
+
+            if (sCookie) sList = sCookie.split(',');
+            if (pr2Cookie) pr2List = pr2Cookie.split(',');
 
             const priceMap = {};
             sList.forEach((sid, index) => {
                 const cleanSid = sid.replace(/^0+/, ''); 
                 if (pr2List[index] !== undefined) {
-                    priceMap[sid] = pr2List[index];
-                    priceMap[cleanSid] = pr2List[index];
+                    priceMap[sid.trim()] = pr2List[index].trim();
+                    priceMap[cleanSid] = pr2List[index].trim();
                 }
             });
 
@@ -389,8 +430,8 @@ function initSelector() {
                     const cleanItemSid = item.sid ? item.sid.replace(/^0+/, '') : '';
                     let newPrice = "";
                     
-                    if (item.sid && priceMap[item.sid] !== undefined) {
-                        newPrice = priceMap[item.sid];
+                    if (item.sid && priceMap[item.sid.trim()] !== undefined) {
+                        newPrice = priceMap[item.sid.trim()];
                     } else if (priceMap[cleanItemSid] !== undefined) {
                         newPrice = priceMap[cleanItemSid];
                     }
@@ -406,6 +447,20 @@ function initSelector() {
                         }
                     }
                 });
+            }
+
+            const selector = document.getElementById("stockSelector");
+            renderTable(selector ? selector.value : "");
+        }
+
+        // 若網路請求失敗時的 Cookie 備用載入
+        function loadFromCookiesAndRender() {
+            const cookieData = decodeURIComponent(getCookie("pr2"));
+            if (cookieData) {
+                processPriceData(cookieData);
+            } else {
+                const selector = document.getElementById("stockSelector");
+                renderTable(selector ? selector.value : "");
             }
         }
 
@@ -440,7 +495,7 @@ function initSelector() {
             renderTable(selector ? selector.value : "");
         }
 
-        // 6. 渲染表格與計算統計資訊函式
+        // 5. 渲染表格與計算統計資訊函式（同步更新市價、報酬率）
         function renderTable(filterSid = "") {
             const tbody = document.querySelector("#mystoTable tbody");
             tbody.innerHTML = ""; 
@@ -509,7 +564,6 @@ function initSelector() {
 
                     const formattedCost = item.cost !== undefined && item.cost !== "" ? formatNumber(item.cost, 0) : '';
                     const formattedQty = item.no !== undefined && item.no !== "" ? formatNumber(item.no, 0) : '';
-                    const stockName = item.na || stockNameMap[item.sid] || '-';
 
                     tr.innerHTML = `
                         <td style="font-size: 14px;">${item.md || ''}</td>
@@ -528,22 +582,17 @@ function initSelector() {
             }
 
             const avgBuy = buyCount > 0 ? (buySum / buyCount).toFixed(2) : "0.00";
-            const avgCostRaw = costCount > 0 ? formatNumber(costSum, 0) : 0;
-            const avgCost = formatNumber(avgCostRaw, 2);
             const formattedTotalQty = formatNumber(totalQuantity, 0);
 
+            // 更新畫面上方統計列的「市價」
             document.getElementById("statsInfo").innerHTML = `
                 <span style="font-size: 20px;">股數：<span style="color: #6f42c1;font-size: 20px;">${formattedTotalQty}</span></span>
                 <span style="font-size: 20px;">均價：<span style="color: #d9534f;font-size: 20px;">${avgBuy}</span></span>
-
-                <span style="font-size: 20px;">市價：<span style="color: #8B4522;font-size: 20px;">${displayPrice}</span></span>
+                <span style="font-size: 20px;">市價：<span style="color: #8B4513;font-size: 20px;">${displayPrice}</span></span>
             `;
-
-
-
         }
 
-        // 初始化執行（預設選取下拉選單第 1 筆）
+        // 初始化執行
         initSelector();
 
         const selector = document.getElementById("stockSelector");
@@ -554,32 +603,12 @@ function initSelector() {
         } else {
             renderTable();
         }
+
+        // 頁面載入後立即執行一次 Google Drive 讀取、寫入 pr2 Cookie 與畫面同步更新
+        fetchDriveFileAndSaveCookie();
+
+        // 設定每 10 秒自動重新從 Google 雲端抓取檔案、寫入 pr2 Cookie 並同步更新畫面市價與報酬率
+        setInterval(fetchDriveFileAndSaveCookie, 10000);
     </script>
-
-  
-
-
-
-    <script>
-        function scheduleReload() {
-            var now = new Date();
-            var totalMinutes = now.getHours() * 60 + now.getMinutes();
-
-            // 09:00 (540 分鐘) ~ 13:30 (810 分鐘)
-            var isPeakTime = totalMinutes >= 540 && totalMinutes <= 810;
-            var delay = isPeakTime ? 5000 : 20000; 
-
-            setTimeout(function() {
-                var iframe = document.getElementById('myIframe');
-                if (iframe) {
-                    iframe.src = iframe.src; 
-                }
-                scheduleReload(); 
-            }, delay);
-        }
-
-        scheduleReload();
-    </script>
-
 </body>
 </html>

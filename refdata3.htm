@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>股票即時價同步與存檔</title>
+    <style>
+        
+ body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      
+      color: #333;
+    }
+
+    .home-icon {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 480px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+.loading-dots {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .loading-dots span {
+      width: 10px;
+      height: 10px;
+      background-color: #3498db;
+      border-radius: 50%;
+      animation: bounce 1.4s infinite ease-in-out both;
+    }
+
+    .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { 
+        transform: scale(0);
+      } 
+      40% { 
+        transform: scale(1.0);
+      }
+    }
+
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background-color: #28a745; color: white; }
+        .status { color: #555; font-size: 0.9em; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+  <!-- 時間/載入狀態顯示區域 -->
+
+
+  <div id="tim">
+    <div class="loading-dots">
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <a href="index.htm" class="home-link" title="返回首頁">
+    <img src="home.png" alt="首頁" class="home-icon">
+  </a>
+
+  <div class="card">
+
+    <h2>股票即時價自動同步系統 (每10秒執行)</h2>
+    <div class="status" id="statusText">狀態：準備連線...</div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>股票代號</th>
+                <th>即時股價</th>
+            </tr>
+        </thead>
+        <tbody id="stockTableBody">
+            <tr><td colspan="2">資料讀取中...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+
+<script>
+// GOOLE 家中/data3/GS
+
+    // 已修正網址結尾的換行問題
+ const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxpMNyKDU8TpUt6WGaLIqYG-L6vOM0zaY_QUxfAQ2sPliWQCtOWDWeZ5TuZaWyiLOrDHA/exec";
+
+    function triggerGS() {
+        // 已修正寫錯的元素選取語法
+        document.getElementById("statusText").innerText = "狀態：正在向 GS 請求並更新 data3.txt...";
+
+        fetch(WEB_APP_URL)
+            .then(response => response.json())
+            .then(res => {
+                const symbols = res.symbols.split(",");
+                const prices = res.data.split(",");
+                
+                let tbody = document.getElementById("stockTableBody");
+                tbody.innerHTML = "";
+
+                // 將代號與價格填入網頁表格
+                for (let i = 0; i < symbols.length; i++) {
+                    let tr = document.createElement("tr");
+                    let tdSymbol = document.createElement("td");
+                    let tdPrice = document.createElement("td");
+
+                    tdSymbol.innerText = symbols[i];
+                    tdPrice.innerText = prices[i] || "N/A";
+
+                    tr.appendChild(tdSymbol);
+                    tr.appendChild(tdPrice);
+                    tbody.appendChild(tr);
+                }
+
+                document.getElementById("statusText").innerText = `狀態：已同步並更新至雲端 data2.txt (最後更新：${res.timestamp})`;
+            })
+            .catch(error => {
+                console.error("錯誤：", error);
+                document.getElementById("statusText").innerText = "狀態：同步失敗，請檢查網路或指令碼權限。";
+            });
+    }
+
+    // 網頁開啟時立即執行一次
+    triggerGS();
+
+    // 每 10 秒 (10000 毫秒) 自動執行一次
+    setInterval(triggerGS, 10000);
+</script>
+
+</body>
+</html>

@@ -11,28 +11,25 @@
     <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
 
     <style>
-  body {
-      margin: 0;
-      padding: 0;
-      min-height: 100vh; /* 確保高度佔滿整個視窗 */
-      background-color: #580000; /* 背景顏色（深紅/暗紅） */
-      
-      display: flex;
-      justify-content: center; /* 水平居中 */
-      align-items: center;     /* 垂直居中 */
-    }
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh; /* 確保高度佔滿整個視窗 */
+            background-color: #580000; /* 背景顏色（深紅/暗紅） */
+            display: flex;
+            justify-content: center; /* 水平居中 */
+            align-items: center;     /* 垂直居中 */
+        }
 
-    /* 2. 中間卡片主體 */
-    .card {
-      background-color: #ffffff;
-      border-radius: 16px; /* 圓角效果 */
-      padding: 8px;
-      width: 98%;
-      max-width: 800px;  /* 設定最大寬度，避免在大螢幕上太寬 */
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 陰影提升質感 */
-    }
-
-       
+        /* 2. 中間卡片主體 */
+        .card {
+            background-color: #ffffff;
+            border-radius: 16px; /* 圓角效果 */
+            padding: 8px;
+            width: 98%;
+            max-width: 800px;  /* 設定最大寬度，避免在大螢幕上太寬 */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 陰影提升質感 */
+        }
 
         /* 讓表格容器支援手機橫向滑動，避免螢幕太小破版 */
         .table-container {
@@ -83,10 +80,9 @@
             font-weight: bold;
         }
 
-     .table-dark-text2 {
+        .table-dark-text2 {
             color: #006946;
             font-weight: bold;
-
         }
 
         /* 損益顏色樣式 */
@@ -121,22 +117,6 @@
                 font-size: 14px;
             }
             th, td {
-                padding: 1px 1px;
-            }
-            /* 將手機版 Home 圖示放大至 120px，並加上 !important 確保強制生效 */
-            .home-icon img {
-                width: 5px !important;
-                height: 5px !important;
-            }
-        }
-
-
-/* === 針對手機版 (螢幕寬度小於 600px 時) 的優化 === */
-        @media screen and (max-width: 600px) {
-            table {
-                font-size: 14px;
-            }
-            th, td {
                 padding: 2px 1px;
             }
             /* 將手機版 Home 圖示放大至 50px */
@@ -161,8 +141,7 @@
             }
         }
 
-
-/* 頂部標題列與 Home 圖示 */
+        /* 頂部標題列與 Home 圖示 */
         .header-bar {
             position: relative;
             display: flex;
@@ -193,83 +172,97 @@
             transform: scale(1.1);
             opacity: 0.85;
         }
-
-
     </style>
 </head>
 <body>
 
- <div class="card">
- <!-- 頂部標題區域 (包含左上角 HOME 圖示) -->
-    <div class="header-bar">
-        <a href="index.htm" class="home-link" title="返回首頁">
-            <img src="home.png" alt="首頁" class="home-icon">
-        </a>
-        <h2 style="font-size: 20px;color:#00F;">股票資產群組配置</h2>
+    <div class="card">
+        <!-- 頂部標題區域 (包含左上角 HOME 圖示) -->
+        <div class="header-bar">
+            <a href="index.htm" class="home-link" title="返回首頁">
+                <img src="home.png" alt="首頁" class="home-icon">
+            </a>
+            <h2 style="font-size: 20px;color:#00F;">股票資產群組配置</h2>
+        </div>
+
+        <!-- 狀態與除錯顯示區 -->
+        <div id="status-bar" style="background: #e6f7ff; border: 1px solid #91d5ff; padding: 8px; font-size: 13px; margin-bottom: 10px; border-radius: 4px; color: #0050b3; word-break: break-all;">
+            狀態：初始化中...
+        </div>
+
+        <!-- 表格 1：類型總金額統計表 -->
+        <div class="table-container">
+            <table id="stoTable">
+                <thead>
+                    <tr>
+                        <th>類型</th>
+                        <th>買入金額</th>
+                        <th>目前市價</th>
+                        <th>比例</th>
+                        <th>備註</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- JavaScript 動態填入資料 -->
+                </tbody>
+                <tfoot id="tableFoot">
+                    <!-- JavaScript 動態填入總計 -->
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- 表格 2：股票明細與損益統計表 -->
+        <div class="table-container">
+            <h2 style="color: #00f; text-align: center; font-size: 20px;">股票明細損益</h2>
+            <table id="stoTable2">
+                <thead>
+                    <tr>
+                        <th>查看</th>
+                        <th>股票</th>
+                        <th>名稱</th>
+                        <th>股數</th>
+                        <th>買價</th>
+                        <th>市價</th>
+                        <th>損益</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody2">
+                    <!-- JavaScript 動態填入資料 -->
+                </tbody>
+            </table>
+        </div>
     </div>
-
-    <!-- 表格 1：類型總金額統計表 -->
-    <div class="table-container">
-
-        <table id="stoTable">
-            <thead>
-                <tr>
-                    <th>類型</th>
-                    <th>買入金額</th>
-                    <th>目前市價</th>
-                    <th>比例</th>
-                    <th>備註</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <!-- JavaScript 動態填入資料 -->
-            </tbody>
-            <tfoot id="tableFoot">
-                <!-- JavaScript 動態填入總計 -->
-            </tfoot>
-        </table>
-    </div>
-
-    <!-- 表格 2：股票明細與損益統計表 -->
-    <div class="table-container">
-        <h2 style="color: #00f; text-align: center; font-size: 20px;">股票明細損益</h2>
-        <table id="stoTable2">
-            <thead>
-                <tr>
-                    <th>查看</th>
-                    <th>股票</th>
-                    <th>名稱</th>
-                    <th>股數</th>
-                    <th>買價</th>
-                    <th>市價</th>
-                    <th>損益</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody2">
-                <!-- JavaScript 動態填入資料 -->
-            </tbody>
-        </table>
-    </div>
-
 
     <!-- 載入外部資料 -->
     <script src="mysto.js"></script>
     <script>
-        if (typeof mysto !== 'undefined') {
+        // 股票代號清單變數
+        var s = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A";
 
-            function getCookie(name) {
-                const value = `; ${document.cookie}`;
-                const parts = value.split(`; ${name}=`);
-                if (parts.length === 2) return parts.pop().split(';').shift();
-                return "";
+        // ⚠️ 請填入您的 Google Apps Script 網頁應用程式網址
+        const apiUrl = 'https://script.google.com/macros/s/AKfycbzVZHg92IkxLWbvKW_fbEzhcceezMG8Ltw8N8ElEhjvktsm3ER3R0aQJ53vdMum5-DG/exec';
+
+        // 輔助函式：讀取 Cookie
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return "";
+        }
+
+        // 二、核心渲染與計算函式
+        function renderTables() {
+            if (typeof mysto === 'undefined') {
+                console.error("mysto 陣列未定義");
+                return;
             }
 
-            const sCookie = decodeURIComponent(getCookie("s"));
+            // 1. 取得 s 變數與 pr2 Cookie 中的市價清單
+            const sList = s ? s.split(',') : [];
             const pr2Cookie = decodeURIComponent(getCookie("pr2"));
+            const pr2List = pr2Cookie ? pr2Cookie.split(/[\r\n,]+/) : [];
 
-            const sList = sCookie ? sCookie.split(',') : [];
-            const pr2List = pr2Cookie ? pr2Cookie.split(',') : [];
-
+            // 2. 建立股票代號與市價的對應表
             const priceMap = {};
             sList.forEach((sid, index) => {
                 if (sid) {
@@ -281,22 +274,33 @@
                 }
             });
 
+            // 3. 更新 mysto 內的 price 與計算 ra 報酬率
             mysto.forEach(item => {
                 if (item.sid) {
                     const cleanSid = String(item.sid).trim();
-                    if (priceMap.hasOwnProperty(cleanSid)) {
+                    if (priceMap[cleanSid] !== undefined && priceMap[cleanSid] > 0) {
                         item.price = priceMap[cleanSid];
+                    } else if (item.price === undefined || isNaN(item.price) || item.price === 0) {
+                        item.price = item.buy || 0;
                     }
+                }
+
+                const buyPrice = parseFloat(item.buy) || 0;
+                const currentPrice = parseFloat(item.price) || 0;
+                if (buyPrice > 0) {
+                    item.ra = (((currentPrice - buyPrice) / buyPrice) * 100).toFixed(2) + '%';
+                } else {
+                    item.ra = '0.00%';
                 }
             });
 
+            // 4. 處理表格 1：類型總金額統計表
             const groupData = {};
             const groupData2 = {};
 
             mysto.forEach(item => {
                 const gro = item.gro || "其它";
                 const cost = parseFloat(item.cost) || 0;
-                
                 const price = parseFloat(item.price) || 0;
                 const no = parseFloat(item.no) || 0;
                 const cost2 = price * no;
@@ -317,43 +321,50 @@
             ];
 
             const tbody = document.getElementById('tableBody');
-            let totalSum = 0;
-            let totalSum2 = 0;
-            predefinedGroups.forEach(group => {
-                totalSum += groupData[group.name] || 0;
-                totalSum2 += groupData2[group.name] || 0;
-            });
+            if (tbody) {
+                tbody.innerHTML = "";
+                let totalSum = 0;
+                let totalSum2 = 0;
 
-            predefinedGroups.forEach(group => {
-                const cost = groupData[group.name] || 0;
-                const cost2 = groupData2[group.name] || 0;
-                const ratio = totalSum > 0 ? ((cost / totalSum) * 100).toFixed(1) + '%' : '0.0%';
-                
-                const tr = document.createElement('tr');
-                tr.className = `row-${group.name}`;
-                tr.innerHTML = `
-                    <td>${group.name}</td>
-                    <td style="text-align: right;">${Math.round(cost).toLocaleString()}</td>
-                    <td style="text-align: right;">${Math.round(cost2).toLocaleString()}</td>
-                    <td>${ratio}</td>
-                    <td style="text-align: center;font-size:14px;color:#00F;">${group.remark}</td>
-                `;
-                tbody.appendChild(tr);
-            });
+                predefinedGroups.forEach(group => {
+                    totalSum += groupData[group.name] || 0;
+                    totalSum2 += groupData2[group.name] || 0;
+                });
 
-            const tfoot = document.getElementById('tableFoot');
-            const footTr = document.createElement('tr');
-            footTr.innerHTML = `
-                <td>總計</td>
-                <td style="text-align: right;">${Math.round(totalSum).toLocaleString()}</td>
-                <td style="text-align: right;">${Math.round(totalSum2).toLocaleString()}</td>
-                <td>損益</td>
-                <td style="text-align: right;" id="profit-cell">XX</td>
-            `;
-            tfoot.appendChild(footTr);
+                predefinedGroups.forEach(group => {
+                    const cost = groupData[group.name] || 0;
+                    const cost2 = groupData2[group.name] || 0;
+                    const ratio = totalSum > 0 ? ((cost / totalSum) * 100).toFixed(1) + '%' : '0.0%';
+                    
+                    const tr = document.createElement('tr');
+                    tr.className = `row-${group.name}`;
+                    tr.innerHTML = `
+                        <td>${group.name}</td>
+                        <td style="text-align: right;">${Math.round(cost).toLocaleString()}</td>
+                        <td style="text-align: right;">${Math.round(cost2).toLocaleString()}</td>
+                        <td>${ratio}</td>
+                        <td style="text-align: center;font-size:14px;color:#00F;">${group.remark}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
 
+                const tfoot = document.getElementById('tableFoot');
+                if (tfoot) {
+                    tfoot.innerHTML = "";
+                    const footTr = document.createElement('tr');
+                    footTr.innerHTML = `
+                        <td>總計</td>
+                        <td style="text-align: right;">${Math.round(totalSum).toLocaleString()}</td>
+                        <td style="text-align: right;">${Math.round(totalSum2).toLocaleString()}</td>
+                        <td>損益</td>
+                        <td style="text-align: right;" id="profit-cell">XX</td>
+                    `;
+                    tfoot.appendChild(footTr);
+                }
+            }
+
+            // 5. 處理表格 2：股票明細與損益統計表（已修正小數點精度與精確損益計算）
             const stockMap = {};
-
             mysto.forEach(item => {
                 const sid = item.sid ? String(item.sid).trim() : "未知";
                 const name = item.na || item.name || item.sname || item.stockName || "";
@@ -385,71 +396,86 @@
             });
 
             const tbody2 = document.getElementById('tableBody2');
+            if (tbody2) {
+                tbody2.innerHTML = "";
 
-var tol9=0;
-var tol91=0;
-var profit2=0;
-            sortedStocks.forEach(stock => {
-                const avgBuy = stock.totalNo > 0 ? (stock.totalBuyWeight / stock.totalNo) : 0;
-                const totalMarketValue = stock.totalNo * stock.price;
-                const totalCostValue = stock.totalBuyWeight;
-                const profit = totalMarketValue - totalCostValue;
+                var tol9 = 0;
+                sortedStocks.forEach(stock => {
+                    const avgBuy = stock.totalNo > 0 ? (stock.totalBuyWeight / stock.totalNo) : 0;
+                    
+                    // 確保小數點精確度一致，避免浮點數誤差
+                    const fixedAvgBuy = Number(avgBuy.toFixed(2));
+                    const fixedPrice = Number(Number(stock.price).toFixed(2));
 
+                    // 精確計算損益整數
+                    const profit2 = Math.round((fixedPrice - fixedAvgBuy) * stock.totalNo);
+                    const totalMarketValue = stock.totalNo * fixedPrice;
+                    const totalCostValue = stock.totalBuyWeight;
+                    const profit = totalMarketValue - totalCostValue;
 
-stock.price = Number(stock.price.toFixed(2));
+                    let profitClass = 'table-dark-text';
+                    if (profit2 > 0) {
+                        profitClass = 'profit-pos';
+                    } else if (profit2 < 0) {
+                        profitClass = 'profit-neg';
+                    }
+                    tol9 += profit2;
 
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="font-size:18px;"><a class="btn-view" data-fancybox data-type="iframe" href="2CB.htm?p=${stock.sid}">查看</a></td>
+                        <td class="table-dark-text">${stock.sid}</td>
+                        <td class="table-dark-text" style="text-align: left;font-size:13px;">${stock.name}</td>
+                        <td style="text-align: right;" class="table-dark-text">${stock.totalNo.toLocaleString()}</td>
+                        <td style="font-size:18px;text-align: right;" class="table-dark-text">${fixedAvgBuy.toFixed(2)}</td>
+                        <td style="font-size:18px;text-align: right;" class="table-dark-text2">${fixedPrice.toFixed(2)}</td>
+                        <td style="font-size:18px;text-align: right;" class="${profitClass}">${profit2.toLocaleString()}</td>
+                    `;
+                    tbody2.appendChild(tr);
+                });
 
-const profit2=(stock.price.toFixed(3)-avgBuy.toFixed(3))*stock.totalNo;
-
-
-                let profitClass = 'table-dark-text';
-                if (profit > 0) {
-                    profitClass = 'profit-pos';
-                } else if (profit < 0) {
-                    profitClass = 'profit-neg';
+                tol9 = Math.round(tol9);
+                const profitCell = document.getElementById('profit-cell');
+                if (profitCell) {
+                    profitCell.textContent = tol9.toLocaleString();
                 }
-tol9+=profit2;
-
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-              <td style="font-size:18px;"><a class="btn-view" data-fancybox data-type="iframe" href="2CB.htm?p=${stock.sid}">查看</a></td>
-              <td class="table-dark-text">${stock.sid}</td>
-              <td class="table-dark-text" style="text-align: left;font-size:13px;">${stock.name}</td>
-                    <td class="table-dark-text" style="text-align: right;">${stock.totalNo.toLocaleString()}</td>
-                    <td class="table-dark-text" style="font-size:18px;text-align: right;">${avgBuy.toFixed(2)}</td>
-                    <td class="table-dark-text2" style="font-size:18px;text-align: right;">${stock.price.toFixed(2)}</td>
-                    <td style="font-size:18px;text-align: right;" class="${profitClass}">${Math.round(profit2).toLocaleString()}</td>
-                `;
-                tbody2.appendChild(tr);
-            });
-
-tol9=Math.round(tol9)
-document.getElementById('profit-cell').textContent = tol9.toLocaleString();
-        }
-    </script>
-
-
-
-    <script>
-        function scheduleReload() {
-            var now = new Date();
-            var totalMinutes = now.getHours() * 60 + now.getMinutes();
-
-            // 09:00 (540 分鐘) ~ 13:30 (810 分鐘)
-            var isPeakTime = totalMinutes >= 540 && totalMinutes <= 810;
-            var delay = isPeakTime ? 5000 : 20000; 
-
-            setTimeout(function() {
-                var iframe = document.getElementById('myIframe');
-                if (iframe) {
-                    iframe.src = iframe.src; 
-                }
-                scheduleReload(); 
-            }, delay);
+            }
         }
 
-        scheduleReload();
+        // 6. 每 10 秒從 Google 雲端讀取市價並更新 Cookie 與畫面
+        async function fetchAndUpdateStockPrices() {
+            const statusBar = document.getElementById('status-bar');
+            try {
+                statusBar.style.color = "#0050b3";
+                statusBar.textContent = "狀態：正在向雲端讀取市價...";
+
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`伺服器回應錯誤: ${response.status}`);
+                }
+                
+                const data = await response.text();
+                statusBar.style.color = "#389e0d";
+                statusBar.textContent = `【市價更新成功】`;
+                
+                // 將抓到的市價存入 pr2 Cookie (有效期限 600 秒)
+                document.cookie = `s=${encodeURIComponent(s)}; path=/; max-age=600`;   //股代號
+                document.cookie = `pr2=${encodeURIComponent(data)}; path=/; max-age=600`;
+
+                renderTables();
+
+            } catch (error) {
+                console.warn('雲端讀取失敗:', error);
+                statusBar.style.color = "#cf1322";
+                statusBar.textContent = `【讀取失敗】（使用本地快取或預設買價渲染）`;
+                renderTables(); 
+            }
+        }
+
+        window.onload = function() {
+            fetchAndUpdateStockPrices();
+            setInterval(fetchAndUpdateStockPrices, 10000);
+        };
     </script>
 
 </body>
