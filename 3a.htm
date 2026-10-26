@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>股票歷年行情與提升率分析</title>
+    <!-- 引入 Chart.js 圖表庫 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary-color: #1a73e8;
@@ -122,14 +124,14 @@
         .info-card {
             background-color: #f1f3f4;
             border-left: 2px solid var(--primary-color);
-            padding: 2px 2px;
-            border-radius: 2px;
-            margin-bottom: 2px;
+            padding: 6px 12px;
+            border-radius: 4px;
+            margin-bottom: 12px;
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            gap: 2px;
+            gap: 8px;
         }
 
         .info-item {
@@ -153,6 +155,18 @@
         .down { color: var(--down-color); }
         .neutral { color: #202124; }
 
+        /* 折線圖容器 */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            margin-bottom: 16px;
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+        }
+
         /* 表格容器與樣式 */
         .table-responsive {
             width: 100%;
@@ -165,11 +179,11 @@
             width: 100%;
             border-collapse: collapse;
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
 
         th, td {
-            padding: 2px 2px;
+            padding: 6px 8px;
             border-bottom: 1px solid var(--border-color);
             white-space: nowrap;
         }
@@ -242,6 +256,11 @@
         </div>
     </div>
 
+    <!-- 月均價折線圖區域 -->
+    <div class="chart-container">
+        <canvas id="priceChart"></canvas>
+    </div>
+
     <!-- 資料表格 -->
     <div class="table-responsive">
         <table>
@@ -284,6 +303,9 @@
     const rateValue = document.getElementById('rateValue');
     const tableBody = document.getElementById('tableBody');
 
+    // Chart.js 實體變數
+    let myChart = null;
+
     // 解析日期 md (例如 "081/07" -> 8107) 用於比較與排序
     function parseMD(mdStr) {
         if (!mdStr) return 0;
@@ -308,7 +330,7 @@
             }
         });
 
-        // 依據 sid 由小到大排序 (支援字串數字與補零格式，如 0050、00919、2330)
+        // 依據 sid 由小到大排序 (支援字串數字與補零格式)
         uniqueStocks.sort((a, b) => a.sid.localeCompare(b.sid, undefined, { numeric: true }));
 
         stockSelect.innerHTML = uniqueStocks.map(s => 
@@ -356,14 +378,75 @@
         renderData();
     }
 
-    // 渲染資料與計算提升率
+    // 渲染折線圖
+    function renderChart(data) {
+        const ctx = document.getElementById('priceChart').getContext('2d');
+
+        // 因為 data 是「最新在前 (降序)」，繪圖時通常需要「舊到新 (升序)」，因此做 .reverse()
+        const chartData = [...data].reverse();
+        const labels = chartData.map(item => item.md);
+        const prices = chartData.map(item => parseFloat(item.pri2));
+
+        // 如果圖表已存在則銷毀重新繪製
+        if (myChart) {
+            myChart.destroy();
+        }
+
+        myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '月均價',
+                    data: prices,
+                    borderColor: '#1a73e8',
+                    backgroundColor: 'rgba(26, 115, 232, 0.08)',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#1a73e8',
+                    fill: true,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: { size: 10 },
+                            maxRotation: 45
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            font: { size: 11 }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 渲染資料、更新圖表與計算提升率
     function renderData() {
         const selectedSid = stockSelect.value;
         const selectedYear = yearSelect.value;
 
         // 尋找選取股票的名稱並顯示在資訊欄
         const currentStockObj = sto2.find(item => item.sid === selectedSid);
-        const stockName = currentStockObj ? currentStockObj.na : '';
         stockDisplay.textContent = selectedSid ? `${selectedSid}`.trim() : '--';
 
         // 1. 篩選資料：大於等於選取年度 (選擇年度 ~ 本年度)
@@ -410,9 +493,12 @@
             rateValue.className = 'info-value neutral';
         }
 
-        // 5. 渲染表格
+        // 5. 渲染折線圖
+        renderChart(filteredData);
+
+        // 6. 渲染表格
         if (filteredData.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="4" class="no-data">無符合資料</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="3" class="no-data">無符合資料</td></tr>`;
             return;
         }
 

@@ -231,13 +231,18 @@
                 </tbody>
             </table>
         </div>
+<br><br><br><br><br><br>
+
+<iframe src="refdata3.htm" style="height: 10px; width: 100%; display: block; margin: 0 auto; border: none;"></iframe>
     </div>
+
 
     <!-- 載入外部資料 -->
     <script src="mysto.js"></script>
     <script>
         // 股票代號清單變數
-        var s = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A";
+
+var s = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A";
 
         // ⚠️ 請填入您的 Google Apps Script 網頁應用程式網址
         const apiUrl = 'https://script.google.com/macros/s/AKfycbzVZHg92IkxLWbvKW_fbEzhcceezMG8Ltw8N8ElEhjvktsm3ER3R0aQJ53vdMum5-DG/exec';
@@ -423,7 +428,7 @@
 
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td style="font-size:18px;"><a class="btn-view" data-fancybox data-type="iframe" href="2CB.htm?p=${stock.sid}">查看</a></td>
+                        <td style="font-size:18px;"><a class="btn-view" data-fancybox data-type="iframe" href="2cb.htm?p=${stock.sid}">查看</a></td>
                         <td class="table-dark-text">${stock.sid}</td>
                         <td class="table-dark-text" style="text-align: left;font-size:13px;">${stock.name}</td>
                         <td style="text-align: right;" class="table-dark-text">${stock.totalNo.toLocaleString()}</td>
