@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>Glitch 伺服器端 123.txt 編輯器</title>
+  <style>
+    body { font-family: sans-serif; margin: 40px; background: #f9f9f9; }
+    textarea { width: 100%; height: 150px; padding: 10px; font-size: 16px; }
+    button { padding: 10px 20px; font-size: 16px; background: #007bff; color: white; border: none; cursor: pointer; margin-top: 10px; }
+    button:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+  <h2>線上編輯 Glitch 伺服器端的 123.txt</h2>
+  <textarea id="contentBox">載入中...</textarea>
+  <br>
+  <button id="saveBtn">儲存至伺服器</button>
+  <p id="status"></p>
+
+  <script>
+    // 網頁載入時讀取 123.txt
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        let res = await fetch('/api/read');
+        let text = await res.text();
+        document.getElementById('contentBox').value = text;
+      } catch (e) {
+        document.getElementById('status').innerText = '讀取失敗';
+      }
+    });
+
+    // 點擊按鈕寫入 123.txt
+    document.getElementById('saveBtn').addEventListener('click', async () => {
+      let textData = document.getElementById('contentBox').value;
+      document.getElementById('status').innerText = '儲存中...';
+
+      try {
+        let res = await fetch('/api/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: textData })
+        });
+        let result = await res.json();
+        document.getElementById('status').innerText = result.message;
+      } catch (e) {
+        document.getElementById('status').innerText = '儲存發生錯誤';
+      }
+    });
+  </script>
+</body>
+</html>
