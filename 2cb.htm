@@ -396,6 +396,7 @@
             let costSum = 0;
             let costCount = 0;
             let displayPrice = "-";
+            let buy9 = 0;
 
             let itemsToRender = [];
 
@@ -409,6 +410,7 @@
 
                     if (item.price !== undefined && item.price !== "") {
                         displayPrice = item.price;
+			
                     }
 
                     const qtyVal = parseFloat(item.no);
@@ -420,6 +422,7 @@
                     if (!isNaN(buyVal)) {
                         buySum += buyVal;
                         buyCount++;
+     buy9+=buyVal*qtyVal;
                     }
 
                     const costVal = parseFloat(item.cost);
@@ -474,11 +477,12 @@
             const avgCostRaw = costCount > 0 ? formatNumber(costSum, 0) : 0;
             const avgCost = formatNumber(avgCostRaw, 2);
             const formattedTotalQty = formatNumber(totalQuantity, 0);
+            const buy91 = formatNumber(buy9, 0);
 
             document.getElementById("statsInfo").innerHTML = `
                 <span style="font-size: 20px;">股數：<span style="color: #6f42c1;font-size: 20px;">${formattedTotalQty}</span></span>
                 <span style="font-size: 20px;">均價：<span style="color: #d9534f;font-size: 20px;">${avgBuy}</span></span>
-
+                <span style="font-size: 20px;">買入：<span style="color: #8B4522;font-size: 20px;">${buy91}元</span></span>
                 <span style="font-size: 20px;">市價：<span style="color: #8B4522;font-size: 20px;">${displayPrice}</span></span>
             `;
         }
