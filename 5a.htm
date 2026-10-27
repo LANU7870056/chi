@@ -13,12 +13,10 @@
     <style>
         body {
             margin: 0;
-            padding: 0;
-            min-height: 100vh; /* 確保高度佔滿整個視窗 */
+            padding: 20px 0; /* 上下保留間距，不使用 flex 垂直置中避免滾動定位跑版 */
+            min-height: 100vh;
             background-color: #580000; /* 背景顏色（深紅/暗紅） */
-            display: flex;
-            justify-content: center; /* 水平居中 */
-            align-items: center;     /* 垂直居中 */
+            display: block; /* 修正：改回預設區塊流 */
         }
 
         /* 2. 中間卡片主體 */
@@ -27,7 +25,8 @@
             border-radius: 16px; /* 圓角效果 */
             padding: 8px;
             width: 98%;
-            max-width: 800px;  /* 設定最大寬度，避免在大螢幕上太寬 */
+            max-width: 800px;  /* 設定最大寬度 */
+            margin: 0 auto;    /* 修正：水平置中 */
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 陰影提升質感 */
         }
 
@@ -103,12 +102,16 @@
             cursor: pointer;
         }
 
-        /* 設定 Fancybox 彈出 iframe 視窗的尺寸 */
+        /* 設定 Fancybox 彈出 iframe 視窗的尺寸與居中 */
+        .fancybox-slide {
+            align-items: center !important; /* 確保在可視範圍內垂直置中 */
+        }
+
         .fancybox-slide--iframe .fancybox-content {
             width: 800px;
             height: 600px;
-            max-width: 120%;
-            max-height: 120%;
+            max-width: 95%;
+            max-height: 90vh;
         }
 
         /* === 針對手機版 (螢幕寬度小於 600px 時) 的優化 === */
@@ -231,23 +234,18 @@
                 </tbody>
             </table>
         </div>
-<br><br><br><br><br><br>
+        <br><br><br><br><br><br>
 
-<iframe src="refdata3.htm" style="height: 10px; width: 100%; display: block; margin: 0 auto; border: none;"></iframe>
+        <iframe src="refdata3.htm" style="height: 10px; width: 100%; display: block; margin: 0 auto; border: none;"></iframe>
     </div>
-
 
     <!-- 載入外部資料 -->
     <script src="mysto.js"></script>
     <script>
-        // 股票代號清單變數
+        var s = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A,006208";
 
-var s = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A";
-
-        // ⚠️ 請填入您的 Google Apps Script 網頁應用程式網址
         const apiUrl = 'https://script.google.com/macros/s/AKfycbzVZHg92IkxLWbvKW_fbEzhcceezMG8Ltw8N8ElEhjvktsm3ER3R0aQJ53vdMum5-DG/exec';
 
-        // 輔助函式：讀取 Cookie
         function getCookie(name) {
             const value = `; ${document.cookie}`;
             const parts = value.split(`; ${name}=`);
@@ -255,19 +253,16 @@ var s = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00
             return "";
         }
 
-        // 二、核心渲染與計算函式
         function renderTables() {
             if (typeof mysto === 'undefined') {
                 console.error("mysto 陣列未定義");
                 return;
             }
 
-            // 1. 取得 s 變數與 pr2 Cookie 中的市價清單
             const sList = s ? s.split(',') : [];
             const pr2Cookie = decodeURIComponent(getCookie("pr2"));
             const pr2List = pr2Cookie ? pr2Cookie.split(/[\r\n,]+/) : [];
 
-            // 2. 建立股票代號與市價的對應表
             const priceMap = {};
             sList.forEach((sid, index) => {
                 if (sid) {
@@ -279,7 +274,6 @@ var s = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00
                 }
             });
 
-            // 3. 更新 mysto 內的 price 與計算 ra 報酬率
             mysto.forEach(item => {
                 if (item.sid) {
                     const cleanSid = String(item.sid).trim();
@@ -299,7 +293,6 @@ var s = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00
                 }
             });
 
-            // 4. 處理表格 1：類型總金額統計表
             const groupData = {};
             const groupData2 = {};
 
@@ -368,7 +361,6 @@ var s = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00
                 }
             }
 
-            // 5. 處理表格 2：股票明細與損益統計表（已修正小數點精度與精確損益計算）
             const stockMap = {};
             mysto.forEach(item => {
                 const sid = item.sid ? String(item.sid).trim() : "未知";
@@ -408,11 +400,9 @@ var s = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00
                 sortedStocks.forEach(stock => {
                     const avgBuy = stock.totalNo > 0 ? (stock.totalBuyWeight / stock.totalNo) : 0;
                     
-                    // 確保小數點精確度一致，避免浮點數誤差
                     const fixedAvgBuy = Number(avgBuy.toFixed(2));
                     const fixedPrice = Number(Number(stock.price).toFixed(2));
 
-                    // 精確計算損益整數
                     const profit2 = Math.round((fixedPrice - fixedAvgBuy) * stock.totalNo);
                     const totalMarketValue = stock.totalNo * fixedPrice;
                     const totalCostValue = stock.totalBuyWeight;
@@ -447,7 +437,6 @@ var s = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00
             }
         }
 
-        // 6. 每 10 秒從 Google 雲端讀取市價並更新 Cookie 與畫面
         async function fetchAndUpdateStockPrices() {
             const statusBar = document.getElementById('status-bar');
             try {
@@ -463,8 +452,7 @@ var s = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00
                 statusBar.style.color = "#389e0d";
                 statusBar.textContent = `【市價更新成功】`;
                 
-                // 將抓到的市價存入 pr2 Cookie (有效期限 600 秒)
-                document.cookie = `s=${encodeURIComponent(s)}; path=/; max-age=600`;   //股代號
+                document.cookie = `s=${encodeURIComponent(s)}; path=/; max-age=600`;
                 document.cookie = `pr2=${encodeURIComponent(data)}; path=/; max-age=600`;
 
                 renderTables();
@@ -482,6 +470,5 @@ var s = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00
             setInterval(fetchAndUpdateStockPrices, 10000);
         };
     </script>
-
 </body>
 </html>

@@ -153,7 +153,7 @@
 
         .up { color: var(--up-color); }
         .down { color: var(--down-color); }
-        .neutral { color: #202124; }
+        .neutral { color: var(--text-color); }
 
         /* 折線圖容器 */
         .chart-container {
@@ -312,10 +312,11 @@
         const parts = mdStr.split('/');
         const year = parseInt(parts[0], 10) || 0;
         const month = parseInt(parts[1], 10) || 0;
+
         return year * 100 + month;
     }
 
-    // 初始化選單 1 (個股，優先選擇 sCookie，否則預設 00919)
+    // 初始化選單 1 (個股，改用純字串 sid.localeCompare 排序)
     function initStockSelect() {
         const uniqueStocks = [];
         const seenSid = new Set();
@@ -330,8 +331,8 @@
             }
         });
 
-        // 依據 sid 由小到大排序 (支援字串數字與補零格式)
-        uniqueStocks.sort((a, b) => a.sid.localeCompare(b.sid, undefined, { numeric: true }));
+        // 依據 sid 純字串排序（解決 6 位數代號如 009816 被誤判排在最後的問題）
+        uniqueStocks.sort((a, b) => a.sid.localeCompare(b.sid));
 
         stockSelect.innerHTML = uniqueStocks.map(s => 
             `<option value="${s.sid}">${s.label}</option>`
@@ -378,14 +379,16 @@
         renderData();
     }
 
-    // 渲染折線圖
+    // 渲染折線圖 (使用 pri2、low、upp)
     function renderChart(data) {
         const ctx = document.getElementById('priceChart').getContext('2d');
 
         // 因為 data 是「最新在前 (降序)」，繪圖時通常需要「舊到新 (升序)」，因此做 .reverse()
         const chartData = [...data].reverse();
         const labels = chartData.map(item => item.md);
-        const prices = chartData.map(item => parseFloat(item.pri2));
+        const prices = chartData.map(item => parseFloat(item.pri2));   // 使用 pri2
+        const lowPrices = chartData.map(item => parseFloat(item.low)); // 使用 low
+        const uppPrices = chartData.map(item => parseFloat(item.upp)); // 使用 upp
 
         // 如果圖表已存在則銷毀重新繪製
         if (myChart) {
@@ -396,24 +399,53 @@
             type: 'line',
             data: {
                 labels: labels,
-                datasets: [{
-                    label: '月均價',
-                    data: prices,
-                    borderColor: '#1a73e8',
-                    backgroundColor: 'rgba(26, 115, 232, 0.08)',
-                    borderWidth: 2,
-                    pointRadius: 3,
-                    pointBackgroundColor: '#1a73e8',
-                    fill: true,
-                    tension: 0.1
-                }]
+                datasets: [
+                    {
+                        label: '最高 (upp)',
+                        data: uppPrices,
+                        borderColor: '#d93025', // 漲紅/高點顏色
+                        backgroundColor: 'transparent',
+                        borderWidth: 1.5,
+                        pointRadius: 2,
+                        pointBackgroundColor: '#d93025',
+                        borderDash: [4, 4],
+                        tension: 0.1
+                    },
+                    {
+                        label: '月均價 (pri2)',
+                        data: prices,
+                        borderColor: '#1a73e8', // 主色藍
+                        backgroundColor: 'rgba(26, 115, 232, 0.08)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#1a73e8',
+                        fill: false,
+                        tension: 0.1
+                    },
+                    {
+                        label: '最低 (low)',
+                        data: lowPrices,
+                        borderColor: '#188038', // 跌綠/低點顏色
+                        backgroundColor: 'transparent',
+                        borderWidth: 1.5,
+                        pointRadius: 2,
+                        pointBackgroundColor: '#188038',
+                        borderDash: [4, 4],
+                        tension: 0.1
+                    }
+                ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        display: false
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            boxWidth: 12,
+                            font: { size: 11 }
+                        }
                     },
                     tooltip: {
                         mode: 'index',
