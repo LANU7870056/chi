@@ -4,6 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>股票戰情室</title>
+
+<!-- 1. 引入 jQuery 與 Fancybox 燈箱套件 -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
@@ -202,9 +209,24 @@
   }
 }
 
+
+/* 設定 Fancybox 彈出 iframe 視窗的尺寸與居中 */
+        .fancybox-slide {
+            align-items: center !important; /* 確保在可視範圍內垂直置中 */
+        }
+
+        .fancybox-slide--iframe .fancybox-content {
+top:0px;
+            width: 800px;
+            height: 600px;
+            max-width: 110%;
+            max-height: 90vh;
+        }
+
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-0 md:p-6 bg-slate-950 font-rajdhani">
+
 
   <!-- 桌上型電腦背板氛圍效果 (隱約賽博背景網格) -->
   <div class="fixed inset-0 pointer-events-none opacity-25 bg-[radial-gradient(#00f3ff_1px,transparent_1px)] [background-size:28px_28px]"></div>
@@ -227,7 +249,7 @@
         </div>
       </div>
     </div>
-
+<iframe src="refdata3.htm" style="height: 5px; width: 100px; display: block; margin: 0 auto; border: none;"></iframe>
     <!-- 超炫動態 Canvas 桌布背景 (可切換 5 種主題) -->
     <canvas id="wallpaper-canvas" class="absolute inset-0 w-full h-full z-0 pointer-events-none"></canvas>
 
@@ -287,6 +309,8 @@
           </a>
 
           <!-- 圖示 5: 股票資產配置 -->
+
+
           <a href="5a.htm" onclick="audioSys.playClick(); createRipple(event);" class="flex flex-col items-center group w-full text-decoration-none">
             <div class="sphere-btn sphere-game">
               <i data-lucide="gamepad-2" class="w-9 h-9 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]"></i>
@@ -989,5 +1013,6 @@
       updateTime();
     };
   </script>
+
 </body>
 </html>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>台灣股票/ETF股利殖利率查詢</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter & Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+<style>
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background-color: #580000;
+      display: flex;
+      justify-content: center;
+    }
+
+    .card {
+      background-color: #ffffff;
+      border-radius: 16px;
+      padding: 2px;
+      width: 98%;
+      max-width: 800px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      background-color: #fff;
+      box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+      border-radius: 2px;
+      margin-top: 2px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 300px;
+      border-collapse: collapse;
+      background-color: #fff;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 1px 1px;
+      text-align: center;
+      border-bottom: 1px solid #dee2e6;
+      font-size: 16px;
+    }
+
+    th {
+      background-color: #007bff;
+      padding: 1px 1px;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .header-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      min-height: 36px;
+    }
+
+    .home-icon {
+      height: 50px;
+      width: auto;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    .home-icon:hover {
+      transform: scale(1.1);
+      opacity: 0.85;
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 2.3rem;
+      color: var(--primary-color);
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <!-- 頂部標題區域 -->
+  <div class="header-bar">
+    <a href="index.htm" class="home-link" title="返回首頁">
+      <img src="home.png" alt="首頁" class="home-icon">
+    </a>
+    <h2 style="font-size: 20px;color:#00F;">股票分析戰情室</h2>
+  </div>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-1 sm:px-1 lg:px-1 py-1 space-y-1">
+    <!-- Controls Box -->
+    <select id="stockSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-base sm:text-lg rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 p-1 pr-1 appearance-none font-medium cursor-pointer shadow-sm transition-all">
+      <!-- Dynamically populated options -->
+    </select>
+
+    <!-- Data Display Section -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+      <div class="p-1 sm:p-1 border-b border-slate-100 flex flex-row items-center justify-between gap-1">
+        <div class="flex flex-row flex-nowrap items-center gap-1.5 text-sm font-semibold text-slate-700 w-full overflow-x-auto">
+          <div style="color: #1d4ed8;" class="bg-amber-50 border border-amber-200 px-2 py-1 rounded-lg text-amber-900 whitespace-nowrap text-sm sm:text-base flex-1 text-center">
+            最新股利：<span id="statLatestDividend" class="text-amber-700 font-bold">--</span>
+          </div>
+          <div style="color: #1d4ed8;" class="bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-lg text-emerald-900 whitespace-nowrap text-sm sm:text-base flex-1 text-center">
+            高殖利率(≥8%)：<span id="statHighYieldCount" class="text-emerald-700 font-bold">0</span> 筆
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table View -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse text-[16px] sm:text-[18px] whitespace-nowrap">
+        <thead>
+          <tr class="bg-slate-100 border-b border-slate-200 font-semibold">
+            <th class="py-1 px-1 text-center responsive-th">股利</th>
+            <th class="py-1 px-1 text-center responsive-th">除息日</th>
+            <th class="py-1 px-1 text-center responsive-th">發放日</th>
+            <th class="py-1 px-1 text-center responsive-th">股價</th>
+            <th class="py-1 px-1 text-center responsive-th">調整價</th>
+            <th class="py-1 px-1 text-center responsive-th">年化殖利率</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody" class="divide-y divide-slate-200/50">
+          <!-- Dynamic rows -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="hidden py-12 text-center text-slate-500">
+      <i class="fa-solid fa-folder-open text-4xl mb-3 text-slate-300"></i>
+      <p class="text-base font-medium">沒有符合條件的數據資料</p>
+    </div>
+  </main>
+</div>
+
+<!-- Include external JS file -->
+<script src="da5.js"></script>
+
+<!-- Application Script -->
+<script>
+  const fallbackData = [
+    {sid:"0052", na:"富邦台灣科技", ra:"1.199", da1:"46132", da2:"46157", price:"50.05", DJ:"0050.05", rate:"0.024"},
+    {sid:"0052", na:"富邦台灣科技", ra:"3.23", da1:"45770", da2:"45796", price:"153", DJ:"21.86", rate:"0.085"},
+    {sid:"0052", na:"富邦台灣科技", ra:"6.43", da1:"45400", da2:"45427", price:"160.75", DJ:"22.96", rate:"0.105"},
+    {sid:"00403A", na:"主動統一升級50", ra:"0.42", da1:"46180", da2:"46200", price:"10.26", DJ:"10.26", rate:"0.042"}
+  ];
+
+  let dataSource = [];
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof da5 !== 'undefined' && Array.isArray(da5) && da5.length > 0) {
+      dataSource = da5;
+    } else {
+      dataSource = fallbackData;
+    }
+
+    initDropdown();
+    bindEvents();
+    renderData();
+  });
+
+  function convertExcelDate(excelSerial) {
+    const serial = Number(excelSerial);
+    if (isNaN(serial) || serial <= 0) return { formatted: excelSerial || '--', raw: excelSerial };
+    
+    const jsDate = new Date((serial - 25569) * 86400 * 1000);
+    if (isNaN(jsDate.getTime())) return { formatted: excelSerial, raw: excelSerial };
+
+    const yyyy = jsDate.getUTCFullYear();
+    const mm = String(jsDate.getUTCMonth() + 1).padStart(2, '0');
+    const dd = String(jsDate.getUTCDate()).padStart(2, '0');
+    
+    return {
+      formatted: `${yyyy}-${mm}-${dd}`,
+      raw: serial
+    };
+  }
+
+  function formatPercentage(rateVal) {
+    const num = parseFloat(rateVal);
+    if (isNaN(num)) return rateVal || '0.00%';
+    return (num * 100).toFixed(2) + '%';
+  }
+
+  function getRateBadgeClass(rateVal) {
+    const num = parseFloat(rateVal);
+    if (isNaN(num)) return "bg-slate-100 text-slate-800";
+
+    if (num >= 0.10) {
+      return "bg-red-100 text-red-600 font-extrabold";
+    }
+    if (num >= 0.08) {
+      return "bg-blue-100 text-blue-600 font-bold";
+    }
+    return "bg-emerald-100 text-emerald-800 font-bold";
+  }
+
+  function initDropdown() {
+    const selectEl = document.getElementById('stockSelect');
+    selectEl.innerHTML = '';
+
+    const uniqueStocks = [];
+    const map = new Map();
+
+    dataSource.forEach(item => {
+      const key = `${item.sid}_${item.na}`;
+      if (!map.has(key)) {
+        map.set(key, true);
+        uniqueStocks.push({ sid: item.sid, na: item.na });
+      }
+    });
+
+    uniqueStocks.forEach(stock => {
+      const opt = document.createElement('option');
+      opt.value = stock.sid;
+      opt.textContent = `${stock.sid} ${stock.na}`;
+      selectEl.appendChild(opt);
+    });
+
+    // 檢查網址列是否有帶入 p 參數 (例如 ?p=00403A)
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramP = urlParams.get('p');
+
+    if (paramP && uniqueStocks.some(s => s.sid === paramP)) {
+      selectEl.value = paramP;
+    } else if (uniqueStocks.length > 0) {
+      selectEl.value = uniqueStocks[0].sid;
+    }
+  }
+
+  function bindEvents() {
+    const selectEl = document.getElementById('stockSelect');
+    selectEl.addEventListener('change', () => renderData());
+  }
+
+  function renderData() {
+    const selectedSid = document.getElementById('stockSelect').value;
+    let filtered = dataSource.filter(item => item.sid === selectedSid);
+
+    const tBody = document.getElementById('tableBody');
+    const emptyState = document.getElementById('emptyState');
+
+    tBody.innerHTML = '';
+
+    if (filtered.length === 0) {
+      emptyState.classList.remove('hidden');
+      updateTopStats(null, 0);
+      return;
+    } else {
+      emptyState.classList.add('hidden');
+    }
+
+    let highYieldCount = 0;
+
+    filtered.forEach((item, index) => {
+      const da1Date = convertExcelDate(item.da1);
+      const da2Date = convertExcelDate(item.da2);
+      const rateFormatted = formatPercentage(item.rate);
+      const badgeClass = getRateBadgeClass(item.rate);
+
+      const rateNum = parseFloat(item.rate);
+      if (!isNaN(rateNum) && rateNum >= 0.08) {
+        highYieldCount++;
+      }
+
+      const isOddRow = (index % 2 === 0);
+      const rowBgClass = isOddRow ? 'bg-[#fef9c3] hover:bg-yellow-200/80' : 'bg-[#e0f2fe] hover:bg-sky-200/80';
+
+      const tr = document.createElement('tr');
+      tr.className = `${rowBgClass} transition-colors border-b border-slate-200/60`;
+      tr.innerHTML = `
+        <td style="font-size: 18px; color: #1d4ed8; padding: 1px;" class="text-center font-semibold text-slate-900">${item.ra}</td>
+        <td style="font-size: 18px; color: #1d4ed8; padding: 1px;">
+          <div class="font-medium text-slate-800" style="font-size:14px;">${da1Date.formatted}</div>
+        </td>
+        <td style="padding: 1px;"><div class="font-medium text-slate-800" style="font-size:14px;">${da2Date.formatted}</div></td>
+        <td style="padding: 1px;" class="text-center font-medium text-slate-900">${item.price}</td>
+        <td style="font-size: 16px; color: #1d4ed8; padding: 1px;" class="text-center text-slate-700">${item.DJ}</td>
+        <td style="font-size: 18px; color: #1d4ed8; padding: 1px;" class="align-middle text-center">
+          <span class="inline-flex items-center px-2 py-0.5 rounded-md ${badgeClass}">
+            ${rateFormatted}
+          </span>
+        </td>
+      `;
+      tBody.appendChild(tr);
+    });
+
+    const firstItem = filtered.length > 0 ? filtered[0] : null;
+    updateTopStats(firstItem, highYieldCount);
+  }
+
+  function updateTopStats(firstItem, highYieldCount) {
+    const latestDivEl = document.getElementById('statLatestDividend');
+    const highYieldEl = document.getElementById('statHighYieldCount');
+
+    if (firstItem && firstItem.ra) {
+      const raVal = parseFloat(firstItem.ra);
+      if (!isNaN(raVal)) {
+        latestDivEl.innerText = `${(raVal * 1000).toLocaleString('zh-TW')} 元`;
+      } else {
+        latestDivEl.innerText = '--';
+      }
+    } else {
+      latestDivEl.innerText = '--';
+    }
+
+    highYieldEl.innerText = highYieldCount;
+  }
+</script>
+</body>
+</html>

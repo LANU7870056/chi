@@ -16,7 +16,7 @@
             padding: 20px 0; /* 上下保留間距，不使用 flex 垂直置中避免滾動定位跑版 */
             min-height: 100vh;
             background-color: #580000; /* 背景顏色（深紅/暗紅） */
-            display: block; /* 修正：改回預設區塊流 */
+            display: block; /* 修正 : 改回預設區塊流 */
         }
 
         /* 2. 中間卡片主體 */
@@ -26,7 +26,7 @@
             padding: 8px;
             width: 98%;
             max-width: 800px;  /* 設定最大寬度 */
-            margin: 0 auto;    /* 修正：水平置中 */
+            margin: 0 auto;    /* 修正 : 水平置中 */
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 陰影提升質感 */
         }
 
@@ -189,7 +189,7 @@
         </div>
 
         <!-- 狀態與除錯顯示區 -->
-        <div id="status-bar" style="background: #e6f7ff; border: 1px solid #91d5ff; padding: 8px; font-size: 13px; margin-bottom: 10px; border-radius: 4px; color: #0050b3; word-break: break-all;">
+        <div id="status-bar" style="background: #e6f7ff; border: 0px solid #91d5ff; padding: 1px; font-size: 10px; margin-bottom: 2px; border-radius: 1px; color: #0050b3; word-break: break-all;">
             狀態：初始化中...
         </div>
 
@@ -236,13 +236,16 @@
         </div>
         <br><br><br><br><br><br>
 
-        <iframe src="refdata3.htm" style="height: 10px; width: 100%; display: block; margin: 0 auto; border: none;"></iframe>
+        <iframe src="refdata3.htm" style="height: 5px; width: 100px; display: block; margin: 0 auto; border: none;"></iframe>
     </div>
 
     <!-- 載入外部資料 -->
     <script src="mysto.js"></script>
     <script>
         var s = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A,006208";
+
+
+        var ky = "00403A,00406A,00919,00982A,00988A,00992A,009816,00896,00929";
 
         const apiUrl = 'https://script.google.com/macros/s/AKfycbzVZHg92IkxLWbvKW_fbEzhcceezMG8Ltw8N8ElEhjvktsm3ER3R0aQJ53vdMum5-DG/exec';
 
@@ -260,6 +263,7 @@
             }
 
             const sList = s ? s.split(',') : [];
+            const kyList = ky ? ky.split(',').map(item => item.trim()) : [];
             const pr2Cookie = decodeURIComponent(getCookie("pr2"));
             const pr2List = pr2Cookie ? pr2Cookie.split(/[\r\n,]+/) : [];
 
@@ -416,11 +420,17 @@
                     }
                     tol9 += profit2;
 
+                    // 檢查是否符合 ky 名單，若符合則產生藍色超連結名稱，否則維持預設樣式
+                    const isKyStock = kyList.includes(stock.sid);
+                    const nameHtml = isKyStock 
+                        ? `<a class="btn-view" data-fancybox data-type="iframe" href="da5z.htm?p=${stock.sid}" style="color: #0000ff; text-decoration: underline; font-weight: bold;">${stock.name}</a>` 
+                        : stock.name;
+
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td style="font-size:18px;"><a class="btn-view" data-fancybox data-type="iframe" href="2cb.htm?p=${stock.sid}">查看</a></td>
-                        <td class="table-dark-text">${stock.sid}</td>
-                        <td class="table-dark-text" style="text-align: left;font-size:13px;">${stock.name}</td>
+                        <td style="font-size:18px;"><a class="btn-view" data-fancybox data-type="iframe" href="2cb.htm?p=${stock.sid}"><img src="bk1.png"></a></td>
+                        <td class="table-dark-text"><a class="btn-view" data-fancybox data-type="iframe" href="3az.htm?p=${stock.sid}">${stock.sid}</a></td>
+                        <td class="table-dark-text" style="text-align: left;font-size:13px;">${nameHtml}</td>
                         <td style="text-align: right;" class="table-dark-text">${stock.totalNo.toLocaleString()}</td>
                         <td style="font-size:18px;text-align: right;" class="table-dark-text">${fixedAvgBuy.toFixed(2)}</td>
                         <td style="font-size:18px;text-align: right;" class="table-dark-text2">${fixedPrice.toFixed(2)}</td>

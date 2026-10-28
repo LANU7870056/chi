@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>股票歷年行情與提升率分析</title>
+    <!-- 引入 Chart.js 圖表庫 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #202124;
+            --border-color: #dadce0;
+            --up-color: #d93025;   /* 漲紅 */
+            --down-color: #188038; /* 跌綠 */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #5a0000; /* 深紅背景 */
+            color: var(--text-color);
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        /* 頂部標題列與 Home 圖示 */
+        .header-bar {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            min-height: 36px;
+        }
+
+        .home-link {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .home-icon {
+            height: 50px;
+            width: auto;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .home-icon:hover {
+            transform: scale(1.1);
+            opacity: 0.85;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        /* 篩選區域：強制同一列 */
+        .filter-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .form-control {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .form-control label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #5f6368;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        select {
+            width: 100%;
+            padding: 8px 10px;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: #fff;
+            outline: none;
+            transition: border-color 0.2s;
+            text-overflow: ellipsis;
+        }
+
+        select:focus {
+            border-color: var(--primary-color);
+        }
+
+        /* 表格上方資訊欄 */
+        .info-card {
+            background-color: #f1f3f4;
+            border-left: 2px solid var(--primary-color);
+            padding: 6px 12px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .info-title {
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: #5f6368;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .up { color: var(--up-color); }
+        .down { color: var(--down-color); }
+        .neutral { color: var(--text-color); }
+
+        /* 折線圖容器 */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            margin-bottom: 16px;
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        /* 表格容器與樣式 */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        th, td {
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #3c4043;
+        }
+
+        /* 奇數列：淺黃 */
+        tbody tr:nth-child(odd) {
+            background-color: #fffde7;
+        }
+
+        /* 偶數列：淺綠 */
+        tbody tr:nth-child(even) {
+            background-color: #e8f5e9;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            filter: brightness(0.96);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: #70757a;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 頂部標題區域 (包含左上角 HOME 圖示) -->
+    <div class="header-bar">
+        <a href="index.htm" class="home-link" title="返回首頁">
+            <img src="home.png" alt="首頁" class="home-icon">
+        </a>
+        <h2>股票分析戰情室</h2>
+    </div>
+
+    <!-- 選單區域 (同一列) -->
+    <div class="filter-group">
+        <div class="form-control">
+            <select id="stockSelect"></select>
+        </div>
+        <div class="form-control">
+            <select id="yearSelect"></select>
+        </div>
+    </div>
+
+    <!-- 表格上方資訊欄：包含股票代號、目前股價、股價提升率 -->
+    <div class="info-card">
+        <div class="info-item">
+            <span class="info-title">股票代號：</span>
+            <span id="stockDisplay" class="info-value neutral">--</span>
+        </div>
+        <div class="info-item">
+            <span class="info-title">目前股價：</span>
+            <span id="currentPrice" class="info-value neutral">--</span>
+        </div>
+        <div class="info-item">
+            <span class="info-title">股價率：</span>
+            <span id="rateValue" class="info-value neutral">--%</span>
+        </div>
+    </div>
+
+    <!-- 月均價折線圖區域 -->
+    <div class="chart-container">
+        <canvas id="priceChart"></canvas>
+    </div>
+
+    <!-- 資料表格 -->
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>日期</th>
+                    <th>年度</th>
+                    <th>月均價</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="sto.js"></script>
+<script>
+    // Cookie 讀取函式
+    function getCookie(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+        }
+        return "";
+    }
+
+    // 取得網址列的 p 參數 (例如 ?p=0052)
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlStock = urlParams.get('p');
+
+    // 取得 S 與 pr2 Cookie
+    const sCookie = decodeURIComponent(getCookie("s"));
+    const pr2Cookie = decodeURIComponent(getCookie("pr2"));
+
+    // DOM 元素
+    const stockSelect = document.getElementById('stockSelect');
+    const yearSelect = document.getElementById('yearSelect');
+    const stockDisplay = document.getElementById('stockDisplay');
+    const currentPrice = document.getElementById('currentPrice');
+    const rateValue = document.getElementById('rateValue');
+    const tableBody = document.getElementById('tableBody');
+
+    // Chart.js 實體變數
+    let myChart = null;
+
+    // 解析日期 md (例如 "081/07" -> 8107) 用於比較與排序
+    function parseMD(mdStr) {
+        if (!mdStr) return 0;
+        const parts = mdStr.split('/');
+        const year = parseInt(parts[0], 10) || 0;
+        const month = parseInt(parts[1], 10) || 0;
+
+        return year * 100 + month;
+    }
+
+    // 初始化選單 1 (個股，改用純字串 sid.localeCompare 排序)
+    function initStockSelect() {
+        const uniqueStocks = [];
+        const seenSid = new Set();
+
+        // 確保 sto2 存在且有資料
+        if (typeof sto2 === 'undefined' || !Array.isArray(sto2)) {
+            console.error('sto2 資料尚未載入！');
+            return;
+        }
+
+        sto2.forEach(item => {
+            if (!seenSid.has(item.sid)) {
+                seenSid.add(item.sid);
+                uniqueStocks.push({
+                    sid: item.sid,
+                    label: `${item.sid}-${item.na}`
+                });
+            }
+        });
+
+        // 依據 sid 純字串排序（解決 6 位數代號如 009816 被誤判排在最後的問題）
+        uniqueStocks.sort((a, b) => a.sid.localeCompare(b.sid));
+
+        stockSelect.innerHTML = uniqueStocks.map(s => 
+            `<option value="${s.sid}">${s.label}</option>`
+        ).join('');
+
+        // 強制轉為字串比對，確保帶入的 ?p=0052 能正確對應
+        const targetStock = urlStock ? String(urlStock).trim() : '';
+
+        // 優先順序：1. 網址參數 p  >  2. Cookie 中的股票代號  >  3. 預設 00919
+        if (targetStock && seenSid.has(targetStock)) {
+            stockSelect.value = targetStock;
+        } else if (sCookie && seenSid.has(sCookie)) {
+            stockSelect.value = sCookie;
+        } else if (seenSid.has('00919')) {
+            stockSelect.value = '00919';
+        }
+
+        stockSelect.addEventListener('change', updateYearSelect);
+        updateYearSelect();
+    }
+
+    // 更新選單 2 (選擇年度 ~ 最新年度)
+    function updateYearSelect() {
+        const selectedSid = stockSelect.value;
+        
+        // 取得該股票的所有年度並排序
+        const years = sto2
+            .filter(item => item.sid === selectedSid)
+            .map(item => parseInt(item.year, 10))
+            .filter((v, i, a) => a.indexOf(v) === i);
+
+        // 年度由大到小排序
+        years.sort((a, b) => b - a);
+
+        const maxYear = years.length > 0 ? years[0] : '';
+
+        // 建立選單選項
+        let optionsHTML = `<option value="ALL">全部年度</option>`;
+        optionsHTML += years.map(y => {
+            if (y === maxYear) {
+                return `<option value="${y}">${y} 年（僅本年度）</option>`;
+            }
+            return `<option value="${y}">${y} 年 ～ ${maxYear} 年</option>`;
+        }).join('');
+        
+        yearSelect.innerHTML = optionsHTML;
+        yearSelect.onchange = renderData;
+        
+        renderData();
+    }
+
+    // 渲染折線圖 (使用 pri2、low、upp)
+    function renderChart(data) {
+        const ctx = document.getElementById('priceChart').getContext('2d');
+
+        // 因為 data 是「最新在前 (降序)」，繪圖時通常需要「舊到新 (升序)」，因此做 .reverse()
+        const chartData = [...data].reverse();
+        const labels = chartData.map(item => item.md);
+        const prices = chartData.map(item => parseFloat(item.pri2));   // 使用 pri2
+        const lowPrices = chartData.map(item => parseFloat(item.low)); // 使用 low
+        const uppPrices = chartData.map(item => parseFloat(item.upp)); // 使用 upp
+
+        // 如果圖表已存在則銷毀重新繪製
+        if (myChart) {
+            myChart.destroy();
+        }
+
+        myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: '最高 (upp)',
+                        data: uppPrices,
+                        borderColor: '#d93025', // 漲紅/高點顏色
+                        backgroundColor: 'transparent',
+                        borderWidth: 1.5,
+                        pointRadius: 2,
+                        pointBackgroundColor: '#d93025',
+                        borderDash: [4, 4],
+                        tension: 0.1
+                    },
+                    {
+                        label: '月均價 (pri2)',
+                        data: prices,
+                        borderColor: '#1a73e8', // 主色藍
+                        backgroundColor: 'rgba(26, 115, 232, 0.08)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#1a73e8',
+                        fill: false,
+                        tension: 0.1
+                    },
+                    {
+                        label: '最低 (low)',
+                        data: lowPrices,
+                        borderColor: '#188038', // 跌綠/低點顏色
+                        backgroundColor: 'transparent',
+                        borderWidth: 1.5,
+                        pointRadius: 2,
+                        pointBackgroundColor: '#188038',
+                        borderDash: [4, 4],
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            boxWidth: 12,
+                            font: { size: 11 }
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: { size: 10 },
+                            maxRotation: 45
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            font: { size: 11 }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 渲染資料、更新圖表與計算提升率
+    function renderData() {
+        const selectedSid = stockSelect.value;
+        const selectedYear = yearSelect.value;
+
+        // 尋找選取股票的名稱並顯示在資訊欄
+        const currentStockObj = sto2.find(item => item.sid === selectedSid);
+        stockDisplay.textContent = selectedSid ? `${selectedSid}`.trim() : '--';
+
+        // 1. 篩選資料：大於等於選取年度 (選擇年度 ~ 本年度)
+        let filteredData = sto2.filter(item => item.sid === selectedSid);
+        
+        if (selectedYear !== 'ALL') {
+            const startYear = parseInt(selectedYear, 10);
+            filteredData = filteredData.filter(item => parseInt(item.year, 10) >= startYear);
+        }
+
+        // 2. 日期由大到小排序 (最新在前)
+        filteredData.sort((a, b) => parseMD(b.md) - parseMD(a.md));
+
+        // 3. 更新目前股價：若選取股票為 sCookie 且有 pr2Cookie 則顯示，否則顯示最新一筆原始股價
+        if (selectedSid === sCookie && pr2Cookie && !isNaN(parseFloat(pr2Cookie))) {
+            currentPrice.textContent = parseFloat(pr2Cookie).toFixed(2);
+        } else if (filteredData.length > 0) {
+            currentPrice.textContent = parseFloat(filteredData[0].pri).toFixed(2);
+        } else {
+            currentPrice.textContent = '--';
+        }
+
+        // 4. 計算股價提升率
+        if (filteredData.length > 0) {
+            const maxDateItem = filteredData[0];
+            const minDateItem = filteredData[filteredData.length - 1];
+
+            const adjMax = parseFloat(maxDateItem.pri2);
+            const adjMin = parseFloat(minDateItem.pri2);
+
+            if (!isNaN(adjMax) && !isNaN(adjMin) && adjMin !== 0) {
+                const rate = ((adjMax - adjMin) / adjMin) * 100;
+                const formattedRate = rate.toFixed(2);
+                
+                let sign = rate > 0 ? '+' : '';
+                rateValue.textContent = `${sign}${formattedRate}%`;
+                rateValue.className = 'info-value ' + (rate > 0 ? 'up' : rate < 0 ? 'down' : 'neutral');
+            } else {
+                rateValue.textContent = '0.00%';
+                rateValue.className = 'info-value neutral';
+            }
+        } else {
+            rateValue.textContent = 'N/A';
+            rateValue.className = 'info-value neutral';
+        }
+
+        // 5. 渲染折線圖
+        renderChart(filteredData);
+
+        // 6. 渲染表格
+        if (filteredData.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="3" class="no-data">無符合資料</td></tr>`;
+            return;
+        }
+
+        tableBody.innerHTML = filteredData.map(item => {
+            const pri = parseFloat(item.pri);
+            const pri2 = parseFloat(item.pri2);
+            // 當 pri 與 pri2 數值不同時顯示 ▲ 符號
+            const mark = (pri !== pri2) ? ' ▲' : '';
+
+            return `
+                <tr>
+                    <td>${item.md}</td>
+                    <td>${item.year}</td>
+                    <td>${pri2.toFixed(2)}${mark}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // 頁面載入時執行
+    window.addEventListener('DOMContentLoaded', initStockSelect);
+</script>
+
+</body>
+</html>
