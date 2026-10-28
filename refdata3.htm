@@ -5,15 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>即時股價自動更新系統</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            text-align: center;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+     body {
+            margin: 0;
+            padding: 20px 0; /* 上下保留間距，不使用 flex 垂直置中避免滾動定位跑版 */
+            min-height: 100vh;
+            background-color: #580000; /* 背景顏色（深紅/暗紅） */
+            display: block; /* 修正 : 改回預設區塊流 */
+        }
+
+        /* 2. 中間卡片主體 */
+        .card {
+            background-color: #ffffff;
+            border-radius: 16px; /* 圓角效果 */
+            padding: 8px;
+            width: 98%;
+            max-width: 800px;  /* 設定最大寬度 */
+            margin: 0 auto;    /* 修正 : 水平置中 */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 陰影提升質感 */
         }
         #statusMessage {
             margin-top: 20px;
@@ -32,9 +40,49 @@
             border: 1px solid #ddd;
             display: none;
         }
+
+        /* 頂部標題列與 Home 圖示 */
+        .header-bar {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            min-height: 36px;
+        }
+
+ .home-link {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .home-icon {
+            height: 50px;
+            width: auto;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .home-icon:hover {
+            transform: scale(1.1);
+            opacity: 0.85;
+        }
     </style>
 </head>
 <body>
+ <div class="card">
+ <!-- 頂部標題區域 (包含左上角 HOME 圖示) -->
+        <div class="header-bar">
+            <a href="index.htm" class="home-link" title="返回首頁">
+                <img src="home.png" alt="首頁" class="home-icon">
+            </a>
+            <h2 style="font-size: 20px;color:#00F;">股票資產群組配置</h2>
+        </div>
 
     <h2>股票資料自動抓取與寫入</h2>
     <p>系統將在背景自動每 10 秒更新一次 `text3.txt` 與即時股價</p>
