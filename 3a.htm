@@ -247,8 +247,8 @@
             <span id="stockDisplay" class="info-value neutral">--</span>
         </div>
         <div class="info-item">
-            <span class="info-title">目前股價：</span>
-            <span id="currentPrice" class="info-value neutral">--</span>
+            <span class="info-title">市價：</span>
+            <span id="currentPrice" class="info-value neutral" style="display: inline-block; padding: 4px 12px; background-color: #FF93ff; border: 1px solid #70b8ff; border-radius: 6px;">--</span>
         </div>
         <div class="info-item">
             <span class="info-title">股價率：</span>
@@ -291,9 +291,37 @@
         return "";
     }
 
+
+
+
     // 取得 S 與 pr2 Cookie
     const sCookie = decodeURIComponent(getCookie("s"));
     const pr2Cookie = decodeURIComponent(getCookie("pr2"));
+
+
+function getStockPrice(targetSymbol) {
+    // 取得解碼後的 Cookie 字串
+    const sCookie = decodeURIComponent(getCookie("s"));
+    const pr2Cookie = decodeURIComponent(getCookie("pr2"));
+
+    if (!sCookie || !pr2Cookie) return null;
+
+    // 將逗號分隔的字串轉為陣列
+    const symbols = sCookie.split(',');
+    const prices = pr2Cookie.split(',');
+
+    // 尋找目標股票代碼在陣列中的位置 (Index)
+    const index = symbols.indexOf(targetSymbol);
+
+    // 若找到且價格陣列有對應索引值，則返回股價
+    if (index !== -1 && prices[index] !== undefined) {
+        return prices[index];
+    }
+
+    return null; // 未找到對應代碼
+}
+
+
 
     // DOM 元素
     const stockSelect = document.getElementById('stockSelect');
@@ -472,10 +500,14 @@
         });
     }
 
-    // 渲染資料、更新圖表與計算提升率
+    // ~~~渲染資料、更新圖表與計算提升率
     function renderData() {
         const selectedSid = stockSelect.value;
         const selectedYear = yearSelect.value;
+
+	const pr9 = getStockPrice(selectedSid);
+	currentPrice.textContent=pr9;
+
 
         // 尋找選取股票的名稱並顯示在資訊欄
         const currentStockObj = sto2.find(item => item.sid === selectedSid);
@@ -494,9 +526,9 @@
 
         // 3. 更新目前股價：若選取股票為 sCookie 且有 pr2Cookie 則顯示，否則顯示最新一筆原始股價
         if (selectedSid === sCookie && pr2Cookie && !isNaN(parseFloat(pr2Cookie))) {
-            currentPrice.textContent = parseFloat(pr2Cookie).toFixed(2);
+            //currentPrice.textContent = parseFloat(pr2Cookie).toFixed(2);
         } else if (filteredData.length > 0) {
-            currentPrice.textContent = parseFloat(filteredData[0].pri).toFixed(2);
+            //currentPrice.textContent = parseFloat(filteredData[0].pri).toFixed(2);
         } else {
             currentPrice.textContent = '--';
         }
