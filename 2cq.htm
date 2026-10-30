@@ -119,11 +119,24 @@
             min-width: 0;
         }
 
+        .header-title-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            padding: 0 5px;
+        }
+
         .header-title {
             font-size: 1.2rem;
-            margin-bottom: 5px;
             color: #2c3e50;
             font-weight: bold;
+        }
+
+        .subtotal-text {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #466900;
         }
 
         .table-container {
@@ -204,7 +217,10 @@
         </div>
 
         <div class="main-content">
-            <h1 id="selectedDateTitle" class="header-title">請選擇交易日期</h1>
+            <div class="header-title-container">
+                <h1 id="selectedDateTitle" class="header-title">請選擇交易日期</h1>
+                <div class="subtotal-text">小計：<span id="subtotalVal">0</span></div>
+            </div>
 
             <div class="table-container">
                 <table>
@@ -245,14 +261,10 @@
         return "";
     }
 
-    
-
     // 建立穩健的對照表
     function getMappedStockPrices() {
         const sCookie = getCookie("s");   // 例如: "2330,2317,2454"
         const pr2Cookie = getCookie("pr2"); // 例如: "580,105,900"
-
-
 
         const sList = sCookie ? sCookie.split(',') : [];
         const pr2List = pr2Cookie ? pr2Cookie.split(',') : [];
@@ -277,11 +289,13 @@
         const dateListEl = document.getElementById("dateList");
         const tableBodyEl = document.getElementById("stockTableBody");
         const titleEl = document.getElementById("selectedDateTitle");
+        const subtotalValEl = document.getElementById("subtotalVal");
 
         const uniqueDates = [...new Set(rawData.map(item => item.md))].sort().reverse();
 
         if (uniqueDates.length === 0) {
             tableBodyEl.innerHTML = `<tr><td colspan="5" class="no-data">查無任何交易資料</td></tr>`;
+            subtotalValEl.textContent = "0";
             return;
         }
 
@@ -304,36 +318,45 @@
         });
 
         function renderTable(selectedDate) {
-            titleEl.textContent = `日期：${selectedDate} 交易明細`;
+            titleEl.textContent = `${selectedDate}`;
 
             const filteredData = rawData.filter(item => item.md === selectedDate);
 
             if (filteredData.length === 0) {
                 tableBodyEl.innerHTML = `<tr><td colspan="5" class="no-data">該日期無資料</td></tr>`;
+                subtotalValEl.textContent = "0";
                 return;
             }
+
+            let tol9 = 0; // 成本累加變數
 
             const rowsHTML = filteredData.map(item => {
                 // 確保 item.sid 轉為字串並去除空白來進行精準對應
                 const currentSid = String(item.sid).trim();
-                
+
                 if (stockPriceMap[currentSid] !== undefined && stockPriceMap[currentSid] !== "") {
                     item.ra = stockPriceMap[currentSid];
                 } else if (!item.ra || item.ra === "=") {
                     item.ra = "-";
                 }
 
+                // 累加成本 (自動處理字串或數值)
+                const costVal = parseFloat(item.cost);
+                if (!isNaN(costVal)) {
+                    tol9 += costVal;
+                }
+
                 // 數值轉換以進行比較
                 const buyPrice = parseFloat(item.buy);
                 const currentPrice = parseFloat(item.ra);
 
-                // 判斷買價顏色：低於現價顯示紅色，大於現價顯示藍色
+                // 判斷買價顏色：低於現價顯示藍色，大於現價顯示紅色
                 let buyColor = "#333"; // 預設顏色
                 if (!isNaN(buyPrice) && !isNaN(currentPrice)) {
                     if (buyPrice < currentPrice) {
-                        buyColor = "#00f"; // 低於現價 -> 紅色
+                        buyColor = "#00f"; // 低於現價 -> 藍色
                     } else if (buyPrice > currentPrice) {
-                        buyColor = "#f00"; // 大於現價 -> 藍色
+                        buyColor = "#f00"; // 大於現價 -> 紅色
                     }
                 }
 
@@ -349,6 +372,8 @@
             }).join("");
 
             tableBodyEl.innerHTML = rowsHTML;
+            // 更新小計數值並加入千分號
+            subtotalValEl.textContent = tol9.toLocaleString();
         }
     });
 </script>
