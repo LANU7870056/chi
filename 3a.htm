@@ -291,37 +291,27 @@
         return "";
     }
 
-
-
-
     // 取得 S 與 pr2 Cookie
     const sCookie = decodeURIComponent(getCookie("s"));
     const pr2Cookie = decodeURIComponent(getCookie("pr2"));
 
+    function getStockPrice(targetSymbol) {
+        const sCookie = decodeURIComponent(getCookie("s"));
+        const pr2Cookie = decodeURIComponent(getCookie("pr2"));
 
-function getStockPrice(targetSymbol) {
-    // 取得解碼後的 Cookie 字串
-    const sCookie = decodeURIComponent(getCookie("s"));
-    const pr2Cookie = decodeURIComponent(getCookie("pr2"));
+        if (!sCookie || !pr2Cookie) return null;
 
-    if (!sCookie || !pr2Cookie) return null;
+        const symbols = sCookie.split(',');
+        const prices = pr2Cookie.split(',');
 
-    // 將逗號分隔的字串轉為陣列
-    const symbols = sCookie.split(',');
-    const prices = pr2Cookie.split(',');
+        const index = symbols.indexOf(targetSymbol);
 
-    // 尋找目標股票代碼在陣列中的位置 (Index)
-    const index = symbols.indexOf(targetSymbol);
+        if (index !== -1 && prices[index] !== undefined) {
+            return prices[index];
+        }
 
-    // 若找到且價格陣列有對應索引值，則返回股價
-    if (index !== -1 && prices[index] !== undefined) {
-        return prices[index];
+        return null;
     }
-
-    return null; // 未找到對應代碼
-}
-
-
 
     // DOM 元素
     const stockSelect = document.getElementById('stockSelect');
@@ -336,7 +326,7 @@ function getStockPrice(targetSymbol) {
 
     // 解析日期 md (例如 "081/07" -> 8107) 用於比較與排序
     function parseMD(mdStr) {
-        if (!mdStr) return 0;
+        if (!mdStr || mdStr === '今日') return 999999;
         const parts = mdStr.split('/');
         const year = parseInt(parts[0], 10) || 0;
         const month = parseInt(parts[1], 10) || 0;
@@ -344,7 +334,7 @@ function getStockPrice(targetSymbol) {
         return year * 100 + month;
     }
 
-    // 初始化選單 1 (個股，改用純字串 sid.localeCompare 排序)
+    // 初始化選單 1
     function initStockSelect() {
         const uniqueStocks = [];
         const seenSid = new Set();
@@ -359,14 +349,12 @@ function getStockPrice(targetSymbol) {
             }
         });
 
-        // 依據 sid 純字串排序（解決 6 位數代號如 009816 被誤判排在最後的問題）
         uniqueStocks.sort((a, b) => a.sid.localeCompare(b.sid));
 
         stockSelect.innerHTML = uniqueStocks.map(s => 
             `<option value="${s.sid}">${s.label}</option>`
         ).join('');
 
-        // 若 Cookie 中有股票代號 (sCookie) 且符合清單則優先選用，否則預設選取 00919
         if (sCookie && seenSid.has(sCookie)) {
             stockSelect.value = sCookie;
         } else if (seenSid.has('00919')) {
@@ -377,22 +365,19 @@ function getStockPrice(targetSymbol) {
         updateYearSelect();
     }
 
-    // 更新選單 2 (選擇年度 ~ 最新年度)
+    // 更新選單 2
     function updateYearSelect() {
         const selectedSid = stockSelect.value;
         
-        // 取得該股票的所有年度並排序
         const years = sto2
             .filter(item => item.sid === selectedSid)
             .map(item => parseInt(item.year, 10))
             .filter((v, i, a) => a.indexOf(v) === i);
 
-        // 年度由大到小排序
         years.sort((a, b) => b - a);
 
         const maxYear = years.length > 0 ? years[0] : '';
 
-        // 建立選單選項
         let optionsHTML = `<option value="ALL">全部年度</option>`;
         optionsHTML += years.map(y => {
             if (y === maxYear) {
@@ -407,18 +392,15 @@ function getStockPrice(targetSymbol) {
         renderData();
     }
 
-    // 渲染折線圖 (使用 pri2、low、upp)
-    function renderChart(data) {
+    // 渲染折線圖
+    function renderChart(chartData) {
         const ctx = document.getElementById('priceChart').getContext('2d');
 
-        // 因為 data 是「最新在前 (降序)」，繪圖時通常需要「舊到新 (升序)」，因此做 .reverse()
-        const chartData = [...data].reverse();
         const labels = chartData.map(item => item.md);
-        const prices = chartData.map(item => parseFloat(item.pri2));   // 使用 pri2
-        const lowPrices = chartData.map(item => parseFloat(item.low)); // 使用 low
-        const uppPrices = chartData.map(item => parseFloat(item.upp)); // 使用 upp
+        const prices = chartData.map(item => parseFloat(item.pri2));   
+        const lowPrices = chartData.map(item => parseFloat(item.low)); 
+        const uppPrices = chartData.map(item => parseFloat(item.upp)); 
 
-        // 如果圖表已存在則銷毀重新繪製
         if (myChart) {
             myChart.destroy();
         }
@@ -431,7 +413,7 @@ function getStockPrice(targetSymbol) {
                     {
                         label: '最高 (upp)',
                         data: uppPrices,
-                        borderColor: '#d93025', // 漲紅/高點顏色
+                        borderColor: '#d93025',
                         backgroundColor: 'transparent',
                         borderWidth: 1.5,
                         pointRadius: 2,
@@ -442,7 +424,7 @@ function getStockPrice(targetSymbol) {
                     {
                         label: '月均價 (pri2)',
                         data: prices,
-                        borderColor: '#1a73e8', // 主色藍
+                        borderColor: '#1a73e8',
                         backgroundColor: 'rgba(26, 115, 232, 0.08)',
                         borderWidth: 2,
                         pointRadius: 3,
@@ -453,7 +435,7 @@ function getStockPrice(targetSymbol) {
                     {
                         label: '最低 (low)',
                         data: lowPrices,
-                        borderColor: '#188038', // 跌綠/低點顏色
+                        borderColor: '#188038',
                         backgroundColor: 'transparent',
                         borderWidth: 1.5,
                         pointRadius: 2,
@@ -482,38 +464,32 @@ function getStockPrice(targetSymbol) {
                 },
                 scales: {
                     x: {
-                        grid: {
-                            display: false
-                        },
+                        grid: { display: false },
                         ticks: {
                             font: { size: 10 },
                             maxRotation: 45
                         }
                     },
                     y: {
-                        ticks: {
-                            font: { size: 11 }
-                        }
+                        ticks: { font: { size: 11 } }
                     }
                 }
             }
         });
     }
 
-    // ~~~渲染資料、更新圖表與計算提升率
+    // 渲染資料、更新圖表與計算提升率
     function renderData() {
         const selectedSid = stockSelect.value;
         const selectedYear = yearSelect.value;
 
-	const pr9 = getStockPrice(selectedSid);
-	currentPrice.textContent=pr9;
+        const pr9 = getStockPrice(selectedSid);
+        currentPrice.textContent = pr9 !== null ? pr9 : '--';
 
-
-        // 尋找選取股票的名稱並顯示在資訊欄
         const currentStockObj = sto2.find(item => item.sid === selectedSid);
         stockDisplay.textContent = selectedSid ? `${selectedSid}`.trim() : '--';
 
-        // 1. 篩選資料：大於等於選取年度 (選擇年度 ~ 本年度)
+        // 1. 篩選資料
         let filteredData = sto2.filter(item => item.sid === selectedSid);
         
         if (selectedYear !== 'ALL') {
@@ -524,16 +500,7 @@ function getStockPrice(targetSymbol) {
         // 2. 日期由大到小排序 (最新在前)
         filteredData.sort((a, b) => parseMD(b.md) - parseMD(a.md));
 
-        // 3. 更新目前股價：若選取股票為 sCookie 且有 pr2Cookie 則顯示，否則顯示最新一筆原始股價
-        if (selectedSid === sCookie && pr2Cookie && !isNaN(parseFloat(pr2Cookie))) {
-            //currentPrice.textContent = parseFloat(pr2Cookie).toFixed(2);
-        } else if (filteredData.length > 0) {
-            //currentPrice.textContent = parseFloat(filteredData[0].pri).toFixed(2);
-        } else {
-            currentPrice.textContent = '--';
-        }
-
-        // 4. 計算股價提升率
+        // 3. 計算股價提升率
         if (filteredData.length > 0) {
             const maxDateItem = filteredData[0];
             const minDateItem = filteredData[filteredData.length - 1];
@@ -557,10 +524,24 @@ function getStockPrice(targetSymbol) {
             rateValue.className = 'info-value neutral';
         }
 
-        // 5. 渲染折線圖
-        renderChart(filteredData);
+        // 4. 準備繪圖專用資料：舊到新排序，並在最後面推入「今日」與市價
+        let chartArray = [...filteredData].reverse();
+        
+        if (pr9 !== null && !isNaN(parseFloat(pr9))) {
+            const todayPrice = parseFloat(pr9);
+            chartArray.push({
+                md: '今日',
+                year: '今日',
+                pri2: todayPrice,
+                upp: todayPrice,
+                low: todayPrice
+            });
+        }
 
-        // 6. 渲染表格
+        // 5. 渲染折線圖
+        renderChart(chartArray);
+
+        // 6. 渲染表格（維持歷史資料）
         if (filteredData.length === 0) {
             tableBody.innerHTML = `<tr><td colspan="3" class="no-data">無符合資料</td></tr>`;
             return;
@@ -569,7 +550,6 @@ function getStockPrice(targetSymbol) {
         tableBody.innerHTML = filteredData.map(item => {
             const pri = parseFloat(item.pri);
             const pri2 = parseFloat(item.pri2);
-            // 當 pri 與 pri2 數值不同時顯示 ▲ 符號
             const mark = (pri !== pri2) ? ' ▲' : '';
 
             return `
