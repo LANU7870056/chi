@@ -263,7 +263,10 @@
 
     // 建立穩健的對照表
     function getMappedStockPrices() {
-        const sCookie = getCookie("s");   // 例如: "2330,2317,2454"
+//const sCookie = getCookie("s");   // 例如: "2330,2317,2454"
+
+sCookie="2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A,006208";
+
         const pr2Cookie = getCookie("pr2"); // 例如: "580,105,900"
 
         const sList = sCookie ? sCookie.split(',') : [];
