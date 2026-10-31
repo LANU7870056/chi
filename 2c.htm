@@ -93,8 +93,8 @@
         }
         #stockSelector {
             background-color: #ffffcc; /* 淺黃底色 */
-            font-weight: bold;       /* 字體加粗 */
-            color: blue;              /* 藍色字體 */
+            font-weight: bold;        /* 字體加粗 */
+            color: blue;               /* 藍色字體 */
         }
 
         /* 統計摘要列 */
@@ -222,7 +222,7 @@
                 top: 0;
                 z-index: 1;
                 font-weight: 600;
-            }      
+            }     
         }
     </style>
 </head>
@@ -289,18 +289,19 @@
     <script src="mysto.js"></script>
     
     <script>
-        const apiKey = 'AIzaSyBF-GpIzWbymBF8yXeIyePAayAkPr5__us';
-        const fileId = '1diXTdZZMosDjZMAjiNrr2b3ELTY0hknL';
+        // Google Apps Script 代理伺服器網址  使用XX.XLS的GS
+const gasProxyUrl = "https://script.google.com/macros/s/AKfycbzq2-tq2cFvghSDvsL4gt_VAHhtpTxQ5OLICtnH8vw3ZMYWQ3TGoWiIT515xXczPjTqaw/exec"; 
 
-
-
+        // 股票代號對照變數 S
+        const sString = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A,006208";
 
         // 全域排序狀態
         let currentSortKey = "";     
         let currentSortOrder = "asc"; 
 
-        // 建立股票名稱對照表
+        // 建立股票名稱對照表與價格對照對應
         const stockNameMap = {};
+        let globalPriceMap = {}; // 儲存代號對應的最新市價
 
         // 1. 讀取 Cookie 函式
         function getCookie(name) {
@@ -358,14 +359,13 @@
             }
         }
 
-        // 3. 從 Google 雲端硬碟讀取檔案內容，寫入 Cookie (pr2)，並同步更新畫面
+        // 3. 透過 Google Apps Script 代理讀取雲端檔案內容，寫入 Cookie (pr2)，並同步更新畫面
         async function fetchDriveFileAndSaveCookie() {
             try {
-                const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${apiKey}`;
-                const response = await fetch(url);
+                const response = await fetch(gasProxyUrl);
                 
                 if (!response.ok) {
-                    throw new Error(`讀取 Google 雲端硬碟檔案失敗，狀態碼：${response.status}`);
+                    throw new Error(`讀取代理伺服器失敗，狀態碼：${response.status}`);
                 }
                 
                 const fileContent = await response.text();
@@ -375,10 +375,10 @@
                 date.setTime(date.getTime() + (60 * 1000));
                 const expires = `expires=${date.toUTCString()}`;
 
-                // 核心要求：將讀取到的股價內容寫入 pr2 Cookie 中
+                // 將讀取到的股價內容寫入 pr2 Cookie 中
                 document.cookie = `pr2=${encodeURIComponent(fileContent)}; ${expires}; path=/`;
 
-                // 解析內容並同步更新畫面的市價與報酬率
+                // 解析內容並同步更新畫面
                 processPriceData(fileContent);
 
             } catch (error) {
@@ -387,63 +387,63 @@
             }
         }
 
-        // 4. 解析價格與代號資料，並同步更新 mysto 陣列中的市價與報酬率
+        // 4. 使用 s 變數與 pr2List 進行精確對應建立 globalPriceMap
         function processPriceData(dataContent) {
-            let sList = [];
+            console.log("【收到雲端原始資料】:", dataContent);
+
             let pr2List = [];
 
             try {
                 const jsonData = JSON.parse(dataContent);
-                if (jsonData.s && jsonData.pr2) {
-                    sList = String(jsonData.s).split(',');
+                if (jsonData.pr2) {
                     pr2List = String(jsonData.pr2).split(',');
+                } else if (Array.isArray(jsonData)) {
+                    pr2List = jsonData;
                 }
             } catch (e) {
                 const lines = dataContent.split('\n');
                 for (let line of lines) {
-                    if (line.includes('s=')) sList = line.split('=')[1].trim().split(',');
-                    if (line.includes('pr2=')) pr2List = line.split('=')[1].trim().split(',');
+                    if (line.includes('pr2=')) {
+                        pr2List = line.split('=')[1].trim().split(',');
+                    }
                 }
-                if (sList.length === 0 && pr2List.length === 0) {
+                if (pr2List.length === 0) {
                     pr2List = dataContent.trim().split(',');
                 }
             }
 
-            // 同步讀取瀏覽器的 s Cookie 與 pr2 Cookie
-            const sCookie = decodeURIComponent(getCookie("s"));
-            const pr2Cookie = decodeURIComponent(getCookie("pr2"));
+            pr2List = pr2List.map(p => String(p).trim());
+            console.log("清理後的價格清單 (pr2List):", pr2List);
 
-            if (sCookie) sList = sCookie.split(',');
-            if (pr2Cookie) pr2List = pr2Cookie.split(',');
+            // 將 s 變數拆解成股票代號陣列
+            const sList = sString.split(',').map(s => s.trim());
+            
+            globalPriceMap = {};
 
-            const priceMap = {};
+            // 依照 s 清單的順序與 pr2List 價格進行一對一精確對應
             sList.forEach((sid, index) => {
-                const cleanSid = sid.replace(/^0+/, ''); 
-                if (pr2List[index] !== undefined) {
-                    priceMap[sid.trim()] = pr2List[index].trim();
-                    priceMap[cleanSid] = pr2List[index].trim();
+                if (pr2List[index] !== undefined && pr2List[index] !== "") {
+                    globalPriceMap[sid] = pr2List[index];
                 }
             });
 
+            console.log("精確對應後的 globalPriceMap:", globalPriceMap);
+
+            // 將對應的市價與報酬率更新到 mysto 每一筆交易紀錄上
             if (typeof mysto !== 'undefined' && Array.isArray(mysto)) {
                 mysto.forEach(item => {
-                    const cleanItemSid = item.sid ? item.sid.replace(/^0+/, '') : '';
-                    let newPrice = "";
-                    
-                    if (item.sid && priceMap[item.sid.trim()] !== undefined) {
-                        newPrice = priceMap[item.sid.trim()];
-                    } else if (priceMap[cleanItemSid] !== undefined) {
-                        newPrice = priceMap[cleanItemSid];
-                    }
+                    if (item.sid) {
+                        const sid = item.sid.trim();
+                        if (globalPriceMap[sid]) {
+                            const newPrice = globalPriceMap[sid];
+                            item.price = newPrice;
 
-                    if (newPrice !== "") {
-                        item.price = newPrice;
-                        
-                        const buyPrice = parseFloat(item.buy);
-                        const currentPrice = parseFloat(newPrice);
-                        if (!isNaN(buyPrice) && buyPrice > 0 && !isNaN(currentPrice) && currentPrice > 0) {
-                            const returnRate = ((currentPrice - buyPrice) / buyPrice * 100).toFixed(1);
-                            item.ra = returnRate + "%";
+                            const buyPrice = parseFloat(item.buy);
+                            const currentPrice = parseFloat(newPrice);
+                            if (!isNaN(buyPrice) && buyPrice > 0 && !isNaN(currentPrice) && currentPrice > 0) {
+                                const returnRate = ((currentPrice - buyPrice) / buyPrice * 100).toFixed(1);
+                                item.ra = returnRate + "%";
+                            }
                         }
                     }
                 });
@@ -495,7 +495,7 @@
             renderTable(selector ? selector.value : "");
         }
 
-        // 5. 渲染表格與計算統計資訊函式（同步更新市價、報酬率）
+        // 5. 渲染表格與計算統計資訊函式
         function renderTable(filterSid = "") {
             const tbody = document.querySelector("#mystoTable tbody");
             tbody.innerHTML = ""; 
@@ -507,6 +507,7 @@
             let costSum = 0;
             let costCount = 0;
             let displayPrice = "-";
+            let totalMarketValue = 0;
 
             let itemsToRender = [];
 
@@ -517,10 +518,6 @@
                     }
 
                     totalCount++;
-
-                    if (item.price !== undefined && item.price !== "") {
-                        displayPrice = item.price;
-                    }
 
                     const qtyVal = parseFloat(item.no);
                     if (!isNaN(qtyVal)) {
@@ -539,8 +536,22 @@
                         costCount++;
                     }
 
+                    // 計算總市值 (股數 * 現價)
+                    const itemQty = parseFloat(item.no) || 0;
+                    const itemPrice = parseFloat(item.price) || 0;
+                    if (itemQty > 0 && itemPrice > 0) {
+                        totalMarketValue += itemQty * itemPrice;
+                    }
+
                     itemsToRender.push(item);
                 });
+
+                // 如果有選擇特定股票代號，直接從 globalPriceMap 抓取該支股票的市價顯示在頂端
+                if (filterSid !== "" && globalPriceMap[filterSid]) {
+                    displayPrice = globalPriceMap[filterSid];
+                } else if (filterSid === "" && totalMarketValue > 0) {
+                    displayPrice = formatNumber(totalMarketValue.toFixed(0), 0);
+                }
 
                 // 執行排序邏輯
                 if (currentSortKey !== "") {
@@ -577,14 +588,10 @@
                 });
             }
 
-            if (filterSid === "") {
-                displayPrice = "-";
-            }
-
             const avgBuy = buyCount > 0 ? (buySum / buyCount).toFixed(2) : "0.00";
             const formattedTotalQty = formatNumber(totalQuantity, 0);
 
-            // 更新畫面上方統計列的「市價」
+            // 更新畫面上方統計列的市價與數值
             document.getElementById("statsInfo").innerHTML = `
                 <span style="font-size: 20px;">股數：<span style="color: #6f42c1;font-size: 20px;">${formattedTotalQty}</span></span>
                 <span style="font-size: 20px;">均價：<span style="color: #d9534f;font-size: 20px;">${avgBuy}</span></span>
@@ -604,10 +611,10 @@
             renderTable();
         }
 
-        // 頁面載入後立即執行一次 Google Drive 讀取、寫入 pr2 Cookie 與畫面同步更新
+        // 頁面載入後立即執行一次 Google Drive 讀取、寫入 Cookie 與畫面同步更新
         fetchDriveFileAndSaveCookie();
 
-        // 設定每 10 秒自動重新從 Google 雲端抓取檔案、寫入 pr2 Cookie 並同步更新畫面市價與報酬率
+        // 設定每 10 秒自動重新從 Google 雲端抓取檔案並同步更新畫面
         setInterval(fetchDriveFileAndSaveCookie, 10000);
     </script>
 </body>
