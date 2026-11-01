@@ -13,9 +13,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 
- 
-     
-
   <script>
     tailwind.config = {
       theme: {
@@ -29,103 +26,90 @@
   </script>
 
 <style>
-
 body {
-      margin: 0;
-      padding: 0;
-      min-height: 100vh; /* 確保高度佔滿整個視窗 */
-      background-color: #580000; /* 背景顏色（深紅/暗紅） */
-      
-      display: flex;
-      justify-content: center; /* 水平居中 */
-      
-    }
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-color: #580000;
+    display: flex;
+    justify-content: center;
+}
 
-    /* 2. 中間卡片主體 */
-    .card {
-      background-color: #ffffff;
-      border-radius: 16px; /* 圓角效果 */
-      padding: 2px;
-      width: 98%;
-      max-width: 800px;  /* 設定最大寬度，避免在大螢幕上太寬 */
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 陰影提升質感 */
-    }
-     /* 手機端表格水平捲動容器 */
-        .table-container {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            background-color: #fff;
-            box-shadow: 0 2px 2px rgba(0,0,0,0.1);
-            border-radius: 2px;
-            margin-top: 2px;
-        }
-        table {
-            width: 100%;
-            min-width: 300px; /* 確保各欄位有足夠空間展開 */
-            border-collapse: collapse;
-            background-color: #fff;
-            white-space: nowrap; /* 防止欄位文字換行擁擠 */
-        }
-       td {
-            padding: 1px 1px;
-            text-align: center;
-            border-bottom: 1px solid #dee2e6;
-            font-size: 16px;
-        }
-        th {
-            background-color: #007bff;.
-padding: 1px 1px;
-            color: white;
-            position: sticky;
-            top: 0;
-            z-index: 1;
-        }
-    }
+.card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 2px;
+    width: 98%;
+    max-width: 800px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
 
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    background-color: #fff;
+    box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+    border-radius: 2px;
+    margin-top: 2px;
+}
 
+table {
+    width: 100%;
+    min-width: 300px;
+    border-collapse: collapse;
+    background-color: #fff;
+    white-space: nowrap;
+}
 
-/* 左上角回首頁圖示樣式 (PC 預設 30px) */
+td {
+    padding: 1px 1px;
+    text-align: center;
+    border-bottom: 1px solid #dee2e6;
+    font-size: 16px;
+}
 
+th {
+    background-color: #007bff;
+    padding: 1px 1px;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
 
+.header-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    min-height: 36px;
+}
 
-
-
-
- .header-bar {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 16px;
-            min-height: 36px;
-        }
-
-       
 .home-icon {
-            height: 50px;
-            width: auto;
-            cursor: pointer;
-            transition: transform 0.2s, opacity 0.2s;
-        }
+    height: 50px;
+    width: auto;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+}
 
- .home-icon:hover {
-            transform: scale(1.1);
-            opacity: 0.85;
-        }      
+.home-icon:hover {
+    transform: scale(1.1);
+    opacity: 0.85;
+}
 
-        
 h2 {
-            text-align: center;
-            font-size: 2.3rem;
-            color: var(--primary-color);
-            margin: 0;
-        }
-  </style>
+    text-align: center;
+    font-size: 2.3rem;
+    color: var(--primary-color);
+    margin: 0;
+}
+</style>
 </head>
-<body >
+<body>
 <div class="card">
- <!-- 頂部標題區域 (包含左上角 HOME 圖示) -->
+  <!-- 頂部標題區域 -->
     <div class="header-bar">
         <a href="index.htm" class="home-link" title="返回首頁">
             <img src="home.png" alt="首頁" class="home-icon">
@@ -133,30 +117,16 @@ h2 {
         <h2 style="font-size: 20px;color:#00F;">股票分析戰情室</h2>
     </div>
 
-
-
-  <!-- Header -->
-  <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-md sticky top-0 z-30">
-    
-  </header>
-
   <!-- Main Content Container -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-1 sm:px-1 lg:px-1 py-1 space-y-1">
 
-    <!-- Controls Box -->
-   
-
-
-          <select id="stockSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-base sm:text-lg rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 p-1 pr-1 appearance-none font-medium cursor-pointer shadow-sm transition-all">
-            <!-- Dynamically populated options -->
-          </select>
+    <select id="stockSelect" class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-base sm:text-lg rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 p-1 pr-1 appearance-none font-medium cursor-pointer shadow-sm transition-all">
+      <!-- Dynamically populated options -->
+    </select>
 
 <!-- Data Display Section -->
 <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
-      <!-- Table Header & Summary Statistics -->
       <div class="p-1 sm:p-1 border-b border-slate-100 flex flex-row items-center justify-between gap-1">
-        
-        <!-- 表格上方統計：最新股利 & 高殖利率筆數 (強制橫向同一列 flex-row flex-nowrap) -->
         <div class="flex flex-row flex-nowrap items-center gap-1.5 text-sm font-semibold text-slate-700 w-full overflow-x-auto">
           <div style="color: #1d4ed8;" class="bg-amber-50 border border-amber-200 px-2 py-1 rounded-lg text-amber-900 whitespace-nowrap text-sm sm:text-base flex-1 text-center">
             最新股利：<span id="statLatestDividend" class="text-amber-700 font-bold">--</span>
@@ -167,18 +137,19 @@ h2 {
         </div>
       </div>
 </div>
+
       <!-- Table View -->
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse text-[16px] sm:text-[18px] whitespace-nowrap">
           <thead>
-<tr class="bg-slate-100 border-b border-slate-200 font-semibold">
-  <th class="py-1 px-1 text-center responsive-th">股利</th>
-  <th class="py-1 px-1 text-center responsive-th">除息日</th>
-  <th class="py-1 px-1 text-center responsive-th">發放日</th>
-  <th class="py-1 px-1 text-center responsive-th">股價</th>
-  <th class="py-1 px-1 text-center responsive-th">調整價</th>
-  <th class="py-1 px-1 text-center responsive-th">年化殖利率</th>
-</tr>
+            <tr class="bg-slate-100 border-b border-slate-200 font-semibold">
+              <th class="py-1 px-1 text-center responsive-th">股利</th>
+              <th class="py-1 px-1 text-center responsive-th">除息日</th>
+              <th class="py-1 px-1 text-center responsive-th">發放日</th>
+              <th class="py-1 px-1 text-center responsive-th">股價</th>
+              <th class="py-1 px-1 text-center responsive-th">調整價</th>
+              <th class="py-1 px-1 text-center responsive-th">年化殖利率</th>
+            </tr>
           </thead>
           <tbody id="tableBody" class="divide-y divide-slate-200/50">
             <!-- Dynamic rows -->
@@ -192,11 +163,7 @@ h2 {
         <p class="text-base font-medium">沒有符合條件的數據資料</p>
       </div>
 
-    </div>
-
   </main>
-
-
 </div>
 
   <!-- Include external JS file as required -->
@@ -215,26 +182,14 @@ h2 {
     document.addEventListener('DOMContentLoaded', () => {
       if (typeof da5 !== 'undefined' && Array.isArray(da5) && da5.length > 0) {
         dataSource = da5;
-        //updateStatus('已成功從 da5.js 載入', 'emerald');
       } else {
         dataSource = fallbackData;
-        //updateStatus('使用預備資料庫', 'amber');
       }
 
       initDropdown();
       bindEvents();
       renderData();
     });
-
-    function updateStatus(message, color) {
-      const badge = document.getElementById('statusBadge');
-      const text = document.getElementById('statusText');
-      badge.classList.remove('hidden');
-      text.innerText = message;
-      if (color === 'amber') {
-        badge.className = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20";
-      }
-    }
 
     function convertExcelDate(excelSerial) {
       const serial = Number(excelSerial);
@@ -287,6 +242,9 @@ h2 {
         }
       });
 
+      // 依代號（sid）進行排序（支援數字或字串大小排序）
+      uniqueStocks.sort((a, b) => a.sid.localeCompare(b.sid, 'zh-TW', { numeric: true }));
+
       uniqueStocks.forEach(stock => {
         const opt = document.createElement('option');
         opt.value = stock.sid;
@@ -337,22 +295,21 @@ h2 {
         const isOddRow = (index % 2 === 0);
         const rowBgClass = isOddRow ? 'bg-[#fef9c3] hover:bg-yellow-200/80' : 'bg-[#e0f2fe] hover:bg-sky-200/80';
 
-
-const tr = document.createElement('tr');
+        const tr = document.createElement('tr');
         tr.className = `${rowBgClass} transition-colors border-b border-slate-200/60`;
         tr.innerHTML = `
           <td style="font-size: 18px; color: #1d4ed8; padding: 1px;" class="text-center font-semibold text-slate-900">${item.ra}</td>
           <td style="font-size: 18px; color: #1d4ed8; padding: 1px;">
-            <div class="font-medium text-slate-800"  style="font-size:14px;">${da1Date.formatted}</div>
+            <div class="font-medium text-slate-800" style="font-size:14px;">${da1Date.formatted}</div>
           </td>
           <td style="padding: 1px;"><div class="font-medium text-slate-800" style="font-size:14px;">${da2Date.formatted}</div></td>
           <td style="padding: 1px;" class="text-center font-medium text-slate-900">${item.price}</td>
           <td style="font-size: 16px; color: #1d4ed8; padding: 1px;" class="text-center text-slate-700">${item.DJ}</td>
-<td style="font-size: 18px; color: #1d4ed8; padding: 1px;" class="align-middle text-center">
-  <span class="inline-flex items-center px-2 py-0.5 rounded-md ${badgeClass}">
-    ${rateFormatted}
-  </span>
-</td>
+          <td style="font-size: 18px; color: #1d4ed8; padding: 1px;" class="align-middle text-center">
+            <span class="inline-flex items-center px-2 py-0.5 rounded-md ${badgeClass}">
+              ${rateFormatted}
+            </span>
+          </td>
         `;
         tBody.appendChild(tr);
       });

@@ -364,7 +364,7 @@
         updateYearSelect();
     }
 
-    // 更新選單 2
+   // 更新選單 2
     function updateYearSelect() {
         const selectedSid = stockSelect.value;
         
@@ -377,8 +377,8 @@
 
         const maxYear = years.length > 0 ? years[0] : '';
 
-        let optionsHTML = `<option value="ALL">全部年度</option>`;
-        optionsHTML += years.map(y => {
+        // 構建選項（移除「全部年度」）
+        let optionsHTML = years.map(y => {
             if (y === maxYear) {
                 return `<option value="${y}">${y} 年（僅本年度）</option>`;
             }
@@ -386,6 +386,12 @@
         }).join('');
         
         yearSelect.innerHTML = optionsHTML;
+
+        // 預設選取最新的年度（僅本年度）
+        if (maxYear !== '') {
+            yearSelect.value = maxYear;
+        }
+
         yearSelect.onchange = renderData;
         
         renderData();
