@@ -163,7 +163,7 @@ th {
               <th class="py-1 px-1 text-center responsive-th">股利</th>
               <th class="py-1 px-1 text-center responsive-th">除息日</th>
               <th class="py-1 px-1 text-center responsive-th">發放日</th>
-              <th class="py-1 px-1 text-center responsive-th">股價</th>
+              <th class="py-1 px-1 text-center responsive-th">分息</th>
               <th class="py-1 px-1 text-center responsive-th">調整價</th>
               <th class="py-1 px-1 text-center responsive-th">年化殖利率</th>
             </tr>
@@ -189,9 +189,9 @@ th {
   <!-- Application Script -->
   <script>
     const fallbackData = [
-      {sid:"0052", na:"富邦台灣科技", ra:"1.199", da1:"46132", da2:"46157", price:"50.05", DJ:"0050.05", rate:"0.024"},
-      {sid:"0052", na:"富邦台灣科技", ra:"3.23", da1:"45770", da2:"45796", price:"153", DJ:"21.86", rate:"0.085"},
-      {sid:"0052", na:"富邦台灣科技", ra:"6.43", da1:"45400", da2:"45427", price:"160.75", DJ:"22.96", rate:"0.105"}
+      {sid:"0052", na:"富邦台灣科技", ra:"1.199", da1:"46132", da2:"46157", inc:"50.05", DJ:"0050.05", rate:"0.024"},
+      {sid:"0052", na:"富邦台灣科技", ra:"3.23", da1:"45770", da2:"45796", inc:"153", DJ:"21.86", rate:"0.085"},
+      {sid:"0052", na:"富邦台灣科技", ra:"6.43", da1:"45400", da2:"45427", inc:"160.75", DJ:"22.96", rate:"0.105"}
     ];
 
     let dataSource = [];
@@ -223,6 +223,14 @@ th {
         formatted: `${yyyy}-${mm}-${dd}`,
         raw: serial
       };
+    }
+
+    // 數字格式化加上千分號的輔助函式
+    function formatNumber(val) {
+      const num = parseFloat(val);
+      if (isNaN(num)) return val || '--';
+      // 保留原本的小數位數（如果有的話），並自動加入千分號
+      return num.toLocaleString('zh-TW');
     }
 
     function formatPercentage(rateVal) {
@@ -304,6 +312,11 @@ th {
         const rateFormatted = formatPercentage(item.rate);
         const badgeClass = getRateBadgeClass(item.rate);
 
+        // 使用 formatNumber 格式化股價與調整價
+        const formattedInc = formatNumber(item.inc);
+        const formattedDJ = formatNumber(item.DJ);
+        const formattedRa = formatNumber(item.ra);
+
         const rateNum = parseFloat(item.rate);
         if (!isNaN(rateNum) && rateNum >= 0.08) {
           highYieldCount++;
@@ -315,13 +328,13 @@ th {
         const tr = document.createElement('tr');
         tr.className = `${rowBgClass} transition-colors border-b border-slate-200/60`;
         tr.innerHTML = `
-          <td style="font-size: 18px; color: #1d4ed8; padding: 1px;" class="text-center font-semibold text-slate-900">${item.ra}</td>
+          <td style="font-size: 18px; color: #1d4ed8; padding: 1px;" class="text-center font-semibold text-slate-900">${formattedRa}</td>
           <td style="font-size: 18px; color: #1d4ed8; padding: 1px;">
             <div class="font-medium text-slate-800" style="font-size:14px;">${da1Date.formatted}</div>
           </td>
           <td style="padding: 1px;"><div class="font-medium text-slate-800" style="font-size:14px;">${da2Date.formatted}</div></td>
-          <td style="padding: 1px;" class="text-center font-medium text-slate-900">${item.price}</td>
-          <td style="font-size: 16px; color: #1d4ed8; padding: 1px;" class="text-center text-slate-700">${item.DJ}</td>
+          <td style="padding: 1px;" class="text-center font-medium text-slate-900">${formattedInc}</td>
+          <td style="font-size: 16px; color: #1d4ed8; padding: 1px;" class="text-center text-slate-700">${formattedDJ}</td>
           <td style="font-size: 18px; color: #1d4ed8; padding: 1px;" class="align-middle text-center">
             <span class="inline-flex items-center px-2 py-0.5 rounded-md ${badgeClass}">
               ${rateFormatted}
@@ -342,6 +355,7 @@ th {
       if (firstItem && firstItem.ra) {
         const raVal = parseFloat(firstItem.ra);
         if (!isNaN(raVal)) {
+          // 頂部最新股利也加上千分號
           latestDivEl.innerText = `${(raVal * 1000).toLocaleString('zh-TW')} 元`;
         } else {
           latestDivEl.innerText = '--';
@@ -350,7 +364,7 @@ th {
         latestDivEl.innerText = '--';
       }
 
-      highYieldEl.innerText = highYieldCount;
+      highYieldEl.innerText = highYieldCount.toLocaleString('zh-TW');
     }
   </script>
 </body>

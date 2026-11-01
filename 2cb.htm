@@ -81,7 +81,7 @@
         #stockSelector {
             background-color: #ffffcc; /* 淺黃底色 */
             font-weight: bold;       /* 字體加粗 */
-            color: blue;              /* 藍色字體 */
+            color: blue;             /* 藍色字體 */
         }
 
         /* 統計摘要列 */
@@ -220,6 +220,7 @@
             <table id="mystoTable">
                 <thead>
                     <tr>
+                        <th>編號</th> <!-- 新增編號欄位標題 -->
                         <th class="sortable" onclick="handleSort('md')">日期<span class="sort-icon">▲▼</span></th>         
                         <th>股數</th>
                         <th class="sortable" onclick="handleSort('buy')">買價<span class="sort-icon">▲▼</span></th>
@@ -410,7 +411,6 @@
 
                     if (item.price !== undefined && item.price !== "") {
                         displayPrice = item.price;
-			
                     }
 
                     const qtyVal = parseFloat(item.no);
@@ -422,7 +422,7 @@
                     if (!isNaN(buyVal)) {
                         buySum += buyVal;
                         buyCount++;
-     buy9+=buyVal*qtyVal;
+                        buy9 += buyVal * qtyVal;
                     }
 
                     const costVal = parseFloat(item.cost);
@@ -445,8 +445,8 @@
                     });
                 }
 
-                // 渲染表格內容
-                itemsToRender.forEach(item => {
+                // 渲染表格內容（加入 index 產生從 1 開始的編號）
+                itemsToRender.forEach((item, index) => {
                     const tr = document.createElement("tr");
                     
                     let raClass = "";
@@ -458,6 +458,7 @@
                     const formattedQty = item.no !== undefined && item.no !== "" ? formatNumber(item.no, 0) : '';
 
                     tr.innerHTML = `
+                        <td style="font-size: 14px;">${index + 1}</td> <!-- 第 1 欄：顯示流水編號 -->
                         <td style="font-size: 14px;">${item.md || ''}</td>
                         <td style="font-size: 14px;">${formattedQty}</td>
                         <td class="buy-price">${item.buy || ''}</td>
