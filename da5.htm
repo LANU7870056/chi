@@ -78,17 +78,24 @@ th {
     z-index: 1;
 }
 
+/* 調整頂部排版，讓左右平衡以確保標題絕對置中 */
 .header-bar {
     position: relative;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     margin-bottom: 16px;
-    min-height: 36px;
+    min-height: 50px;
+    padding: 0 8px;
+}
+
+.home-link {
+    display: flex;
+    align-items: center;
 }
 
 .home-icon {
-    height: 50px;
+    height: 40px;
     width: auto;
     cursor: pointer;
     transition: transform 0.2s, opacity 0.2s;
@@ -99,22 +106,32 @@ th {
     opacity: 0.85;
 }
 
-h2 {
-    text-align: center;
-    font-size: 2.3rem;
-    color: var(--primary-color);
+/* 讓標題文字絕對置中於 header-bar */
+.header-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    color: #00F;
     margin: 0;
+    font-weight: 700;
+}
+
+/* 右側放一個與左側按鈕同寬的隱藏區塊，用來平衡畫面讓標題更正 */
+.header-spacer {
+    width: 40px; 
 }
 </style>
 </head>
 <body>
 <div class="card">
-  <!-- 頂部標題區域 -->
+  <!-- 頂部標題區域 (HOME 圖示在左側，戰情室文字置中) -->
     <div class="header-bar">
         <a href="index.htm" class="home-link" title="返回首頁">
             <img src="home.png" alt="首頁" class="home-icon">
         </a>
-        <h2 style="font-size: 20px;color:#00F;">股票分析戰情室</h2>
+        <h2 class="header-title">股票分析戰情室</h2>
+        <div class="header-spacer"></div>
     </div>
 
   <!-- Main Content Container -->
@@ -242,7 +259,7 @@ h2 {
         }
       });
 
-      // 依代號（sid）進行排序（支援數字或字串大小排序）
+      // 依代號（sid）進行排序
       uniqueStocks.sort((a, b) => a.sid.localeCompare(b.sid, 'zh-TW', { numeric: true }));
 
       uniqueStocks.forEach(stock => {
