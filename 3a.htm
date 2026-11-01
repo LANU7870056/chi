@@ -222,6 +222,7 @@
 <body>
 
 <div class="container">
+
     <!-- 頂部標題區域 (包含左上角 HOME 圖示) -->
     <div class="header-bar">
         <a href="index.htm" class="home-link" title="返回首頁">
@@ -291,12 +292,9 @@
         return "";
     }
 
-    // 取得 S 與 pr2 Cookie
-    const sCookie = decodeURIComponent(getCookie("s"));
-    const pr2Cookie = decodeURIComponent(getCookie("pr2"));
-
+    // 取得指定股票的市價 (pr2)
     function getStockPrice(targetSymbol) {
-        const sCookie = decodeURIComponent(getCookie("s"));
+        const sCookie = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A,006208";
         const pr2Cookie = decodeURIComponent(getCookie("pr2"));
 
         if (!sCookie || !pr2Cookie) return null;
@@ -338,6 +336,7 @@
     function initStockSelect() {
         const uniqueStocks = [];
         const seenSid = new Set();
+        const sCookie = decodeURIComponent(getCookie("s"));
 
         sto2.forEach(item => {
             if (!seenSid.has(item.sid)) {
@@ -398,8 +397,8 @@
 
         const labels = chartData.map(item => item.md);
         const prices = chartData.map(item => parseFloat(item.pri2));   
-        const lowPrices = chartData.map(item => parseFloat(item.low)); 
-        const uppPrices = chartData.map(item => parseFloat(item.upp)); 
+        const lowPrices = chartData.map(item => parseFloat(item.low));  
+        const uppPrices = chartData.map(item => parseFloat(item.upp));  
 
         if (myChart) {
             myChart.destroy();
@@ -486,7 +485,6 @@
         const pr9 = getStockPrice(selectedSid);
         currentPrice.textContent = pr9 !== null ? pr9 : '--';
 
-        const currentStockObj = sto2.find(item => item.sid === selectedSid);
         stockDisplay.textContent = selectedSid ? `${selectedSid}`.trim() : '--';
 
         // 1. 篩選資料
@@ -562,8 +560,39 @@
         }).join('');
     }
 
-    // 頁面載入時執行
-    window.addEventListener('DOMContentLoaded', initStockSelect);
+    // 檢查 Cookie pr2，若為空則 fetch 取得資料並寫入 Cookie，完成後初始化畫面
+    function checkAndLoadPr2() {
+        const pr2Value = getCookie("pr2");
+
+        if (!pr2Value) {
+            const webAppUrl = "https://script.google.com/macros/s/AKfycbxnoHYewiSJQ85KyJEgyvHv6BEZfl4lxVpSy9ihyp9rcww9N4FiYOm98oMolk06DBXgxg/exec";
+
+            fetch(webAppUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('網路回應失敗');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    // 寫入 Cookie (有效期限 600 秒)
+                    document.cookie = `pr2=${encodeURIComponent(data)}; path=/; max-age=600`;
+                    // 取得資料後初始化畫面
+                    initStockSelect();
+                })
+                .catch(error => {
+                    console.error('取得 pr2 資料發生錯誤:', error);
+                    // 即使發生錯誤也嘗試初始化畫面避免畫面全白
+                    initStockSelect();
+                });
+        } else {
+            // Cookie 已存在，直接初始化畫面
+            initStockSelect();
+        }
+    }
+
+    // 頁面載入完成時執行檢查
+    window.addEventListener('DOMContentLoaded', checkAndLoadPr2);
 </script>
 
 </body>
