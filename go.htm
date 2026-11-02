@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>自動定時取得 GS 內容並存入 Cookie</title>
+</head>
+<body>
+
+    <h2>自動同步資料中...</h2>
+    <p id="status">狀態：正在初始化...</p>
+    <p id="last-update">最後更新時間：尚未更新</p>
+
+    <script>
+        // 將這裡替換為您的 Google Apps Script 網頁應用程式網址
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyjJZBpATGA5B8Abc3ubGkah3iK_iYTOb-pJt4siMVnApNuWAcpaAD2QPuAUCa3v7kz3w/exec";
+
+        // 設定 Cookie 的輔助函數
+        function setCookie(name, value, days) {
+            let expires = "";
+            if (days) {
+                let date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/";
+        }
+
+        // 執行取得 C3 並存入 Cookie 的核心函式
+        async function fetchC3AndSaveCookie() {
+            const statusEl = document.getElementById("status");
+            const timeEl = document.getElementById("last-update");
+
+            try {
+                // 發送 GET 請求到 GS
+                const response = await fetch(WEB_APP_URL);
+                const data = await response.json();
+
+                if (data.status === "success") {
+                    const c3Content = data.value;
+
+                    // 將 C3 內容存入名為 "pr2" 的 Cookie（有效期限 7 天）
+                    setCookie("pr2", c3Content, 7);
+
+                    // 更新畫面顯示
+                    const now = new Date().toLocaleTimeString();
+                    statusEl.innerText = `狀態：同步成功！C3 內容：「${c3Content}」`;
+                    timeEl.innerText = `最後更新時間：${now}`;
+                    
+                    console.log(`[${now}] Cookie "pr2" 已更新，內容:`, c3Content);
+                } else {
+                    statusEl.innerText = "狀態：取得失敗 - " + data.message;
+                }
+            } catch (error) {
+                console.error("發生錯誤:", error);
+                statusEl.innerText = "狀態：連線錯誤，請檢查主控台 (Console)";
+            }
+        }
+
+        // 1. 畫面一載入完成立即執行一次
+        window.addEventListener("DOMContentLoaded", () => {
+            fetchC3AndSaveCookie();
+
+            // 2. 設定每 10 秒（10000 毫秒）自動執行一次
+            setInterval(fetchC3AndSaveCookie, 10000);
+        });
+    </script>
+
+</body>
+</html>
