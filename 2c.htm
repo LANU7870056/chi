@@ -269,6 +269,7 @@
             <table id="mystoTable">
                 <thead>
                     <tr>
+                        <th>項次</th>
                         <th class="sortable" onclick="handleSort('md')">日期<span class="sort-icon">▲▼</span></th>
                         <th>股數</th>
                         <th class="sortable" onclick="handleSort('buy')">買價<span class="sort-icon">▲▼</span></th>
@@ -290,7 +291,7 @@
     
     <script>
         // Google Apps Script 代理伺服器網址  使用XX.XLS的GS
-const gasProxyUrl = "https://script.google.com/macros/s/AKfycbzq2-tq2cFvghSDvsL4gt_VAHhtpTxQ5OLICtnH8vw3ZMYWQ3TGoWiIT515xXczPjTqaw/exec"; 
+        const gasProxyUrl = "https://script.google.com/macros/s/AKfycbzq2-tq2cFvghSDvsL4gt_VAHhtpTxQ5OLICtnH8vw3ZMYWQ3TGoWiIT515xXczPjTqaw/exec"; 
 
         // 股票代號對照變數 S
         const sString = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A,006208";
@@ -564,8 +565,8 @@ const gasProxyUrl = "https://script.google.com/macros/s/AKfycbzq2-tq2cFvghSDvsL4
                     });
                 }
 
-                // 渲染表格內容
-                itemsToRender.forEach(item => {
+                // 渲染表格內容（包含第 1 欄自動編號 index + 1）
+                itemsToRender.forEach((item, index) => {
                     const tr = document.createElement("tr");
                     
                     let raClass = "";
@@ -577,6 +578,7 @@ const gasProxyUrl = "https://script.google.com/macros/s/AKfycbzq2-tq2cFvghSDvsL4
                     const formattedQty = item.no !== undefined && item.no !== "" ? formatNumber(item.no, 0) : '';
 
                     tr.innerHTML = `
+                        <td style="font-size: 14px; font-weight: bold; color: #555;">${index + 1}</td>
                         <td style="font-size: 14px;">${item.md || ''}</td>
                         <td style="font-size: 14px;">${formattedQty}</td>
                         <td class="buy-price">${item.buy || ''}</td>
