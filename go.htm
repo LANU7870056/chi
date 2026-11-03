@@ -8,9 +8,12 @@
 
     <h2>自動同步資料中...</h2>
     <p id="status">狀態：正在初始化...</p>
+    <p id="status2">狀態：正在初始化...</p>
     <p id="last-update">最後更新時間：尚未更新</p>
 
     <script>
+    var s = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A";
+
         // 將這裡替換為您的 Google Apps Script 網頁應用程式網址
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyjJZBpATGA5B8Abc3ubGkah3iK_iYTOb-pJt4siMVnApNuWAcpaAD2QPuAUCa3v7kz3w/exec";
 
@@ -19,7 +22,7 @@
             let expires = "";
             if (days) {
                 let date = new Date();
-                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                date.setTime(date.getTime() + (days * 60 * 100));
                 expires = "; expires=" + date.toUTCString();
             }
             document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/";
@@ -28,6 +31,7 @@
         // 執行取得 C3 並存入 Cookie 的核心函式
         async function fetchC3AndSaveCookie() {
             const statusEl = document.getElementById("status");
+            const statusE2 = document.getElementById("status2");
             const timeEl = document.getElementById("last-update");
 
             try {
@@ -39,11 +43,13 @@
                     const c3Content = data.value;
 
                     // 將 C3 內容存入名為 "pr2" 的 Cookie（有效期限 7 天）
-                    setCookie("pr2", c3Content, 7);
+                    setCookie("pr2", c3Content, 1);
+                    setCookie("s", s,1);
 
                     // 更新畫面顯示
                     const now = new Date().toLocaleTimeString();
-                    statusEl.innerText = `狀態：同步成功！C3 內容：「${c3Content}」`;
+                    statusEl.innerText = `同步！pr2：「${c3Content}」`;
+                    statusE2.innerText = `S：「${s}」`;
                     timeEl.innerText = `最後更新時間：${now}`;
                     
                     console.log(`[${now}] Cookie "pr2" 已更新，內容:`, c3Content);
