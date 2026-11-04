@@ -4,17 +4,77 @@
     <meta charset="UTF-8">
     <title>自動定時取得 GS 內容並存入 Cookie</title>
 </head>
-<body>
+<style>
+  body {
+    margin: 0;
+    padding: 20px 0;
+    min-height: 100vh;
+    background-color: #580000;
+    display: block;
+  }
 
-    <h2>自動同步資料中...</h2>
-    <p id="status">狀態：正在初始化...</p>
-    <p id="status2">狀態：正在初始化...</p>
-    <p id="last-update">最後更新時間：尚未更新</p>
+  /* 確保全域邊框與內邊距計算包含在 width 內 */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  /* 中間卡片主體 */
+  .card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 16px; /* 適當調大內邊距提升視覺質感 */
+    width: 98%;
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  /* 頂部標題列與 Home 圖示 */
+  .header-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    min-height: 36px;
+  }
+
+  .home-icon {
+    height: 50px;
+    width: auto;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+
+  /* 狀態訊息區域：限制寬度不超過卡片，並允許文字自動換行 */
+  .status-container p {
+    max-width: 100%;       /* 寬度上限為卡片內部最大寬度 */
+    word-break: break-all; /* 防止長英文字母或網址/數字撐開容器 */
+    margin: 8px 0;         /* 保持段落適當間距 */
+  }
+</style>
+
+<body>
+  <div class="card">
+    <div class="header-bar">
+      <a href="index.htm" class="home-link" title="返回首頁">
+        <img src="home.png" alt="首頁" class="home-icon">
+      </a>
+      <h2 style="font-size: 20px; color: #00F; margin: 0 0 0 10px;">股票資產群組配置</h2>
+    </div>
+
+    <!-- 狀態與更新時間容器 -->
+    <div class="status-container">
+      <p id="status">狀態：正在初始化...</p>
+      <p id="status2">狀態：正在初始化...</p>
+      <p id="last-update">最後更新時間：尚未更新</p>
+    </div>
+  </div>
 
     <script>
-    var s = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A";
+    var ss = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A";
 
-        // 將這裡替換為您的 Google Apps Script 網頁應用程式網址
+        // 將這裡替換為您的 Google Apps Script 網頁應用程式網址  data7.xlsx  
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyjJZBpATGA5B8Abc3ubGkah3iK_iYTOb-pJt4siMVnApNuWAcpaAD2QPuAUCa3v7kz3w/exec";
 
         // 設定 Cookie 的輔助函數
@@ -22,7 +82,7 @@
             let expires = "";
             if (days) {
                 let date = new Date();
-                date.setTime(date.getTime() + (days * 60 * 100));
+                date.setTime(date.getTime() + (days * 6 * 100));
                 expires = "; expires=" + date.toUTCString();
             }
             document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/";
@@ -44,12 +104,12 @@
 
                     // 將 C3 內容存入名為 "pr2" 的 Cookie（有效期限 7 天）
                     setCookie("pr2", c3Content, 1);
-                    setCookie("s", s,1);
+                    setCookie("s", ss,1);
 
                     // 更新畫面顯示
                     const now = new Date().toLocaleTimeString();
-                    statusEl.innerText = `同步！pr2：「${c3Content}」`;
-                    statusE2.innerText = `S：「${s}」`;
+                    statusEl.innerText = `pr2：「${c3Content}」`;
+                    statusE2.innerText = `S：「${ss}」`;
                     timeEl.innerText = `最後更新時間：${now}`;
                     
                     console.log(`[${now}] Cookie "pr2" 已更新，內容:`, c3Content);
