@@ -123,9 +123,9 @@
   </div>
 
   <script>
-    var ss = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A";
+    var ss = "2002,2317,2303,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A";
 
-    // 替換為您的 Google Apps Script 網頁應用程式網址
+    // 替換為您的 Google Apps Script 網頁應用程式網址  data7.xlsx
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyjJZBpATGA5B8Abc3ubGkah3iK_iYTOb-pJt4siMVnApNuWAcpaAD2QPuAUCa3v7kz3w/exec";
 
     // 設定 Cookie 的輔助函數
@@ -133,7 +133,7 @@
         let expires = "";
         if (days) {
             let date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            date.setTime(date.getTime() + (days * 1 * 60 * 1000));
             expires = "; expires=" + date.toUTCString();
         }
         document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/";

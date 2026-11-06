@@ -282,6 +282,7 @@
                     <!-- 動態插入 -->
                 </tbody>
             </table>
+<BR><BR>        <iframe src="go.htm" style="height: 5px; width: 100px; display: block; margin: 0 auto; border: none;"></iframe>
         </div>
 
     </div>
@@ -291,10 +292,10 @@
     
     <script>
         // Google Apps Script 代理伺服器網址  使用XX.XLS的GS
-        const gasProxyUrl = "https://script.google.com/macros/s/AKfycbzq2-tq2cFvghSDvsL4gt_VAHhtpTxQ5OLICtnH8vw3ZMYWQ3TGoWiIT515xXczPjTqaw/exec"; 
+//const gasProxyUrl = "https://script.google.com/macros/s/AKfycbzq2-tq2cFvghSDvsL4gt_VAHhtpTxQ5OLICtnH8vw3ZMYWQ3TGoWiIT515xXczPjTqaw/exec"; 
 
         // 股票代號對照變數 S
-        const sString = "2002,2317,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A,006208";
+const sString ="2002,2317,2303,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00929,00939,00961,009816,00982A,00988A,00992A,006208";
 
         // 全域排序狀態
         let currentSortKey = "";     
@@ -362,28 +363,29 @@
 
         // 3. 透過 Google Apps Script 代理讀取雲端檔案內容，寫入 Cookie (pr2)，並同步更新畫面
         async function fetchDriveFileAndSaveCookie() {
-            try {
-                const response = await fetch(gasProxyUrl);
+  try {
+                //const response = await fetch(gasProxyUrl);
                 
-                if (!response.ok) {
-                    throw new Error(`讀取代理伺服器失敗，狀態碼：${response.status}`);
-                }
+                //if (!response.ok) {
+                //    throw new Error(`讀取代理伺服器失敗，狀態碼：${response.status}`);
+                //}
                 
-                const fileContent = await response.text();
+                //const fileContent = await response.text();
          
                 // 設定 Cookie 有效時間（1分鐘）
-                const date = new Date();
-                date.setTime(date.getTime() + (60 * 1000));
-                const expires = `expires=${date.toUTCString()}`;
+                //const date = new Date();
+                //date.setTime(date.getTime() + (60 * 1000));
+                //const expires = `expires=${date.toUTCString()}`;
+
 
                 // 將讀取到的股價內容寫入 pr2 Cookie 中
-                document.cookie = `pr2=${encodeURIComponent(fileContent)}; ${expires}; path=/`;
+                //document.cookie = `pr2=${encodeURIComponent(fileContent)}; ${expires}; path=/`;
 
                 // 解析內容並同步更新畫面
                 processPriceData(fileContent);
 
             } catch (error) {
-                console.error('發生錯誤：', error);
+                //console.error('發生錯誤：', error);
                 loadFromCookiesAndRender();
             }
         }
