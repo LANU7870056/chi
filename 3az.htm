@@ -372,7 +372,7 @@
         updateYearSelect();
     }
 
-    // 更新選單 2 (選擇年度) -> 已修改為預設選取「本年度（最大年度）」
+    // 更新選單 2 (選擇年度)
     function updateYearSelect() {
         const selectedSid = stockSelect.value;
         
@@ -385,10 +385,8 @@
 
         const maxYear = years.length > 0 ? years[0] : '';
 
-        // 建立選單選項
         let optionsHTML = '';
         
-        // 讓本年度排在最前面或依需求呈現，此處將本年度選項置頂並作為預設
         optionsHTML += years.map(y => {
             if (y === maxYear) {
                 return `<option value="${y}" selected>${y} 年（僅本年度）</option>`;
@@ -405,13 +403,18 @@
     }
 
     // 渲染折線圖
-    function renderChart(data) {
+    function renderChart(data, currentMarketPrice) {
         const ctx = document.getElementById('priceChart').getContext('2d');
         const chartData = [...data].reverse();
-        const labels = chartData.map(item => item.md);
-        const prices = chartData.map(item => parseFloat(item.pri2));
-        const lowPrices = chartData.map(item => parseFloat(item.low));
-        const uppPrices = chartData.map(item => parseFloat(item.upp));
+        
+        // 抓取市價轉換為數字，若無則預設為 0
+        const marketPriceNum = currentMarketPrice ? parseFloat(currentMarketPrice) : 0;
+
+        // 整理歷史資料與加入「今日」數據點
+        const labels = [...chartData.map(item => item.md), '今日'];
+        const prices = [...chartData.map(item => parseFloat(item.pri2)), marketPriceNum];
+        const lowPrices = [...chartData.map(item => parseFloat(item.low)), marketPriceNum];
+        const uppPrices = [...chartData.map(item => parseFloat(item.upp)), marketPriceNum];
 
         if (myChart) {
             myChart.destroy();
@@ -423,7 +426,7 @@
                 labels: labels,
                 datasets: [
                     {
-                        label: '最高 (upp)',
+                        label: '最高 (upp/市價)',
                         data: uppPrices,
                         borderColor: '#d93025',
                         backgroundColor: 'transparent',
@@ -434,7 +437,7 @@
                         tension: 0.1
                     },
                     {
-                        label: '月均價 (pri2)',
+                        label: '月均價 (pri2/市價)',
                         data: prices,
                         borderColor: '#1a73e8',
                         backgroundColor: 'rgba(26, 115, 232, 0.08)',
@@ -445,7 +448,7 @@
                         tension: 0.1
                     },
                     {
-                        label: '最低 (low)',
+                        label: '最低 (low/市價)',
                         data: lowPrices,
                         borderColor: '#188038',
                         backgroundColor: 'transparent',
@@ -495,7 +498,6 @@
         const pr9 = getStockPrice(selectedSid);
         currentPrice.textContent = pr9 ? pr9 : '--';
 
-        const currentStockObj = sto2.find(item => item.sid === selectedSid);
         stockDisplay.textContent = selectedSid ? `${selectedSid}`.trim() : '--';
 
         let filteredData = sto2.filter(item => item.sid === selectedSid);
@@ -530,7 +532,8 @@
             rateValue.className = 'info-value neutral';
         }
 
-        renderChart(filteredData);
+        // 傳遞市價至圖表渲染函式
+        renderChart(filteredData, pr9);
 
         if (filteredData.length === 0) {
             tableBody.innerHTML = `<tr><td colspan="3" class="no-data">無符合資料</td></tr>`;
