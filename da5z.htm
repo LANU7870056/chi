@@ -168,10 +168,10 @@
 <!-- Application Script -->
 <script>
   const fallbackData = [
-    {sid:"0052", na:"富邦台灣科技", ra:"1.199", da1:"46132", da2:"46157", price:"50.05", DJ:"0050.05", rate:"0.024"},
-    {sid:"0052", na:"富邦台灣科技", ra:"3.23", da1:"45770", da2:"45796", price:"153", DJ:"21.86", rate:"0.085"},
-    {sid:"0052", na:"富邦台灣科技", ra:"6.43", da1:"45400", da2:"45427", price:"160.75", DJ:"22.96", rate:"0.105"},
-    {sid:"00403A", na:"主動統一升級50", ra:"0.42", da1:"46180", da2:"46200", price:"10.26", DJ:"10.26", rate:"0.042"}
+    {sid:"0052", na:"富邦台灣科技", ra:"1.199", da1:"46132", da2:"46157", inc:"12500.05", DJ:"0050.05", rate:"0.024"},
+    {sid:"0052", na:"富邦台灣科技", ra:"3.23", da1:"45770", da2:"45796", inc:"153", DJ:"21.86", rate:"0.085"},
+    {sid:"0052", na:"富邦台灣科技", ra:"6.43", da1:"45400", da2:"45427", inc:"", DJ:"22.96", rate:"0.105"},
+    {sid:"00403A", na:"主動統一升級50", ra:"0.42", da1:"46180", da2:"46200", inc:"10260", DJ:"10.26", rate:"0.042"}
   ];
 
   let dataSource = [];
@@ -209,6 +209,14 @@
     const num = parseFloat(rateVal);
     if (isNaN(num)) return rateVal || '0.00%';
     return (num * 100).toFixed(2) + '%';
+  }
+
+  // 格式化 inc 數值為千分號，若無資料或非有效數字則回傳 "-"
+  function formatInc(val) {
+    if (val === undefined || val === null || val === '') return '-';
+    const num = parseFloat(val);
+    if (isNaN(num)) return val; // 如果原本就是字串且非純數字則保持原樣，或可依需求直接回傳 '-'
+    return num.toLocaleString('zh-TW', { minimumFractionDigits: 0, maximumFractionDigits: 4 });
   }
 
   function getRateBadgeClass(rateVal) {
@@ -286,6 +294,7 @@
       const da2Date = convertExcelDate(item.da2);
       const rateFormatted = formatPercentage(item.rate);
       const badgeClass = getRateBadgeClass(item.rate);
+      const incFormatted = formatInc(item.inc); // 格式化 inc
 
       const rateNum = parseFloat(item.rate);
       if (!isNaN(rateNum) && rateNum >= 0.08) {
@@ -303,7 +312,7 @@
           <div class="font-medium text-slate-800" style="font-size:14px;">${da1Date.formatted}</div>
         </td>
         <td style="padding: 1px;"><div class="font-medium text-slate-800" style="font-size:14px;">${da2Date.formatted}</div></td>
-        <td style="padding: 1px;" class="text-center font-medium text-slate-900">${item.price}</td>
+        <td style="padding: 1px;" class="text-center font-medium text-slate-900">${incFormatted}</td>
         <td style="font-size: 16px; color: #1d4ed8; padding: 1px;" class="text-center text-slate-700">${item.DJ}</td>
         <td style="font-size: 18px; color: #1d4ed8; padding: 1px;" class="align-middle text-center">
           <span class="inline-flex items-center px-2 py-0.5 rounded-md ${badgeClass}">
