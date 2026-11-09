@@ -38,7 +38,7 @@ body {
 .card {
     background-color: #ffffff;
     border-radius: 16px;
-    padding: 2px;
+    padding: 8px;
     width: 98%;
     max-width: 800px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -71,7 +71,7 @@ td {
 
 th {
     background-color: #007bff;
-    padding: 1px 1px;
+    padding: 4px 2px;
     color: white;
     position: sticky;
     top: 0;
@@ -123,9 +123,8 @@ th {
 <body>
 <div class="card">
   <!-- 頂部標題區域 -->
-
-<div class="card-header relative flex items-center p-3">
-    <!-- 左側按鈕區塊（自然靠左） -->
+  <div class="card-header relative flex items-center p-3">
+    <!-- 左側按鈕區塊 -->
     <div class="flex items-center gap-2 z-10">
         <a href="index.htm" title="回首頁">
             <img src="home.png" alt="Home" class="header-icon w-12 h-12">
@@ -135,41 +134,69 @@ th {
         </a>
     </div>
 
-    <!-- 中間標題（絕對定位達成完美置中） -->
+    <!-- 中間標題 -->
     <span class="absolute left-1/2 -translate-x-1/2 text-lg font-bold text-gray-800">
         股利收入
     </span>
-</div>
-
+  </div>
 
   <!-- Main Content Container -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-1 sm:px-1 lg:px-1 py-1 space-y-1">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-1 sm:px-1 lg:px-1 py-1 space-y-6">
 
+      <!-- 第一個表格：已發放股利紀錄 (inc > 0) -->
+      <div>
+        <h2 class="text-base font-bold text-gray-700 mb-2 border-l-4 border-blue-600 pl-2">已入帳股利紀錄</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-[16px] sm:text-[18px] whitespace-nowrap">
+            <thead>
+              <tr class="bg-slate-100 border-b border-slate-200 font-semibold">
+                <th class="py-1 px-2 text-left responsive-th">股號</th>
+                <th class="py-1 px-1 text-center responsive-th">名稱</th>
+                <th class="py-1 px-1 text-center responsive-th">除息日</th>
+                <th class="py-1 px-1 text-center responsive-th">發放日</th>
+                <th class="py-1 px-1 text-center responsive-th">股利</th>
+                <th class="py-1 px-2 text-right responsive-th">股利收入</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody" class="divide-y divide-slate-200/50">
+              <!-- Dynamic rows -->
+            </tbody>
+          </table>
+        </div>
 
-
-      <!-- Table View -->
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse text-[16px] sm:text-[18px] whitespace-nowrap">
-          <thead>
-            <tr class="bg-slate-100 border-b border-slate-200 font-semibold">
-              <th class="py-1 px-2 text-left responsive-th">股號</th>
-              <th class="py-1 px-1 text-center responsive-th">名稱</th>
-              <th class="py-1 px-1 text-center responsive-th">除息日</th>
-              <th class="py-1 px-1 text-center responsive-th">發放日</th>
-              <th class="py-1 px-1 text-center responsive-th">股利</th>
-              <th class="py-1 px-2 text-right responsive-th">股利收入</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody" class="divide-y divide-slate-200/50">
-            <!-- Dynamic rows -->
-          </tbody>
-        </table>
+        <!-- Empty State 1 -->
+        <div id="emptyState" class="hidden py-8 text-center text-slate-500">
+          <i class="fa-solid fa-folder-open text-3xl mb-2 text-slate-300"></i>
+          <p class="text-sm font-medium">沒有符合條件的數據資料</p>
+        </div>
       </div>
 
-      <!-- Empty State -->
-      <div id="emptyState" class="hidden py-12 text-center text-slate-500">
-        <i class="fa-solid fa-folder-open text-4xl mb-3 text-slate-300"></i>
-        <p class="text-base font-medium">沒有符合條件的數據資料</p>
+      <!-- 第二個表格：今年除息且本月發放預告 -->
+      <div class="pt-2">
+        <h2 class="text-base font-bold text-gray-700 mb-2 border-l-4 border-emerald-600 pl-2">本月預計發放股利 (今年除息)</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-[16px] sm:text-[18px] whitespace-nowrap">
+            <thead>
+              <tr class="bg-slate-100 border-b border-slate-200 font-semibold">
+                <th class="py-1 px-2 text-left responsive-th !bg-emerald-600">股號</th>
+                <th class="py-1 px-1 text-center responsive-th !bg-emerald-600">名稱</th>
+                <th class="py-1 px-1 text-center responsive-th !bg-emerald-600">除息日</th>
+                <th class="py-1 px-1 text-center responsive-th !bg-emerald-600">發放日</th>
+                <th class="py-1 px-1 text-center responsive-th !bg-emerald-600">股利</th>
+                <th class="py-1 px-2 text-right responsive-th !bg-emerald-600">股利收入</th>
+              </tr>
+            </thead>
+            <tbody id="tableBodyUpcoming" class="divide-y divide-slate-200/50">
+              <!-- Dynamic rows -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State 2 -->
+        <div id="emptyStateUpcoming" class="hidden py-8 text-center text-slate-500">
+          <i class="fa-solid fa-calendar-xmark text-3xl mb-2 text-slate-300"></i>
+          <p class="text-sm font-medium">本月無預計發放的股利資料</p>
+        </div>
       </div>
 
   </main>
@@ -181,12 +208,12 @@ th {
   <!-- Application Script -->
   <script>
     const fallbackData = [
-      {sid:"0052", na:"富邦台灣科技", ra:"1.199", da1:"46132", da2:"46157", inc:"50.05", DJ:"0050.05", rate:"0.024"},
-      {sid:"0052", na:"富邦台灣科技", ra:"3.23", da1:"45770", da2:"45796", inc:"153", DJ:"21.86", rate:"0.085"},
-      {sid:"0052", na:"富邦台灣科技", ra:"6.43", da1:"45400", da2:"45427", inc:"160.75", DJ:"22.96", rate:"0.105"}
+      {sid:"0052", na:"富邦台灣科技", inc:"", ra:"1.199", da1:"115/04/20", da2:"11/15", price:"50.05", DJ:"50.05", rate:"0.024"},
+      {sid:"0052", na:"富邦台灣科技", inc:"153", ra:"3.23", da1:"114/05/10", da2:"114/06/01", price:"21.86", DJ:"21.86", rate:"0.085"}
     ];
 
     let dataSource = [];
+    let upcomingSource = [];
 
     document.addEventListener('DOMContentLoaded', () => {
       let rawData = [];
@@ -196,28 +223,91 @@ th {
         rawData = fallbackData;
       }
 
-      // 篩選出 inc > 0 的資料，並依 SID 進行排序
-      dataSource = rawData.filter(item => parseFloat(item.inc) > 0);
+      // 取得今年民國年份 (2026 - 1911 = 115) 及當前月份
+      const now = new Date();
+      const currentMinguoYear = now.getFullYear() - 1911; // 115
+      const currentMonth = now.getMonth() + 1; // 1 ~ 12
+
+      // 1. 原表格篩選：inc > 0
+      dataSource = rawData.filter(item => {
+        const incVal = parseFloat(item.inc);
+        return !isNaN(incVal) && incVal > 0;
+      });
       dataSource.sort((a, b) => a.sid.localeCompare(b.sid, 'zh-TW', { numeric: true }));
 
+      // 2. 新表格篩選：da1年度為今年 (115), da2月份為本月份, inc為空字串或未填
+      upcomingSource = rawData.filter(item => {
+        const da1Obj = parseDate(item.da1);
+        const da2Obj = parseDate(item.da2);
+
+        // 檢查 inc 是否為空或 0
+        const rawInc = item.inc;
+        const isIncEmpty = (rawInc === undefined || rawInc === null || String(rawInc).trim() === "" || parseFloat(rawInc) === 0);
+        
+        // 檢查 da1 的民國年份是否為當前年份 (115)
+        const isDa1ThisYear = (da1Obj.minguoYear === currentMinguoYear);
+        // 檢查 da2 的月份是否為本月份
+        const isDa2ThisMonth = (da2Obj.month === currentMonth);
+
+        return isDa1ThisYear && isDa2ThisMonth && isIncEmpty;
+      });
+      upcomingSource.sort((a, b) => a.sid.localeCompare(b.sid, 'zh-TW', { numeric: true }));
+
       renderData();
+      renderUpcomingData();
     });
 
-    function convertExcelDate(excelSerial) {
-      const serial = Number(excelSerial);
-      if (isNaN(serial) || serial <= 0) return { formatted: excelSerial || '--', raw: excelSerial };
+    // 支援解析民國日期格式 (如 "115/04/20" 或 "11/15") 以及 Excel 數字序列號
+    function parseDate(dateStr) {
+      if (!dateStr) return { formatted: '--', minguoYear: null, month: null };
       
-      const jsDate = new Date((serial - 25569) * 86400 * 1000);
-      if (isNaN(jsDate.getTime())) return { formatted: excelSerial, raw: excelSerial };
+      const str = String(dateStr).trim();
 
-      const yyyy = jsDate.getUTCFullYear();
-      const mm = String(jsDate.getUTCMonth() + 1).padStart(2, '0');
-      const dd = String(jsDate.getUTCDate()).padStart(2, '0');
-      
-      return {
-        formatted: `${yyyy}-${mm}-${dd}`,
-        raw: serial
-      };
+      // 情況 A：如果包含斜線 (如 "115/04/20" 或 "11/15")
+      if (str.includes('/')) {
+        const parts = str.split('/');
+        if (parts.length === 3) {
+          // 格式：YYY/MM/DD
+          const yyyy = parseInt(parts[0], 10);
+          const mm = parseInt(parts[1], 10);
+          const dd = parseInt(parts[2], 10);
+          return {
+            formatted: `${yyyy + 1911}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}`,
+            minguoYear: yyyy,
+            month: mm
+          };
+        } else if (parts.length === 2) {
+          // 格式：MM/DD (可能沒有年份，預設採用當前年份)
+          const mm = parseInt(parts[0], 10);
+          const dd = parseInt(parts[1], 10);
+          const currentMinguoYear = new Date().getFullYear() - 1911;
+          return {
+            formatted: `${mm}/${dd}`,
+            minguoYear: currentMinguoYear,
+            month: mm
+          };
+        }
+      }
+
+      // 情況 B：如果為 Excel 數字序列號
+      const serial = Number(str);
+      if (!isNaN(serial) && serial > 0) {
+        const jsDate = new Date((serial - 25569) * 86400 * 1000);
+        if (!isNaN(jsDate.getTime())) {
+          const yyyy = jsDate.getUTCFullYear();
+          const minguoYear = yyyy - 1911;
+          const mmNum = jsDate.getUTCMonth() + 1;
+          const mm = String(mmNum).padStart(2, '0');
+          const dd = String(jsDate.getUTCDate()).padStart(2, '0');
+          return {
+            formatted: `${yyyy}-${mm}-${dd}`,
+            minguoYear: minguoYear,
+            month: mmNum
+          };
+        }
+      }
+
+      return { formatted: str, minguoYear: null, month: null };
     }
 
     function formatNumber(val) {
@@ -226,24 +316,23 @@ th {
       return num.toLocaleString('zh-TW');
     }
 
+    // 渲染第一張表格 (已發放)
     function renderData() {
       const tBody = document.getElementById('tableBody');
       const emptyState = document.getElementById('emptyState');
-      //const totalCountEl = document.getElementById('statTotalCount');
 
       tBody.innerHTML = '';
 
       if (dataSource.length === 0) {
         emptyState.classList.remove('hidden');
-        totalCountEl.innerText = '0';
         return;
       } else {
         emptyState.classList.add('hidden');
       }
 
       dataSource.forEach((item, index) => {
-        const da1Date = convertExcelDate(item.da1);
-        const da2Date = convertExcelDate(item.da2);
+        const da1Date = parseDate(item.da1);
+        const da2Date = parseDate(item.da2);
 
         const formattedRa = formatNumber(item.ra);
         const formattedInc = formatNumber(item.inc);
@@ -263,8 +352,44 @@ th {
         `;
         tBody.appendChild(tr);
       });
+    }
 
-      totalCountEl.innerText = dataSource.length.toLocaleString('zh-TW');
+    // 渲染第二張表格 (今年除息、本月發放且未入帳)
+    function renderUpcomingData() {
+      const tBody = document.getElementById('tableBodyUpcoming');
+      const emptyState = document.getElementById('emptyStateUpcoming');
+
+      tBody.innerHTML = '';
+
+      if (upcomingSource.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      upcomingSource.forEach((item, index) => {
+        const da1Date = parseDate(item.da1);
+        const da2Date = parseDate(item.da2);
+
+        const formattedRa = formatNumber(item.ra);
+        const formattedInc = '--';
+
+        const isOddRow = (index % 2 === 0);
+        const rowBgClass = isOddRow ? 'bg-[#f0fdf4] hover:bg-emerald-100/80' : 'bg-[#f0f9ff] hover:bg-sky-100/80';
+
+        const tr = document.createElement('tr');
+        tr.className = `${rowBgClass} transition-colors border-b border-slate-200/60`;
+        tr.innerHTML = `
+          <td style="font-size: 16px; color: #047857; padding: 4px;" class="text-left pl-3 font-semibold">${item.sid}</td>
+          <td style="font-size: 16px; color: #047857; padding: 4px;" class="text-center font-semibold">${item.na}</td>
+          <td style="font-size: 14px; color: #047857; padding: 4px;" class="text-center">${da1Date.formatted}</td>
+          <td style="font-size: 14px; color: #047857; padding: 4px;" class="text-center">${da2Date.formatted}</td>
+          <td style="font-size: 16px; color: #047857; padding: 4px;" class="text-center">${formattedRa}</td>
+          <td style="font-size: 16px; color: #047857; padding: 4px;" class="text-right pr-3 font-semibold">${formattedInc}</td>
+        `;
+        tBody.appendChild(tr);
+      });
     }
   </script>
 </body>
