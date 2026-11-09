@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>台灣股票/ETF股利殖利率查詢</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter & Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-color: #580000;
+    display: flex;
+    justify-content: center;
+}
+
+.card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 2px;
+    width: 98%;
+    max-width: 800px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    background-color: #fff;
+    box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+    border-radius: 2px;
+    margin-top: 2px;
+}
+
+table {
+    width: 100%;
+    min-width: 300px;
+    border-collapse: collapse;
+    background-color: #fff;
+    white-space: nowrap;
+}
+
+td {
+    padding: 1px 1px;
+    text-align: center;
+    border-bottom: 1px solid #dee2e6;
+    font-size: 16px;
+}
+
+th {
+    background-color: #007bff;
+    padding: 1px 1px;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.header-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    min-height: 50px;
+    padding: 0 8px;
+}
+
+.home-link {
+    display: flex;
+    align-items: center;
+}
+
+.home-icon {
+    height: 40px;
+    width: auto;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.home-icon:hover {
+    transform: scale(1.1);
+    opacity: 0.85;
+}
+
+.header-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    color: #00F;
+    margin: 0;
+    font-weight: 700;
+}
+
+.header-spacer {
+    width: 40px; 
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <!-- 頂部標題區域 -->
+
+<div class="card-header relative flex items-center p-3">
+    <!-- 左側按鈕區塊（自然靠左） -->
+    <div class="flex items-center gap-2 z-10">
+        <a href="index.htm" title="回首頁">
+            <img src="home.png" alt="Home" class="header-icon w-12 h-12">
+        </a>
+        <a href="da5.htm" title="上一頁">
+            <img src="back.png" alt="Back" class="header-icon w-12 h-12">
+        </a>
+    </div>
+
+    <!-- 中間標題（絕對定位達成完美置中） -->
+    <span class="absolute left-1/2 -translate-x-1/2 text-lg font-bold text-gray-800">
+        股利收入
+    </span>
+</div>
+
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-1 sm:px-1 lg:px-1 py-1 space-y-1">
+
+
+
+      <!-- Table View -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-[16px] sm:text-[18px] whitespace-nowrap">
+          <thead>
+            <tr class="bg-slate-100 border-b border-slate-200 font-semibold">
+              <th class="py-1 px-2 text-left responsive-th">股號</th>
+              <th class="py-1 px-1 text-center responsive-th">名稱</th>
+              <th class="py-1 px-1 text-center responsive-th">除息日</th>
+              <th class="py-1 px-1 text-center responsive-th">發放日</th>
+              <th class="py-1 px-1 text-center responsive-th">股利</th>
+              <th class="py-1 px-2 text-right responsive-th">股利收入</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="divide-y divide-slate-200/50">
+            <!-- Dynamic rows -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="hidden py-12 text-center text-slate-500">
+        <i class="fa-solid fa-folder-open text-4xl mb-3 text-slate-300"></i>
+        <p class="text-base font-medium">沒有符合條件的數據資料</p>
+      </div>
+
+  </main>
+</div>
+
+  <!-- Include external JS file as required -->
+  <script src="da5.js"></script>
+
+  <!-- Application Script -->
+  <script>
+    const fallbackData = [
+      {sid:"0052", na:"富邦台灣科技", ra:"1.199", da1:"46132", da2:"46157", inc:"50.05", DJ:"0050.05", rate:"0.024"},
+      {sid:"0052", na:"富邦台灣科技", ra:"3.23", da1:"45770", da2:"45796", inc:"153", DJ:"21.86", rate:"0.085"},
+      {sid:"0052", na:"富邦台灣科技", ra:"6.43", da1:"45400", da2:"45427", inc:"160.75", DJ:"22.96", rate:"0.105"}
+    ];
+
+    let dataSource = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      let rawData = [];
+      if (typeof da5 !== 'undefined' && Array.isArray(da5) && da5.length > 0) {
+        rawData = da5;
+      } else {
+        rawData = fallbackData;
+      }
+
+      // 篩選出 inc > 0 的資料，並依 SID 進行排序
+      dataSource = rawData.filter(item => parseFloat(item.inc) > 0);
+      dataSource.sort((a, b) => a.sid.localeCompare(b.sid, 'zh-TW', { numeric: true }));
+
+      renderData();
+    });
+
+    function convertExcelDate(excelSerial) {
+      const serial = Number(excelSerial);
+      if (isNaN(serial) || serial <= 0) return { formatted: excelSerial || '--', raw: excelSerial };
+      
+      const jsDate = new Date((serial - 25569) * 86400 * 1000);
+      if (isNaN(jsDate.getTime())) return { formatted: excelSerial, raw: excelSerial };
+
+      const yyyy = jsDate.getUTCFullYear();
+      const mm = String(jsDate.getUTCMonth() + 1).padStart(2, '0');
+      const dd = String(jsDate.getUTCDate()).padStart(2, '0');
+      
+      return {
+        formatted: `${yyyy}-${mm}-${dd}`,
+        raw: serial
+      };
+    }
+
+    function formatNumber(val) {
+      const num = parseFloat(val);
+      if (isNaN(num)) return val || '--';
+      return num.toLocaleString('zh-TW');
+    }
+
+    function renderData() {
+      const tBody = document.getElementById('tableBody');
+      const emptyState = document.getElementById('emptyState');
+      //const totalCountEl = document.getElementById('statTotalCount');
+
+      tBody.innerHTML = '';
+
+      if (dataSource.length === 0) {
+        emptyState.classList.remove('hidden');
+        totalCountEl.innerText = '0';
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      dataSource.forEach((item, index) => {
+        const da1Date = convertExcelDate(item.da1);
+        const da2Date = convertExcelDate(item.da2);
+
+        const formattedRa = formatNumber(item.ra);
+        const formattedInc = formatNumber(item.inc);
+
+        const isOddRow = (index % 2 === 0);
+        const rowBgClass = isOddRow ? 'bg-[#fef9c3] hover:bg-yellow-200/80' : 'bg-[#e0f2fe] hover:bg-sky-200/80';
+
+        const tr = document.createElement('tr');
+        tr.className = `${rowBgClass} transition-colors border-b border-slate-200/60`;
+        tr.innerHTML = `
+          <td style="font-size: 16px; color: #1d4ed8; padding: 4px;" class="text-left pl-3 font-semibold text-slate-900">${item.sid}</td>
+          <td style="font-size: 16px; color: #1d4ed8; padding: 4px;" class="text-center font-semibold text-slate-900">${item.na}</td>
+          <td style="font-size: 14px; color: #1d4ed8; padding: 4px;" class="text-center">${da1Date.formatted}</td>
+          <td style="font-size: 14px; color: #1d4ed8; padding: 4px;" class="text-center">${da2Date.formatted}</td>
+          <td style="font-size: 16px; color: #1d4ed8; padding: 4px;" class="text-center">${formattedRa}</td>
+          <td style="font-size: 16px; color: #1d4ed8; padding: 4px;" class="text-right pr-3 font-semibold">${formattedInc}</td>
+        `;
+        tBody.appendChild(tr);
+      });
+
+      totalCountEl.innerText = dataSource.length.toLocaleString('zh-TW');
+    }
+  </script>
+</body>
+</html>

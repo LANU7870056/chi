@@ -125,14 +125,28 @@ th {
 </head>
 <body>
 <div class="card">
-  <!-- 頂部標題區域 (HOME 圖示在左側，戰情室文字置中) -->
-    <div class="header-bar">
-        <a href="index.htm" class="home-link" title="返回首頁">
-            <img src="home.png" alt="首頁" class="home-icon">
+
+<div class="card-header relative flex items-center p-3">
+    <!-- 左側按鈕區塊（自然靠左） -->
+    <div class="flex items-center gap-2 z-10">
+        <a href="index.htm" title="回首頁">
+            <img src="home.png" alt="Home" class="header-icon w-12 h-12">
         </a>
-        <h2 class="header-title">股票分析戰情室</h2>
-        <div class="header-spacer"></div>
+        <a href="da5p.htm" title="股利收入">
+            <img src="rate.png" alt="Back" class="header-icon w-12 h-12">
+        </a>
     </div>
+
+    <!-- 中間標題（絕對定位達成完美置中） -->
+    <span class="absolute left-1/2 -translate-x-1/2 text-lg font-bold text-gray-800">
+        股票股利分析戰情室
+    </span>
+</div>
+
+
+
+
+
 
   <!-- Main Content Container -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-1 sm:px-1 lg:px-1 py-1 space-y-1">
