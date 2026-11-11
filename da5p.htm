@@ -37,8 +37,8 @@ body {
 
 .card {
     background-color: #ffffff;
-    border-radius: 16px;
-    padding: 8px;
+    border-radius: 14px;
+    padding: 2px;
     width: 98%;
     max-width: 800px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -71,7 +71,7 @@ td {
 
 th {
     background-color: #007bff;
-    padding: 4px 2px;
+    padding: 2px 1px;
     color: white;
     position: sticky;
     top: 0;
@@ -150,12 +150,12 @@ th {
           <table class="w-full text-left border-collapse text-[16px] sm:text-[18px] whitespace-nowrap">
             <thead>
               <tr class="bg-slate-100 border-b border-slate-200 font-semibold">
-                <th class="py-1 px-2 text-left responsive-th">股號</th>
+                <th class="py-1 px-1 text-left responsive-th">股號</th>
                 <th class="py-1 px-1 text-center responsive-th">名稱</th>
                 <th class="py-1 px-1 text-center responsive-th">除息日</th>
                 <th class="py-1 px-1 text-center responsive-th">發放日</th>
                 <th class="py-1 px-1 text-center responsive-th">股利</th>
-                <th class="py-1 px-2 text-right responsive-th">股利收入</th>
+                <th class="py-1 px-1 text-right responsive-th">股利收入</th>
               </tr>
             </thead>
             <tbody id="tableBody" class="divide-y divide-slate-200/50">
@@ -178,12 +178,12 @@ th {
           <table class="w-full text-left border-collapse text-[16px] sm:text-[18px] whitespace-nowrap">
             <thead>
               <tr class="bg-slate-100 border-b border-slate-200 font-semibold">
-                <th class="py-1 px-2 text-left responsive-th !bg-emerald-600">股號</th>
+                <th class="py-1 px-1 text-left responsive-th !bg-emerald-600">股號</th>
                 <th class="py-1 px-1 text-center responsive-th !bg-emerald-600">名稱</th>
                 <th class="py-1 px-1 text-center responsive-th !bg-emerald-600">除息日</th>
                 <th class="py-1 px-1 text-center responsive-th !bg-emerald-600">發放日</th>
                 <th class="py-1 px-1 text-center responsive-th !bg-emerald-600">股利</th>
-                <th class="py-1 px-2 text-right responsive-th !bg-emerald-600">股利收入</th>
+
               </tr>
             </thead>
             <tbody id="tableBodyUpcoming" class="divide-y divide-slate-200/50">
@@ -343,12 +343,12 @@ th {
         const tr = document.createElement('tr');
         tr.className = `${rowBgClass} transition-colors border-b border-slate-200/60`;
         tr.innerHTML = `
-          <td style="font-size: 16px; color: #1d4ed8; padding: 4px;" class="text-left pl-3 font-semibold text-slate-900">${item.sid}</td>
-          <td style="font-size: 16px; color: #1d4ed8; padding: 4px;" class="text-center font-semibold text-slate-900">${item.na}</td>
+          <td style="font-size: 12px; color: #1d4ed8; padding: 4px;" class="text-left pl-3 font-semibold text-slate-900">${item.sid}</td>
+          <td style="font-size: 12px; color: #1d4ed8; padding: 4px;" class="text-center font-semibold text-slate-900">${item.na}</td>
           <td style="font-size: 14px; color: #1d4ed8; padding: 4px;" class="text-center">${da1Date.formatted}</td>
           <td style="font-size: 14px; color: #1d4ed8; padding: 4px;" class="text-center">${da2Date.formatted}</td>
-          <td style="font-size: 16px; color: #1d4ed8; padding: 4px;" class="text-center">${formattedRa}</td>
-          <td style="font-size: 16px; color: #1d4ed8; padding: 4px;" class="text-right pr-3 font-semibold">${formattedInc}</td>
+          <td style="font-size: 14px; color: #1d4ed8; padding: 4px;" class="text-center">${formattedRa}</td>
+          <td style="font-size: 14px; color: #1d4ed8; padding: 4px;" class="text-right pr-3 font-semibold">${formattedInc}</td>
         `;
         tBody.appendChild(tr);
       });
@@ -381,12 +381,12 @@ th {
         const tr = document.createElement('tr');
         tr.className = `${rowBgClass} transition-colors border-b border-slate-200/60`;
         tr.innerHTML = `
-          <td style="font-size: 16px; color: #047857; padding: 4px;" class="text-left pl-3 font-semibold">${item.sid}</td>
-          <td style="font-size: 16px; color: #047857; padding: 4px;" class="text-center font-semibold">${item.na}</td>
+          <td style="font-size: 14px; color: #047857; padding: 4px;" class="text-left pl-3 font-semibold">${item.sid}</td>
+          <td style="font-size: 14px; color: #047857; padding: 4px;" class="text-center font-semibold">${item.na}</td>
           <td style="font-size: 14px; color: #047857; padding: 4px;" class="text-center">${da1Date.formatted}</td>
           <td style="font-size: 14px; color: #047857; padding: 4px;" class="text-center">${da2Date.formatted}</td>
-          <td style="font-size: 16px; color: #047857; padding: 4px;" class="text-center">${formattedRa}</td>
-          <td style="font-size: 16px; color: #047857; padding: 4px;" class="text-right pr-3 font-semibold">${formattedInc}</td>
+          <td style="font-size: 14px; color: #047857; padding: 4px;" class="text-center">${formattedRa}</td>
+
         `;
         tBody.appendChild(tr);
       });

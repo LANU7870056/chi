@@ -200,7 +200,8 @@
     <script>
         var s = "2002,2317,2303,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00918,00929,00939,00961,009816,00982A,00988A,00992A,006208";
         var ky = "00403A,00406A,00919,00982A,00988A,00992A,009816,00896,00929,0052,00961";
-        const apiUrl = 'https://script.google.com/macros/s/AKfycbwSaqH1nMChGjZLyFPCLSUDbxe546HpSs2HmGZp6qB9VHbXCcIebf2hU31iwGstNDjc6g/exec';
+
+//const apiUrl = 'https://script.google.com/macros/s/AKfycbwSaqH1nMChGjZLyFPCLSUDbxe546HpSs2HmGZp6qB9VHbXCcIebf2hU31iwGstNDjc6g/exec';
 
         function getCookie(name) { 
             const value = `; ${document.cookie}`;
@@ -221,6 +222,8 @@
             const pr2Cookie = decodeURIComponent(getCookie("pr2"));
             const hasPr2 = pr2Cookie && pr2Cookie.trim() !== "";
             const pr2List = hasPr2 ? pr2Cookie.split(/[\r\n,]+/) : [];
+
+
             
             const priceMap = {};
             sList.forEach((sid, index) => {
@@ -402,13 +405,13 @@
 
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td style="font-size:18px;"><a class="btn-view" data-fancybox data-type="iframe" href="2cb.htm?p=${stock.sid}"><img src="bk1.png"></a></td>
+                        <td style="font-size:12px;"><a class="btn-view" data-fancybox data-type="iframe" href="2cb.htm?p=${stock.sid}"><img src="bk1.png"></a></td>
                         <td class="table-dark-text"><a class="btn-view" data-fancybox data-type="iframe" href="3az.htm?p=${stock.sid}">${stock.sid}</a></td>
                         <td class="table-dark-text" style="text-align: left;font-size:13px;">${nameHtml}</td>
                         <td style="text-align: right;" class="table-dark-text">${stock.totalNo.toLocaleString()}</td>
-                        <td style="font-size:18px;text-align: right;" class="table-dark-text">${fixedAvgBuy.toFixed(2)}</td>
-                        <td style="font-size:18px;text-align: right;" class="table-dark-text2">${fixedPrice}</td>
-                        <td style="font-size:18px;text-align: right;" class="${profitClass}">${profit2Text}</td>
+                        <td style="font-size:15px;text-align: right;" class="table-dark-text">${fixedAvgBuy.toFixed(2)}</td>
+                        <td style="font-size:15px;text-align: right;" class="table-dark-text2">${fixedPrice}</td>
+                        <td style="font-size:15px;text-align: right;" class="${profitClass}">${profit2Text}</td>
                     `;
                     tbody2.appendChild(tr);
                 });
