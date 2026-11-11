@@ -25,7 +25,7 @@
     }
   </script>
 
-<style>
+  <style>
     body {
       margin: 0;
       padding: 0;
@@ -87,18 +87,6 @@
       min-height: 36px;
     }
 
-    .home-icon {
-      height: 50px;
-      width: auto;
-      cursor: pointer;
-      transition: transform 0.2s, opacity 0.2s;
-    }
-
-    .home-icon:hover {
-      transform: scale(1.1);
-      opacity: 0.85;
-    }
-
     h2 {
       text-align: center;
       font-size: 2.3rem;
@@ -122,7 +110,7 @@
     </select>
 
     <!-- Data Display Section -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+    <div id="statsSection" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
       <div class="p-1 sm:p-1 border-b border-slate-100 flex flex-row items-center justify-between gap-1">
         <div class="flex flex-row flex-nowrap items-center gap-1.5 text-sm font-semibold text-slate-700 w-full overflow-x-auto">
           <div style="color: #1d4ed8;" class="bg-amber-50 border border-amber-200 px-2 py-1 rounded-lg text-amber-900 whitespace-nowrap text-sm sm:text-base flex-1 text-center">
@@ -136,7 +124,7 @@
     </div>
 
     <!-- Table View -->
-    <div class="overflow-x-auto">
+    <div id="tableWrapper" class="overflow-x-auto">
       <table class="w-full text-left border-collapse text-[16px] sm:text-[18px] whitespace-nowrap">
         <thead>
           <tr class="bg-slate-100 border-b border-slate-200 font-semibold">
@@ -157,7 +145,7 @@
     <!-- Empty State -->
     <div id="emptyState" class="hidden py-12 text-center text-slate-500">
       <i class="fa-solid fa-folder-open text-4xl mb-3 text-slate-300"></i>
-      <p class="text-base font-medium">沒有符合條件的數據資料</p>
+      <p class="text-base font-medium">查無資料</p>
     </div>
   </main>
 </div>
@@ -211,11 +199,10 @@
     return (num * 100).toFixed(2) + '%';
   }
 
-  // 格式化 inc 數值為千分號，若無資料或非有效數字則回傳 "-"
   function formatInc(val) {
     if (val === undefined || val === null || val === '') return '-';
     const num = parseFloat(val);
-    if (isNaN(num)) return val; // 如果原本就是字串且非純數字則保持原樣，或可依需求直接回傳 '-'
+    if (isNaN(num)) return val;
     return num.toLocaleString('zh-TW', { minimumFractionDigits: 0, maximumFractionDigits: 4 });
   }
 
@@ -247,21 +234,30 @@
       }
     });
 
-    uniqueStocks.forEach(stock => {
-      const opt = document.createElement('option');
-      opt.value = stock.sid;
-      opt.textContent = `${stock.sid} ${stock.na}`;
-      selectEl.appendChild(opt);
-    });
-
-    // 檢查網址列是否有帶入 p 參數 (例如 ?p=00403A)
     const urlParams = new URLSearchParams(window.location.search);
     const paramP = urlParams.get('p');
+    const isExist = paramP ? uniqueStocks.some(s => s.sid === paramP) : false;
 
-    if (paramP && uniqueStocks.some(s => s.sid === paramP)) {
-      selectEl.value = paramP;
-    } else if (uniqueStocks.length > 0) {
-      selectEl.value = uniqueStocks[0].sid;
+    if (paramP && !isExist) {
+      // 查無代號：選單只出現「查無資料」
+      const notFoundOpt = document.createElement('option');
+      notFoundOpt.value = "NOT_FOUND";
+      notFoundOpt.textContent = "查無資料";
+      selectEl.appendChild(notFoundOpt);
+      selectEl.value = "NOT_FOUND";
+    } else {
+      uniqueStocks.forEach(stock => {
+        const opt = document.createElement('option');
+        opt.value = stock.sid;
+        opt.textContent = `${stock.sid} ${stock.na}`;
+        selectEl.appendChild(opt);
+      });
+
+      if (paramP && isExist) {
+        selectEl.value = paramP;
+      } else if (uniqueStocks.length > 0) {
+        selectEl.value = uniqueStocks[0].sid;
+      }
     }
   }
 
@@ -272,18 +268,38 @@
 
   function renderData() {
     const selectedSid = document.getElementById('stockSelect').value;
-    let filtered = dataSource.filter(item => item.sid === selectedSid);
-
+    
+    const statsSection = document.getElementById('statsSection');
+    const tableWrapper = document.getElementById('tableWrapper');
     const tBody = document.getElementById('tableBody');
     const emptyState = document.getElementById('emptyState');
 
     tBody.innerHTML = '';
 
-    if (filtered.length === 0) {
+    // 若選擇的項目為查無資料，或找不到該代號的資料，直接隱藏表格與統計並顯示提示
+    if (selectedSid === "NOT_FOUND") {
+      statsSection.classList.add('hidden');
+      tableWrapper.classList.add('hidden');
       emptyState.classList.remove('hidden');
+      const pEl = emptyState.querySelector('p');
+      if (pEl) pEl.innerText = '查無資料';
+      updateTopStats(null, 0);
+      return;
+    }
+
+    let filtered = dataSource.filter(item => item.sid === selectedSid);
+
+    if (filtered.length === 0) {
+      statsSection.classList.add('hidden');
+      tableWrapper.classList.add('hidden');
+      emptyState.classList.remove('hidden');
+      const pEl = emptyState.querySelector('p');
+      if (pEl) pEl.innerText = '查無資料';
       updateTopStats(null, 0);
       return;
     } else {
+      statsSection.classList.remove('hidden');
+      tableWrapper.classList.remove('hidden');
       emptyState.classList.add('hidden');
     }
 
@@ -294,7 +310,7 @@
       const da2Date = convertExcelDate(item.da2);
       const rateFormatted = formatPercentage(item.rate);
       const badgeClass = getRateBadgeClass(item.rate);
-      const incFormatted = formatInc(item.inc); // 格式化 inc
+      const incFormatted = formatInc(item.inc);
 
       const rateNum = parseFloat(item.rate);
       if (!isNaN(rateNum) && rateNum >= 0.08) {
