@@ -1,28 +1,157 @@
-<!DOCTYPE html><html lang="zh-Hant"><head>    <meta charset="UTF-8">    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>類型總金額與股票明細統計表</title>
-    <!-- 1. 引入 jQuery 與 Fancybox 燈箱套件 -->    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />    <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
-    <style>        body {            margin: 0;            padding: 20px 0; /* 上下保留間距，不使用 flex 垂直置中避免滾動定位跑版 */            min-height: 100vh;            background-color: #580000; /* 背景顏色（深紅/暗紅） */            display: block; /* 修正 : 改回預設區塊流 */        }
-        /* 2. 中間卡片主體 */        .card {            background-color: #ffffff;            border-radius: 16px; /* 圓角效果 */            padding: 8px;            width: 98%;            max-width: 800px;  /* 設定最大寬度 */            margin: 0 auto;    /* 修正 : 水平置中 */            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 陰影提升質感 */        }
-        /* 讓表格容器支援手機橫向滑動，避免螢幕太小破版 */        .table-container {            width: 100%;            max-width: 800px;            overflow-x: auto;            margin-bottom: 0px;        }
-        table {            width: 98%;            border-collapse: collapse;            text-align: center;            font-size: 18px;            border: 2px solid #000;            background-color: #fff;        }
-        th, td {            border: 1px solid #000;            padding: 8px 8px;            white-space: nowrap;        }
-        /* 表頭樣式 */        thead th {            background-color: #2b7cd3;            color: white;            font-weight: bold;        }
-        /* 各類型列的背景顏色對應 */        .row-市值ETF { background-color: #ffeb3b; }        .row-高息 { background-color: #ffe0b2; }        .row-主動息 { background-color: #e1bee7; }        .row-其它 { background-color: #bbdefb; }                /* 總計列樣式 */        tfoot tr {            background-color: #6d1a1a;            color: white;            font-weight: bold;        }
-        /* 表格2專屬：咖啡色與加粗字體 */        .table-dark-text {            color: #4a2e1b;            font-weight: bold;        }
-        .table-dark-text2 {            color: #006946;            font-weight: bold;        }
-        /* 損益顏色樣式 */        .profit-pos {            color: #0000ff !important;            font-weight: bold;        }        .profit-neg {            color: #ff0000 !important;            font-weight: bold;        }
-        /* 查看連結樣式 */        .btn-view {            color: #2b7cd3;            text-decoration: underline;            font-weight: bold;            cursor: pointer;        }
-        /* 設定 Fancybox 彈出 iframe 視窗的尺寸與居中 */        .fancybox-slide {            align-items: center !important; /* 確保在可視範圍內垂直置中 */        }
-        .fancybox-slide--iframe .fancybox-content {            width: 800px;            height: 600px;            max-width: 95%;            max-height: 90vh;        }
-        /* === 針對手機版 (螢幕寬度小於 600px 時) 的優化 === */        @media screen and (max-width: 600px) {            table {                font-size: 14px;            }            th, td {                padding: 2px 1px;            }            /* 將手機版 Home 圖示放大至 50px */            .home-icon img {                width: 50px !important;                height: 50px !important;            }
-            /* 手機版 Fancybox 外框：去除邊距並讓內容靠頂部對齊 */            .fancybox-slide {                padding: 0 !important;                align-items: flex-start !important;            }
-            /* 手機版 Fancybox iframe 內容：寬度與高度皆設為 100% */            .fancybox-slide--iframe .fancybox-content {                width: 100% !important;                height: 100% !important;                max-width: 100% !important;                max-height: 100% !important;                margin: 0 !important;            }        }
-        /* 頂部標題列與 Home 圖示 */        .header-bar {            position: relative;            display: flex;            align-items: center;            justify-content: center;            margin-bottom: 16px;            min-height: 36px;        }
-        .home-link {            position: absolute;            left: 0;            top: 50%;            transform: translateY(-50%);            display: flex;            align-items: center;            text-decoration: none;        }
-        .home-icon {            height: 50px;            width: auto;            cursor: pointer;            transition: transform 0.2s, opacity 0.2s;        }
-        .home-icon:hover {            transform: scale(1.1);            opacity: 0.85;        }    </style></head><body>
-    <div class="card">        <!-- 頂部標題區域 (包含左上角 HOME 圖示) -->        <div class="header-bar">            <a href="index.htm" class="home-link" title="返回首頁">                <img src="home.png" alt="首頁" class="home-icon">            </a>            <h2 style="font-size: 20px;color:#00F;">股票資產群組配置</h2>        </div>
-        <!-- 狀態與除錯顯示區 -->        <div id="status-bar" style="background: #e6f7ff; border: 0px solid #91d5ff; padding: 1px; font-size: 10px; margin-bottom: 2px; border-radius: 1px; color: #0050b3; word-break: break-all;">            狀態：初始化中...        </div>
-        <!-- 表格 1：類型總金額統計表 -->        <div class="table-container">
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>類型總金額與股票明細統計表</title>
+    
+    <!-- 1. 引入 jQuery 與 Fancybox 燈箱套件 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+    <style>
+        body { 
+            margin: 0; 
+            padding: 20px 0; /* 上下保留間距，不使用 flex 垂直置中避免滾動定位跑版 */ 
+            min-height: 100vh; 
+            background-color: #580000; /* 背景顏色（深紅/暗紅） */ 
+            display: block; /* 修正 : 改回預設區塊流 */
+        }
+        
+        /* 2. 中間卡片主體 */
+        .card { 
+            background-color: #ffffff; 
+            border-radius: 16px; /* 圓角效果 */ 
+            padding: 8px; 
+            width: 98%; 
+            max-width: 800px;  /* 設定最大寬度 */ 
+            margin: 0 auto;    /* 修正 : 水平置中 */ 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 陰影提升質感 */
+        }
+
+        /* 讓表格容器支援手機橫向滑動，避免螢幕太小破版 */
+        .table-container { 
+            width: 100%; 
+            max-width: 800px; 
+            overflow-x: auto; 
+            margin-bottom: 0px;
+        }
+
+        table { 
+            width: 98%; 
+            border-collapse: collapse; 
+            text-align: center; 
+            font-size: 18px; 
+            border: 2px solid #000; 
+            background-color: #fff;
+        }
+        th, td { 
+            border: 1px solid #000; 
+            padding: 8px 8px; 
+            white-space: nowrap;
+        }
+        /* 表頭樣式 */
+        thead th { 
+            background-color: #2b7cd3; 
+            color: white; 
+            font-weight: bold;
+        }
+
+        /* 各類型列的背景顏色對應 */
+        .row-市值ETF { background-color: #ffeb3b; }
+        .row-高息 { background-color: #ffe0b2; }
+        .row-主動息 { background-color: #e1bee7; }
+        .row-其它 { background-color: #bbdefb; }
+
+        /* 總計列樣式 */
+        tfoot tr { 
+            background-color: #6d1a1a; 
+            color: white; 
+            font-weight: bold;
+        }
+        /* 表格2專屬：咖啡色與加粗字體 */
+        .table-dark-text { color: #4a2e1b; font-weight: bold; }
+        .table-dark-text2 { color: #006946; font-weight: bold; }
+        
+        /* 損益顏色樣式（台股習慣：紅漲綠跌） */
+        .profit-pos { color: #ff0000 !important; font-weight: bold; } /* 正數：紅色 */
+        .profit-neg { color: #008000 !important; font-weight: bold; } /* 負數：綠色 */
+        
+        /* 查看連結樣式 */
+        .btn-view { color: #2b7cd3; text-decoration: underline; font-weight: bold; cursor: pointer; }
+        
+        /* 設定 Fancybox 彈出 iframe 視窗的尺寸與居中 */
+        .fancybox-slide { align-items: center !important; /* 確保在可視範圍內垂直置中 */ }
+        .fancybox-slide--iframe .fancybox-content { 
+            width: 800px; 
+            height: 600px; 
+            max-width: 95%; 
+            max-height: 90vh;
+        }
+
+        /* === 針對手機版 (螢幕寬度小於 600px 時) 的優化 === */
+        @media screen and (max-width: 600px) { 
+            table { font-size: 14px; } 
+            th, td { padding: 2px 1px; } 
+            /* 將手機版 Home 圖示放大至 50px */ 
+            .home-icon img { width: 50px !important; height: 50px !important; }
+            /* 手機版 Fancybox 外框：去除邊距並讓內容靠頂部對齊 */ 
+            .fancybox-slide { padding: 0 !important; align-items: flex-start !important; }
+            /* 手機版 Fancybox iframe 內容：寬度與高度皆設為 100% */ 
+            .fancybox-slide--iframe .fancybox-content { 
+                width: 100% !important; 
+                height: 100% !important; 
+                max-width: 100% !important; 
+                max-height: 100% !important; 
+                margin: 0 !important; 
+            }
+        }
+        
+        /* 頂部標題列與 Home 圖示 */
+        .header-bar { 
+            position: relative; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin-bottom: 16px; 
+            min-height: 36px;
+        }
+        .home-link { 
+            position: absolute; 
+            left: 0; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            display: flex; 
+            align-items: center; 
+            text-decoration: none;
+        }
+        .home-icon { 
+            height: 50px; 
+            width: auto; 
+            cursor: pointer; 
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        .home-icon:hover { transform: scale(1.1); opacity: 0.85; }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <!-- 頂部標題區域 (包含左上角 HOME 圖示) -->
+        <div class="header-bar">
+            <a href="index.htm" class="home-link" title="返回首頁">
+                <img src="home.png" alt="首頁" class="home-icon">
+            </a>
+            <h2 style="font-size: 20px;color:#00F;">股票資產群組配置</h2>
+        </div>
+        
+        <!-- 狀態與除錯顯示區 -->
+        <div id="status-bar" style="background: #e6f7ff; border: 0px solid #91d5ff; padding: 1px; font-size: 12px; margin-bottom: 1px; border-radius: 1px; color: #0050b3; word-break: break-all;">
+            狀態：初始化中...</div>
+
+        <!-- 表格 1：類型總金額統計表 -->
+        <div class="table-container">
             <table id="stoTable">
                 <thead>
                     <tr>
@@ -41,6 +170,7 @@
                 </tfoot>
             </table>
         </div>
+
         <!-- 表格 2：股票明細與損益統計表 -->
         <div class="table-container">
             <h2 style="color: #00f; text-align: center; font-size: 20px;">股票明細損益</h2>
@@ -64,119 +194,152 @@
         <br><br><br><br><br><br>
         <iframe src="go.htm" style="height: 5px; width: 100px; display: block; margin: 0 auto; border: none;"></iframe>
     </div>
+
     <!-- 載入外部資料 -->
     <script src="mysto.js"></script>
     <script>
         var s = "2002,2317,2303,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00918,00929,00939,00961,009816,00982A,00988A,00992A,006208";
-
         var ky = "00403A,00406A,00919,00982A,00988A,00992A,009816,00896,00929,0052";
         const apiUrl = 'https://script.google.com/macros/s/AKfycbwSaqH1nMChGjZLyFPCLSUDbxe546HpSs2HmGZp6qB9VHbXCcIebf2hU31iwGstNDjc6g/exec';
-        function getCookie(name) {            const value = `; ${document.cookie}`;
+
+        function getCookie(name) { 
+            const value = `; ${document.cookie}`;
             const parts = value.split(`; ${name}=`);
             if (parts.length === 2) return parts.pop().split(';').shift();
             return "";
         }
-        function renderTables() {            if (typeof mysto === 'undefined') {
+
+        function renderTables() {
+            if (typeof mysto === 'undefined') {
                 console.error("mysto 陣列未定義");
                 return;
             }
+
             const sList = s ? s.split(',') : [];
             const kyList = ky ? ky.split(',').map(item => item.trim()) : [];
+            
             const pr2Cookie = decodeURIComponent(getCookie("pr2"));
-            const pr2List = pr2Cookie ? pr2Cookie.split(/[\r\n,]+/) : [];
+            const hasPr2 = pr2Cookie && pr2Cookie.trim() !== "";
+            const pr2List = hasPr2 ? pr2Cookie.split(/[\r\n,]+/) : [];
+            
             const priceMap = {};
             sList.forEach((sid, index) => {
                 if (sid) {
                     const cleanSid = String(sid).trim();
-                    const parsedPrice = parseFloat(pr2List[index]);
-                    if (!isNaN(parsedPrice)) {
-                        priceMap[cleanSid] = parsedPrice;
+                    if (hasPr2 && pr2List[index] !== undefined) {
+                        const parsedPrice = parseFloat(pr2List[index]);
+                        if (!isNaN(parsedPrice)) {
+                            priceMap[cleanSid] = parsedPrice;
+                        }
                     }
                 }
             });
+
             mysto.forEach(item => {
                 if (item.sid) {
                     const cleanSid = String(item.sid).trim();
-                    if (priceMap[cleanSid] !== undefined && priceMap[cleanSid] > 0) {
+                    if (hasPr2 && priceMap[cleanSid] !== undefined && priceMap[cleanSid] > 0) {
                         item.price = priceMap[cleanSid];
-                    } else if (item.price === undefined || isNaN(item.price) || item.price === 0) {
-                        item.price = item.buy || 0;
+                    } else {
+                        item.price = null;
                     }
                 }
+                
                 const buyPrice = parseFloat(item.buy) || 0;
-                const currentPrice = parseFloat(item.price) || 0;
-                if (buyPrice > 0) {
+                const currentPrice = item.price !== null ? parseFloat(item.price) : NaN;
+                
+                if (!isNaN(currentPrice) && buyPrice > 0) {
                     item.ra = (((currentPrice - buyPrice) / buyPrice) * 100).toFixed(2) + '%';
                 } else {
                     item.ra = '0.00%';
                 }
             });
+
             const groupData = {};
             const groupData2 = {};
+            let hasValidPriceGlobal = hasPr2;
+
             mysto.forEach(item => {
                 const gro = item.gro || "其它";
                 const cost = parseFloat(item.cost) || 0;
-                const price = parseFloat(item.price) || 0;
                 const no = parseFloat(item.no) || 0;
-                const cost2 = price * no;
+                
                 if (!groupData[gro]) {
                     groupData[gro] = 0;
                     groupData2[gro] = 0;
                 }
                 groupData[gro] += cost;
-                groupData2[gro] += cost2;
+
+                if (item.price !== null && !isNaN(item.price)) {
+                    groupData2[gro] += (item.price * no);
+                } else {
+                    hasValidPriceGlobal = false;
+                }
             });
+
             const predefinedGroups = [
                 { name: "市值ETF", remark: "0052,9816" },
                 { name: "高息", remark: "高股息" },
                 { name: "主動息", remark: "代號為A" },
                 { name: "其它", remark: "一般股票" }
             ];
+
+            // 渲染表格 1：類型總金額統計表
             const tbody = document.getElementById('tableBody');
             if (tbody) {
                 tbody.innerHTML = "";
                 let totalSum = 0;
                 let totalSum2 = 0;
+                
                 predefinedGroups.forEach(group => {
                     totalSum += groupData[group.name] || 0;
                     totalSum2 += groupData2[group.name] || 0;
                 });
+
                 predefinedGroups.forEach(group => {
                     const cost = groupData[group.name] || 0;
                     const cost2 = groupData2[group.name] || 0;
                     const ratio = totalSum > 0 ? ((cost / totalSum) * 100).toFixed(1) + '%' : '0.0%';
+                    const displayCost2 = hasValidPriceGlobal ? Math.round(cost2).toLocaleString() : "--";
+
                     const tr = document.createElement('tr');
                     tr.className = `row-${group.name}`;
                     tr.innerHTML = `
                         <td>${group.name}</td>
                         <td style="text-align: right;">${Math.round(cost).toLocaleString()}</td>
-                        <td style="text-align: right;">${Math.round(cost2).toLocaleString()}</td>
+                        <td style="text-align: right;">${displayCost2}</td>
                         <td>${ratio}</td>
                         <td style="text-align: center;font-size:14px;color:#00F;">${group.remark}</td>
                     `;
                     tbody.appendChild(tr);
                 });
+
                 const tfoot = document.getElementById('tableFoot');
                 if (tfoot) {
                     tfoot.innerHTML = "";
                     const footTr = document.createElement('tr');
+                    const displayTotalSum2 = hasValidPriceGlobal ? Math.round(totalSum2).toLocaleString() : "--";
+                    
                     footTr.innerHTML = `
                         <td>總計</td>
                         <td style="text-align: right;">${Math.round(totalSum).toLocaleString()}</td>
-                        <td style="text-align: right;">${Math.round(totalSum2).toLocaleString()}</td>
-                        <td>損益</td>
-                        <td style="text-align: right;" id="profit-cell">XX</td>
+                        <td style="text-align: right;">${displayTotalSum2}</td>
+                        <td style=";background-color: #fff9c4;color: blue;">損益</td>
+                        <td style="text-align: right;background-color: #fff9c4;" id="profit-cell">--</td>
                     `;
                     tfoot.appendChild(footTr);
                 }
             }
+
+            // 整理個股資料
             const stockMap = {};
             mysto.forEach(item => {
                 const sid = item.sid ? String(item.sid).trim() : "未知";
                 const name = item.na || item.name || item.sname || item.stockName || "";
                 const no = parseFloat(item.no) || 0;
                 const buy = parseFloat(item.buy) || 0;
-                const price = parseFloat(item.price) || 0;
+                const price = item.price;
+
                 if (!stockMap[sid]) {
                     stockMap[sid] = {
                         sid: sid,
@@ -187,39 +350,56 @@
                     };
                 } else {
                     if (!stockMap[sid].name && name) stockMap[sid].name = name;
-                    stockMap[sid].price = price;
+                    if (price !== null) stockMap[sid].price = price;
                 }
                 stockMap[sid].totalNo += no;
                 stockMap[sid].totalBuyWeight += (buy * no);
             });
+
             const sortedStocks = Object.values(stockMap).sort((a, b) => {
                 const numA = parseFloat(a.sid) || 0;
                 const numB = parseFloat(b.sid) || 0;
                 return numA - numB;
             });
+
+            // 渲染表格 2：股票明細與損益統計表
             const tbody2 = document.getElementById('tableBody2');
             if (tbody2) {
                 tbody2.innerHTML = "";
                 var tol9 = 0;
+                var hasValidProfit = hasPr2;
+
                 sortedStocks.forEach(stock => {
                     const avgBuy = stock.totalNo > 0 ? (stock.totalBuyWeight / stock.totalNo) : 0;
                     const fixedAvgBuy = Number(avgBuy.toFixed(2));
-                    const fixedPrice = Number(Number(stock.price).toFixed(2));
-                    const profit2 = Math.round((fixedPrice - fixedAvgBuy) * stock.totalNo);
-                    const totalMarketValue = stock.totalNo * fixedPrice;
-                    const totalCostValue = stock.totalBuyWeight;
-                    const profit = totalMarketValue - totalCostValue;
+                    
+                    let fixedPrice = "--";
+                    let profit2Text = "--";
                     let profitClass = 'table-dark-text';
-                    if (profit2 > 0) {
-                        profitClass = 'profit-pos';
-                    } else if (profit2 < 0) {
-                        profitClass = 'profit-neg';
+
+                    if (stock.price !== null && !isNaN(stock.price)) {
+                        fixedPrice = Number(Number(stock.price).toFixed(2)).toFixed(2);
+                        const p2 = Math.round((stock.price - fixedAvgBuy) * stock.totalNo);
+                        tol9 += p2;
+
+                        if (p2 > 0) {
+                            profit2Text = '+' + p2.toLocaleString();
+                            profitClass = 'profit-pos'; // 正數：紅色
+                        } else if (p2 < 0) {
+                            profit2Text = p2.toLocaleString(); // 負數內建負號
+                            profitClass = 'profit-neg'; // 負數：綠色
+                        } else {
+                            profit2Text = '0';
+                        }
+                    } else {
+                        hasValidProfit = false;
                     }
-                    tol9 += profit2;
+
                     const isKyStock = kyList.includes(stock.sid);
                     const nameHtml = isKyStock 
                         ? `<a class="btn-view" data-fancybox data-type="iframe" href="da5z.htm?p=${stock.sid}" style="color: #0000ff; text-decoration: underline; font-weight: bold;">${stock.name}</a>` 
                         : stock.name;
+
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td style="font-size:18px;"><a class="btn-view" data-fancybox data-type="iframe" href="2cb.htm?p=${stock.sid}"><img src="bk1.png"></a></td>
@@ -227,24 +407,50 @@
                         <td class="table-dark-text" style="text-align: left;font-size:13px;">${nameHtml}</td>
                         <td style="text-align: right;" class="table-dark-text">${stock.totalNo.toLocaleString()}</td>
                         <td style="font-size:18px;text-align: right;" class="table-dark-text">${fixedAvgBuy.toFixed(2)}</td>
-                        <td style="font-size:18px;text-align: right;" class="table-dark-text2">${fixedPrice.toFixed(2)}</td>
-                        <td style="font-size:18px;text-align: right;" class="${profitClass}">${profit2.toLocaleString()}</td>
+                        <td style="font-size:18px;text-align: right;" class="table-dark-text2">${fixedPrice}</td>
+                        <td style="font-size:18px;text-align: right;" class="${profitClass}">${profit2Text}</td>
                     `;
                     tbody2.appendChild(tr);
                 });
-                tol9 = Math.round(tol9);
+
+                // 更新總計列的損益
                 const profitCell = document.getElementById('profit-cell');
                 if (profitCell) {
-                    profitCell.textContent = tol9.toLocaleString();
+                    if (hasValidProfit) {
+                        if (tol9 > 0) {
+                            profitCell.textContent = '+' + Math.round(tol9).toLocaleString();
+                            profitCell.className = 'profit-pos';
+                        } else if (tol9 < 0) {
+                            profitCell.textContent = Math.round(tol9).toLocaleString();
+                            profitCell.className = 'profit-neg';
+                        } else {
+                            profitCell.textContent = '0';
+                            profitCell.className = '';
+                        }
+                    } else {
+                        profitCell.textContent = "--";
+                        profitCell.className = '';
+                    }
                 }
             }
         }
+
         async function fetchAndUpdateStockPrices() {
-renderTables()
-          
+            // 取得目前時間並格式化為 MM:SS
+            const now = new Date();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            // 更新 status-bar 內容
+            document.getElementById('status-bar').textContent = `資料更新[${minutes}:${seconds}]……`;
+            
+            renderTables();
         }
+
         window.onload = function() {
             fetchAndUpdateStockPrices();
             setInterval(fetchAndUpdateStockPrices, 10000);
         };
-    </script></body></html>
+    </script>
+</body>
+</html>
