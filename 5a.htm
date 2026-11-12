@@ -407,7 +407,9 @@
                     tr.innerHTML = `
                         <td style="font-size:12px;"><a class="btn-view" data-fancybox data-type="iframe" href="2cb.htm?p=${stock.sid}"><img src="bk1.png"></a></td>
                         <td class="table-dark-text"><a class="btn-view" data-fancybox data-type="iframe" href="3az.htm?p=${stock.sid}">${stock.sid}</a></td>
-                        <td class="table-dark-text" style="text-align: left;font-size:13px;">${nameHtml}</td>
+     
+<td class="table-dark-text" style="text-align: left; font-size: 15px; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${nameHtml}</td>
+
                         <td style="font-size:13px;text-align: right;" class="table-dark-text">${stock.totalNo.toLocaleString()}</td>
                         <td style="font-size:15px;text-align: right;" class="table-dark-text">${fixedAvgBuy.toFixed(2)}</td>
                         <td style="font-size:15px;text-align: right;" class="table-dark-text2">${fixedPrice}</td>
