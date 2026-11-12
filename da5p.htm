@@ -340,11 +340,17 @@ th {
         const isOddRow = (index % 2 === 0);
         const rowBgClass = isOddRow ? 'bg-[#fef9c3] hover:bg-yellow-200/80' : 'bg-[#e0f2fe] hover:bg-sky-200/80';
 
+
+
+
+const noo = item.no ? `-${item.no}張` : "";
+
         const tr = document.createElement('tr');
         tr.className = `${rowBgClass} transition-colors border-b border-slate-200/60`;
         tr.innerHTML = `
           <td style="font-size: 12px; color: #1d4ed8; padding: 4px;" class="text-left pl-3 font-semibold text-slate-900">${item.sid}</td>
-          <td style="font-size: 12px; color: #1d4ed8; padding: 4px;" class="text-center font-semibold text-slate-900">${item.na}</td>
+          <td style="font-size: 12px; color: #1d4ed8; padding: 4px;" class="text-center font-semibold text-slate-900">${item.na}
+<span style="color: #F00;">${noo}</span></td>
           <td style="font-size: 14px; color: #1d4ed8; padding: 4px;" class="text-center">${da1Date.formatted}</td>
           <td style="font-size: 14px; color: #1d4ed8; padding: 4px;" class="text-center">${da2Date.formatted}</td>
           <td style="font-size: 14px; color: #1d4ed8; padding: 4px;" class="text-center">${formattedRa}</td>
