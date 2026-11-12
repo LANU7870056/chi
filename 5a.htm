@@ -42,13 +42,13 @@
             width: 98%; 
             border-collapse: collapse; 
             text-align: center; 
-            font-size: 18px; 
+            font-size: 16px; 
             border: 2px solid #000; 
             background-color: #fff;
         }
         th, td { 
             border: 1px solid #000; 
-            padding: 8px 8px; 
+            padding: 2px 2px; 
             white-space: nowrap;
         }
         /* 表頭樣式 */
@@ -76,7 +76,7 @@
         
         /* 損益顏色樣式（台股習慣：紅漲綠跌） */
         .profit-pos { color: #ff0000 !important; font-weight: bold; } /* 正數：紅色 */
-        .profit-neg { color: #008000 !important; font-weight: bold; } /* 負數：綠色 */
+        .profit-neg { color:#004D40 !important; font-weight: bold; } /* 負數：綠色 */
         
         /* 查看連結樣式 */
         .btn-view { color: #2b7cd3; text-decoration: underline; font-weight: bold; cursor: pointer; }
@@ -408,10 +408,10 @@
                         <td style="font-size:12px;"><a class="btn-view" data-fancybox data-type="iframe" href="2cb.htm?p=${stock.sid}"><img src="bk1.png"></a></td>
                         <td class="table-dark-text"><a class="btn-view" data-fancybox data-type="iframe" href="3az.htm?p=${stock.sid}">${stock.sid}</a></td>
                         <td class="table-dark-text" style="text-align: left;font-size:13px;">${nameHtml}</td>
-                        <td style="text-align: right;" class="table-dark-text">${stock.totalNo.toLocaleString()}</td>
+                        <td style="font-size:13px;text-align: right;" class="table-dark-text">${stock.totalNo.toLocaleString()}</td>
                         <td style="font-size:15px;text-align: right;" class="table-dark-text">${fixedAvgBuy.toFixed(2)}</td>
                         <td style="font-size:15px;text-align: right;" class="table-dark-text2">${fixedPrice}</td>
-                        <td style="font-size:15px;text-align: right;" class="${profitClass}">${profit2Text}</td>
+                        <td style="font-size:17px;text-align: right;" class="${profitClass}">${profit2Text}</td>
                     `;
                     tbody2.appendChild(tr);
                 });
