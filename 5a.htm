@@ -197,11 +197,9 @@
 
     <!-- 載入外部資料 -->
     <script src="mysto.js"></script>
+    <script src="s.js"></script>
     <script>
-        var s = "2002,2317,2303,2330,2354,2610,4906,6182,6770,6781,00403A,00406A,0050,0052,00896,00919,00918,00929,00939,00961,009816,00982A,00988A,00992A,006208";
-        var ky = "00403A,00406A,00919,00982A,00988A,00992A,009816,00896,00929,0052,00961";
 
-//const apiUrl = 'https://script.google.com/macros/s/AKfycbwSaqH1nMChGjZLyFPCLSUDbxe546HpSs2HmGZp6qB9VHbXCcIebf2hU31iwGstNDjc6g/exec';
 
         function getCookie(name) { 
             const value = `; ${document.cookie}`;
@@ -218,12 +216,11 @@
 
             const sList = s ? s.split(',') : [];
             const kyList = ky ? ky.split(',').map(item => item.trim()) : [];
+            const selList = sel ? sel.split(',').map(item => item.trim()) : [];
             
             const pr2Cookie = decodeURIComponent(getCookie("pr2"));
             const hasPr2 = pr2Cookie && pr2Cookie.trim() !== "";
             const pr2List = hasPr2 ? pr2Cookie.split(/[\r\n,]+/) : [];
-
-
             
             const priceMap = {};
             sList.forEach((sid, index) => {
@@ -403,13 +400,18 @@
                         ? `<a class="btn-view" data-fancybox data-type="iframe" href="da5z.htm?p=${stock.sid}" style="color: #0000ff; text-decoration: underline; font-weight: bold;">${stock.name}</a>` 
                         : stock.name;
 
+                    // 檢查是否符合 sel 變數清單，若符合則設定背景色為淺紅色
+                    const isSelMatch = selList.includes(stock.sid);
+
                     const tr = document.createElement('tr');
+                    if (isSelMatch) {
+                        tr.style.backgroundColor = '#ffcdd2'; // 淺紅色底色
+                    }
+
                     tr.innerHTML = `
                         <td style="font-size:12px;"><a class="btn-view" data-fancybox data-type="iframe" href="2cb.htm?p=${stock.sid}"><img src="bk1.png"></a></td>
                         <td class="table-dark-text"><a class="btn-view" data-fancybox data-type="iframe" href="3az.htm?p=${stock.sid}">${stock.sid}</a></td>
-     
-<td class="table-dark-text" style="text-align: left; font-size: 15px; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${nameHtml}</td>
-
+                        <td class="table-dark-text" style="text-align: left; font-size: 15px; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${nameHtml}</td>
                         <td style="font-size:13px;text-align: right;" class="table-dark-text">${stock.totalNo.toLocaleString()}</td>
                         <td style="font-size:15px;text-align: right;" class="table-dark-text">${fixedAvgBuy.toFixed(2)}</td>
                         <td style="font-size:15px;text-align: right;" class="table-dark-text2">${fixedPrice}</td>
