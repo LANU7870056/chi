@@ -49,9 +49,9 @@ body {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     background-color: #fff;
-    box-shadow: 0 2px 2px rgba(0,0,0,0.1);
-    border-radius: 2px;
-    margin-top: 2px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+    border-radius: 1px;
+    margin-top: 1px;
 }
 
 table {
@@ -71,7 +71,7 @@ td {
 
 th {
     background-color: #007bff;
-    padding: 2px 1px;
+    padding: 1px 1px;
     color: white;
     position: sticky;
     top: 0;
@@ -149,13 +149,13 @@ th {
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-[16px] sm:text-[18px] whitespace-nowrap">
             <thead>
-              <tr class="bg-slate-100 border-b border-slate-200 font-semibold">
+              <tr class="bg-slate-95 border-b border-slate-180 font-semibold">
                 <th style="font-size: 16px;" class="py-1 px-1 text-left responsive-th">股號</th>
                 <th style="font-size: 16px;" class="py-1 px-1 text-center responsive-th">名稱</th>
-                <th style="font-size: 16px;" class="py-1 px-1 text-center responsive-th">除息日</th>
-                <th style="font-size: 16px;" class="py-1 px-1 text-center responsive-th">發放日</th>
+                <th style="font-size: 16px;" class="py-1 px-1 text-center responsive-th">除息</th>
+                <th style="font-size: 16px;" class="py-1 px-1 text-center responsive-th">發放</th>
                 <th style="font-size: 16px;" class="py-1 px-1 text-center responsive-th">股利</th>
-                <th style="font-size: 16px;" class="py-1 px-1 text-right responsive-th">股利收入</th>
+                <th style="font-size: 16px;" class="py-1 px-1 text-right responsive-th">收入</th>
               </tr>
             </thead>
             <tbody id="tableBody" class="divide-y divide-slate-200/50">
@@ -343,18 +343,18 @@ th {
 
 
 
-const noo = item.no ? `-${item.no}張` : "";
+const noo = item.no ? `-${item.no}` : "";
 
         const tr = document.createElement('tr');
         tr.className = `${rowBgClass} transition-colors border-b border-slate-200/60`;
         tr.innerHTML = `
-          <td style="font-size: 12px; color: #1d4ed8; padding: 4px;" class="text-left pl-3 font-semibold text-slate-900">${item.sid}</td>
-          <td style="font-size: 12px; color: #1d4ed8; padding: 4px;" class="text-center font-semibold text-slate-900">${item.na}
+<td style="font-size: 13px; color: #1d4ed8; padding: 1px;" class="text-left pl-3 font-semibold text-slate-900">${item.sid}</td>
+<td style="font-size: 12px; color: #1d4ed8; padding: 1px;" class="text-left font-semibold text-slate-900">${item.na}
 <span style="color: #F00;">${noo}</span></td>
-          <td style="font-size: 14px; color: #1d4ed8; padding: 4px;" class="text-center">${da1Date.formatted}</td>
-          <td style="font-size: 14px; color: #1d4ed8; padding: 4px;" class="text-center">${da2Date.formatted}</td>
-          <td style="font-size: 14px; color: #1d4ed8; padding: 4px;" class="text-center">${formattedRa}</td>
-          <td style="font-size: 14px; color: #1d4ed8; padding: 4px;" class="text-right pr-3 font-semibold">${formattedInc}</td>
+          <td style="font-size: 13px; color: #1d4ed8; padding: 2px;" class="text-center">${da1Date.formatted}</td>
+          <td style="font-size: 13px; color: #1d4ed8; padding: 2px;" class="text-center">${da2Date.formatted}</td>
+          <td style="font-size: 13px; color: #1d4ed8; padding: 2px;" class="text-center">${formattedRa}</td>
+          <td style="font-size: 15px; color: #1d4ed8; padding: 2px;" class="text-right pr-3 font-semibold">${formattedInc}</td>
         `;
         tBody.appendChild(tr);
       });
