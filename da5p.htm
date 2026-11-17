@@ -154,8 +154,9 @@ th {
                 <th style="font-size: 14px;" class="py-1 px-1 text-center responsive-th">名稱</th>
                 <th style="font-size: 14px;" class="py-1 px-1 text-center responsive-th">除息日</th>
                 <th style="font-size: 14px;" class="py-1 px-1 text-center responsive-th">發放日</th>
-                <th style="font-size: 14px;" class="py-1 px-1 text-center responsive-th">股利</th>
                 <th style="font-size: 14px;" class="py-1 px-1 text-right responsive-th">收入</th>
+                <th style="font-size: 14px;" class="py-1 px-1 text-center responsive-th">股利</th>
+
               </tr>
             </thead>
             <tbody id="tableBody" class="divide-y divide-slate-200/50">
@@ -353,8 +354,9 @@ const noo = item.no ? `-${item.no}` : "";
 <span style="color: #F00;">${noo}</span></td>
           <td style="font-size: 13px; color: #1d4ed8; padding: 2px;" class="text-center">${da1Date.formatted}</td>
           <td style="font-size: 13px; color: #1d4ed8; padding: 2px;" class="text-center">${da2Date.formatted}</td>
-          <td style="font-size: 13px; color: #1d4ed8; padding: 2px;" class="text-center">${formattedRa}</td>
           <td style="font-size: 15px; color: #1d4ed8; padding: 2px;" class="text-right pr-3 font-semibold">${formattedInc}</td>
+          <td style="font-size: 13px; color: #1d4ed8; padding: 2px;" class="text-center">${formattedRa}</td>
+
         `;
         tBody.appendChild(tr);
       });
