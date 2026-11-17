@@ -152,6 +152,7 @@ th {
               <tr class="bg-slate-95 border-b border-slate-180 font-semibold">
                 <th style="font-size: 14px;" class="py-1 px-1 text-left responsive-th">股號</th>
                 <th style="font-size: 14px;" class="py-1 px-1 text-center responsive-th">名稱</th>
+                <th style="font-size: 14px;" class="py-1 px-1 text-center responsive-th">名稱</th>
                 <th style="font-size: 14px;" class="py-1 px-1 text-center responsive-th">除息日</th>
                 <th style="font-size: 14px;" class="py-1 px-1 text-center responsive-th">發放日</th>
                 <th style="font-size: 14px;" class="py-1 px-1 text-right responsive-th">收入</th>
@@ -344,14 +345,14 @@ th {
 
 
 
-const noo = item.no ? `-${item.no}` : "";
+const noo = item.no ? `${item.no}` : "";
 
         const tr = document.createElement('tr');
         tr.className = `${rowBgClass} transition-colors border-b border-slate-200/60`;
         tr.innerHTML = `
 <td style="font-size: 13px; color: #1d4ed8; padding: 1px;" class="text-left pl-3 font-semibold text-slate-900">${item.sid}</td>
-<td style="font-size: 12px; color: #1d4ed8; padding: 1px;" class="text-left font-semibold text-slate-900">${item.na}
-<span style="color: #F00;">${noo}</span></td>
+<td style="font-size: 12px; color: #1d4ed8; padding: 1px;" class="text-left font-semibold text-slate-900">${item.na}</td>
+          <td style="font-size: 13px; color: #1d4ed8; padding: 2px;" class="text-center"><span style="color: #F00;">${noo}</td>
           <td style="font-size: 13px; color: #1d4ed8; padding: 2px;" class="text-center">${da1Date.formatted}</td>
           <td style="font-size: 13px; color: #1d4ed8; padding: 2px;" class="text-center">${da2Date.formatted}</td>
           <td style="font-size: 15px; color: #1d4ed8; padding: 2px;" class="text-right pr-3 font-semibold">${formattedInc}</td>
